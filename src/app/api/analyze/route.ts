@@ -3,16 +3,20 @@ import { analyzeText } from '@/lib/openai/client'
 import { z } from 'zod'
 
 const requestSchema = z.object({
-  text: z.string().min(1, 'Text is required'),
-  prompt: z.string().optional(),
+  text: z.string().min(1, 'Text is required').max(10000, 'Text too long'),
+  prompt: z.string().max(500, 'Prompt too long').optional(),
 })
 
 export async function POST(request: NextRequest) {
   try {
+    // Parse and validate request body
     const body = await request.json()
     const { text, prompt } = requestSchema.parse(body)
 
-    const analysis = await analyzeText(text, prompt)
+    // Sanitize input - remove any potential script tags
+    const sanitizedText = text.replace(/<script[^>]*>.*?<\/script>/gi, '')
+
+    const analysis = await analyzeText(sanitizedText, prompt)
 
     return NextResponse.json({
       success: true,
@@ -32,6 +36,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Don't expose internal error details
     return NextResponse.json(
       {
         success: false,

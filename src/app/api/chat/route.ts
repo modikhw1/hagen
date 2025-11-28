@@ -6,9 +6,9 @@ const requestSchema = z.object({
   messages: z.array(
     z.object({
       role: z.enum(['system', 'user', 'assistant']),
-      content: z.string(),
+      content: z.string().max(5000, 'Message too long'),
     })
-  ),
+  ).max(20, 'Too many messages'),
 })
 
 export async function POST(request: NextRequest) {
@@ -16,7 +16,13 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { messages } = requestSchema.parse(body)
 
-    const response = await chat(messages as ChatMessage[])
+    // Sanitize message content
+    const sanitizedMessages = messages.map(msg => ({
+      ...msg,
+      content: msg.content.replace(/<script[^>]*>.*?<\/script>/gi, '')
+    }))
+
+    const response = await chat(sanitizedMessages as ChatMessage[])
 
     return NextResponse.json({
       success: true,
@@ -38,6 +44,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Don't expose internal error details
     return NextResponse.json(
       {
         success: false,
