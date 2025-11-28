@@ -1,0 +1,1 @@
+export { TextAnalyzer } from './TextAnalyzer'
