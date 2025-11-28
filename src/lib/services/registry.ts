@@ -117,7 +117,7 @@ class ServiceRegistry {
     // OpenAI embeddings
     if (process.env.OPENAI_API_KEY) {
       try {
-        const model = process.env.OPENAI_EMBEDDING_MODEL || 'text-embedding-3-large'
+        const model = process.env.OPENAI_EMBEDDING_MODEL || 'text-embedding-3-small'
         this.setEmbeddingProvider(createOpenAIEmbeddings(undefined, model))
       } catch (e) {
         console.warn('⚠️  Could not initialize OpenAI embeddings:', e)

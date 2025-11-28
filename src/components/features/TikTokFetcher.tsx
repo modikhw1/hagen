@@ -7,42 +7,39 @@ import { Card } from '@/components/ui/Card'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
 interface TikTokData {
-  platform?: string
-  type?: string
-  id?: string
-  url?: string
-  title?: string | null
-  description?: string | null
-  author?: {
+  platform: string
+  type: string
+  id: string
+  url: string
+  title: string | null
+  description: string | null
+  author: {
     username: string
     displayName: string
     avatarUrl: string
     verified: boolean
   }
-  stats?: {
+  stats: {
     views: number | null
     likes: number | null
     comments: number | null
     shares: number | null
   }
-  media?: {
+  media: {
     type: string
     duration?: number
     thumbnailUrl?: string
   }
-  tags?: string[]
-  createdAt?: string
+  tags: string[]
+  createdAt: string
   transcript?: string
   additionalData?: any
-  _warnings?: {
-    metadata?: string
-    transcript?: string
-  }
 }
 
 export function TikTokFetcher() {
   const [url, setUrl] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [loadingStatus, setLoadingStatus] = useState<string>('')
   const [result, setResult] = useState<TikTokData | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -50,19 +47,31 @@ export function TikTokFetcher() {
     if (!url.trim()) return
 
     setIsLoading(true)
+    setLoadingStatus('Fetching video metadata...')
     setError(null)
     setResult(null)
 
     try {
       const response = await fetch('/api/tiktok', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          url,
+          include_transcript: true 
+        }),
       })
 
       const data = await response.json()
+      
+      console.log('API Response:', data)
+      console.log('Transcript value:', data.data?.transcript)
+      console.log('Transcript type:', typeof data.data?.transcript)
 
       if (data.success) {
+        setLoadingStatus('Processing transcript...')
+        console.log('Setting result with data:', data.data)
         setResult(data.data)
       } else {
         setError(data.error || 'Failed to fetch TikTok data')
@@ -72,6 +81,7 @@ export function TikTokFetcher() {
       console.error(err)
     } finally {
       setIsLoading(false)
+      setLoadingStatus('')
     }
   }
 
@@ -99,7 +109,10 @@ export function TikTokFetcher() {
         <Card>
           <div className="flex flex-col items-center justify-center py-8 space-y-3">
             <LoadingSpinner />
-            <p className="text-gray-600">Fetching video metadata...</p>
+            <div className="text-center">
+              <p className="text-gray-900 font-medium">{loadingStatus}</p>
+              <p className="text-sm text-gray-500 mt-1">This may take 10-30 seconds</p>
+            </div>
           </div>
         </Card>
       )}
@@ -123,29 +136,27 @@ export function TikTokFetcher() {
               </div>
             )}
 
-            {result.author && (
-              <div>
-                <h4 className="font-semibold text-gray-700 mb-2">Author</h4>
-                <div className="flex items-center gap-2">
-                  {result.author.avatarUrl && (
-                    <img 
-                      src={result.author.avatarUrl} 
-                      alt={result.author.displayName}
-                      className="w-10 h-10 rounded-full"
-                    />
-                  )}
-                  <div>
-                    <p className="font-medium text-gray-900">
-                      {result.author.displayName}
-                      {result.author.verified && (
-                        <span className="ml-1 text-blue-500">✓</span>
-                      )}
-                    </p>
-                    <p className="text-sm text-gray-500">@{result.author.username}</p>
-                  </div>
+            <div>
+              <h4 className="font-semibold text-gray-700 mb-2">Author</h4>
+              <div className="flex items-center gap-2">
+                {result.author.avatarUrl && (
+                  <img 
+                    src={result.author.avatarUrl} 
+                    alt={result.author.displayName}
+                    className="w-10 h-10 rounded-full"
+                  />
+                )}
+                <div>
+                  <p className="font-medium text-gray-900">
+                    {result.author.displayName}
+                    {result.author.verified && (
+                      <span className="ml-1 text-blue-500">✓</span>
+                    )}
+                  </p>
+                  <p className="text-sm text-gray-500">@{result.author.username}</p>
                 </div>
               </div>
-            )}
+            </div>
 
             {result.description && (
               <div>
@@ -170,45 +181,43 @@ export function TikTokFetcher() {
               </div>
             )}
 
-            {result.stats && (
-              <div>
-                <h4 className="font-semibold text-gray-700 mb-2">Statistics</h4>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {result.stats.views !== null && (
-                    <div className="bg-gray-50 p-3 rounded-lg">
-                      <p className="text-sm text-gray-500">Views</p>
-                      <p className="text-xl font-bold text-gray-900">
-                        {result.stats.views.toLocaleString()}
-                      </p>
-                    </div>
-                  )}
-                  {result.stats.likes !== null && (
-                    <div className="bg-gray-50 p-3 rounded-lg">
-                      <p className="text-sm text-gray-500">Likes</p>
-                      <p className="text-xl font-bold text-gray-900">
-                        {result.stats.likes.toLocaleString()}
-                      </p>
-                    </div>
-                  )}
-                  {result.stats.comments !== null && (
-                    <div className="bg-gray-50 p-3 rounded-lg">
-                      <p className="text-sm text-gray-500">Comments</p>
-                      <p className="text-xl font-bold text-gray-900">
-                        {result.stats.comments.toLocaleString()}
-                      </p>
-                    </div>
-                  )}
-                  {result.stats.shares !== null && (
-                    <div className="bg-gray-50 p-3 rounded-lg">
-                      <p className="text-sm text-gray-500">Shares</p>
-                      <p className="text-xl font-bold text-gray-900">
-                        {result.stats.shares.toLocaleString()}
-                      </p>
-                    </div>
-                  )}
-                </div>
+            <div>
+              <h4 className="font-semibold text-gray-700 mb-2">Statistics</h4>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {result.stats.views !== null && (
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-sm text-gray-500">Views</p>
+                    <p className="text-xl font-bold text-gray-900">
+                      {result.stats.views.toLocaleString()}
+                    </p>
+                  </div>
+                )}
+                {result.stats.likes !== null && (
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-sm text-gray-500">Likes</p>
+                    <p className="text-xl font-bold text-gray-900">
+                      {result.stats.likes.toLocaleString()}
+                    </p>
+                  </div>
+                )}
+                {result.stats.comments !== null && (
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-sm text-gray-500">Comments</p>
+                    <p className="text-xl font-bold text-gray-900">
+                      {result.stats.comments.toLocaleString()}
+                    </p>
+                  </div>
+                )}
+                {result.stats.shares !== null && (
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-sm text-gray-500">Shares</p>
+                    <p className="text-xl font-bold text-gray-900">
+                      {result.stats.shares.toLocaleString()}
+                    </p>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
 
             {result.additionalData?.music && (
               <div>
@@ -218,6 +227,23 @@ export function TikTokFetcher() {
                 </p>
               </div>
             )}
+
+            <div>
+              <h4 className="font-semibold text-gray-700 mb-2">Transcript</h4>
+              {result.transcript ? (
+                <div className="bg-gray-50 p-4 rounded-lg max-h-64 overflow-y-auto">
+                  <p className="text-gray-600 whitespace-pre-wrap leading-relaxed">
+                    {result.transcript}
+                  </p>
+                </div>
+              ) : (
+                <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                  <p className="text-blue-800 text-sm">
+                    ℹ️ No transcript could be generated for this video. This may happen if the video has no audio, is too long, or the platform doesn't allow access.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </Card>
       )}

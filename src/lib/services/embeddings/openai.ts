@@ -3,8 +3,8 @@ import type { EmbeddingProvider } from '../types'
 
 export class OpenAIEmbeddingProvider implements EmbeddingProvider {
   name = 'openai'
-  model = 'text-embedding-3-large'
-  dimensions = 3072
+  model = 'text-embedding-3-small'
+  dimensions = 1536
   
   private client: OpenAI
 

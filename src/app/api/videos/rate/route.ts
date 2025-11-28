@@ -50,8 +50,9 @@ export async function POST(request: NextRequest) {
       .from('analyzed_videos')
       .update({
         user_ratings: updatedRatings,
-        tags: tags || video.tags,
-        notes: notes || video.notes
+        user_tags: tags || video.user_tags,
+        user_notes: notes || video.user_notes,
+        rated_at: new Date().toISOString()
       })
       .eq('id', videoId)
 
@@ -64,18 +65,34 @@ export async function POST(request: NextRequest) {
       console.log('🔄 Regenerating embedding with user ratings...')
       
       const embeddingProvider = serviceRegistry.getEmbeddingProvider()
-      const embedding = await embeddingProvider.generateEmbedding({
+      
+      // Prepare text representation combining all data
+      const embeddingText = embeddingProvider.prepareTextForEmbedding({
         metadata: video.metadata,
         analysis: video.visual_analysis,
         userRatings: updatedRatings,
-        tags: tags || video.tags,
+        userTags: tags || video.user_tags,
         computedMetrics: video.video_metrics?.[0] || {}
       })
+      
+      console.log('📝 Embedding text sample:', embeddingText.substring(0, 200))
+      
+      // Generate embedding from text
+      const embedding = await embeddingProvider.generateEmbedding(embeddingText)
+      
+      console.log('🔢 Embedding generated:', embedding.length, 'dimensions')
 
-      await supabase
+      const { error: embeddingError } = await supabase
         .from('analyzed_videos')
-        .update({ embedding })
+        .update({ content_embedding: embedding })
         .eq('id', videoId)
+      
+      if (embeddingError) {
+        console.error('❌ Failed to save embedding:', embeddingError)
+        throw new Error(`Failed to save embedding: ${embeddingError.message}`)
+      }
+      
+      console.log('✅ Embedding updated successfully')
     }
 
     // Check if we should update rating schema

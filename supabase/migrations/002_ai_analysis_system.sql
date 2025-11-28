@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS analyzed_videos (
   rating_schema_version INTEGER DEFAULT 1,
   
   -- Embeddings (swappable embedding model)
-  content_embedding vector(3072), -- OpenAI text-embedding-3-large dimension
+  content_embedding vector(1536), -- OpenAI text-embedding-3-small dimension (or ada-002)
   
   -- Calculated metrics (can be regenerated)
   computed_scores JSONB, -- engagement_rate, freshness_score, etc.
@@ -130,7 +130,7 @@ CREATE POLICY "Allow all for authenticated users" ON video_metrics FOR ALL USING
 
 -- Function: Find similar videos using pgvector
 CREATE OR REPLACE FUNCTION find_similar_videos(
-  query_embedding vector(3072),
+  query_embedding vector(1536),
   match_threshold float DEFAULT 0.3,
   match_count int DEFAULT 10,
   exclude_id uuid DEFAULT NULL
