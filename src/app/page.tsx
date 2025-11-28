@@ -1,4 +1,5 @@
 import { TextAnalyzer } from '@/components/features/TextAnalyzer'
+import { TikTokFetcher } from '@/components/features/TikTokFetcher'
 
 export default function Home() {
   return (
@@ -13,6 +14,13 @@ export default function Home() {
       </div>
 
       <div className="grid gap-8">
+        <section>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+            TikTok Video Data Extractor
+          </h2>
+          <TikTokFetcher />
+        </section>
+
         <section>
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">
             AI-Powered Text Analysis
