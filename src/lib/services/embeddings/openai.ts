@@ -131,3 +131,16 @@ export function createOpenAIEmbeddings(apiKey?: string, model?: string): OpenAIE
   }
   return new OpenAIEmbeddingProvider(key, model)
 }
+
+/**
+ * Simple function to generate a single embedding
+ * Uses a singleton provider instance
+ */
+let embeddingProvider: OpenAIEmbeddingProvider | null = null
+
+export async function generateEmbedding(text: string): Promise<number[]> {
+  if (!embeddingProvider) {
+    embeddingProvider = createOpenAIEmbeddings()
+  }
+  return embeddingProvider.generateEmbedding(text)
+}
