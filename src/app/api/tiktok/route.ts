@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
+import { createClient } from '@supabase/supabase-js'
 
 const SUPADATA_API_URL = 'https://api.supadata.ai'
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 const tiktokVideoSchema = z.object({
   url: z.string().url('Invalid TikTok URL'),
@@ -79,8 +84,39 @@ export async function POST(request: NextRequest) {
     }
     */
 
+    // Extract video ID from URL
+    const videoIdMatch = url.match(/video\/(\d+)/)
+    const videoId = videoIdMatch ? videoIdMatch[1] : `tiktok_${Date.now()}`
+
+    // Save to database
+    const { data: savedVideo, error: saveError } = await supabase
+      .from('analyzed_videos')
+      .upsert({
+        platform: 'tiktok',
+        video_url: url,
+        video_id: videoId,
+        metadata: {
+          ...metadata,
+          transcript,
+          title: metadata.title || metadata.description?.slice(0, 100) || videoId,
+          thumbnail_url: metadata.thumbnail || metadata.cover,
+        },
+        created_at: new Date().toISOString(),
+      }, {
+        onConflict: 'video_url'
+      })
+      .select()
+      .single()
+
+    if (saveError) {
+      console.error('Database save error:', saveError)
+      // Still return success if we got metadata, just note the save failed
+    }
+
     return NextResponse.json({
       success: true,
+      saved: !saveError,
+      videoId: savedVideo?.id,
       data: {
         ...metadata,
         transcript,
