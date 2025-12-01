@@ -15,6 +15,9 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Comprehensive analysis prompt for Gemini via Vertex AI
+// Includes SCRIPT analysis for humor, meaning, and replicability
+// V2: Added casting, production, flexibility, trends, brand, standalone, execution sections
+// Based on user's rating notes and calibration feedback
 const COMPREHENSIVE_ANALYSIS_PROMPT = `Analyze this video comprehensively and provide a structured JSON response with the following sections:
 
 {
@@ -53,11 +56,100 @@ const COMPREHENSIVE_ANALYSIS_PROMPT = `Analyze this video comprehensively and pr
     "keyMessage": "core message or takeaway",
     "narrativeStructure": "how the story/content unfolds",
     "targetAudience": "who this appeals to",
-    "emotionalTone": "dominant emotion conveyed",
-    "humorStyle": "type of humor if present (absurdist, observational, physical, none)",
-    "actingRequired": <1-10, how much acting skill would be needed to replicate>,
-    "productionBarrier": <1-10, how hard would this be to produce (equipment, editing, etc)>,
-    "replicability": <1-10, how easy to replicate with basic resources>
+    "emotionalTone": "dominant emotion conveyed"
+  },
+  "script": {
+    "conceptCore": "one-sentence description of the replicable concept/format that could be copied by another creator",
+    "hasScript": <boolean, does this video follow a scripted narrative vs spontaneous content>,
+    "scriptQuality": <1-10, how well-written/structured is the script (null if unscripted)>,
+    "transcript": "approximate transcript or description of what is said/shown",
+    "humor": {
+      "isHumorous": <boolean>,
+      "humorType": "subversion|absurdist|observational|physical|wordplay|callback|contrast|deadpan|escalation|satire|parody|none",
+      "humorMechanism": "detailed explanation of HOW the humor works - what expectation is set up and how it's subverted or resolved",
+      "comedyTiming": <1-10, effectiveness of timing and beats>,
+      "absurdismLevel": <1-10, how much does this violate normal logic or expectations>,
+      "surrealismLevel": <1-10, how much does this distort reality or use dream-like elements>
+    },
+    "structure": {
+      "hookType": "question|statement|action|mystery|pattern-interrupt|relatable-situation|visual-shock",
+      "hook": "what happens in first 1-3 seconds to grab attention",
+      "setup": "what expectation, context, or premise is established",
+      "development": "how does the middle section build on the setup",
+      "payoff": "how is the expectation resolved, subverted, or paid off",
+      "payoffStrength": <1-10, how satisfying is the conclusion>,
+      "hasCallback": <boolean, does it reference earlier elements>,
+      "hasTwist": <boolean, is there an unexpected turn>
+    },
+    "emotional": {
+      "primaryEmotion": "the main emotion being engineered (humor, awe, curiosity, FOMO, nostalgia, satisfaction, shock, warmth, etc)",
+      "emotionalArc": "how emotion changes through the video",
+      "emotionalIntensity": <1-10, strength of emotional impact>,
+      "relatability": <1-10, how much can average viewer relate to this>
+    },
+    "replicability": {
+      "score": <1-10, how easy is this concept to recreate with different content>,
+      "template": "describe the templatable format in one sentence that another business could follow",
+      "requiredElements": ["list elements ESSENTIAL to make this concept work"],
+      "variableElements": ["list elements that can be swapped for different contexts"],
+      "resourceRequirements": "low|medium|high - what's needed to recreate this",
+      "contextDependency": <1-10, how much does this rely on specific context/brand/person (1=universal, 10=only works for this creator)>
+    },
+    "originality": {
+      "score": <1-10, how fresh/novel is this concept>,
+      "similarFormats": ["list any known formats this resembles"],
+      "novelElements": ["what makes this different from similar content"]
+    }
+  },
+  "casting": {
+    "minimumPeople": <integer, minimum number of people required to execute this concept>,
+    "requiresCustomer": <boolean, does this need a customer/stranger to participate?>,
+    "attractivenessDependency": <1-10, how much does this video rely on physical attractiveness of the subject? 1=works with anyone, 10=only works because subject is attractive>,
+    "personalityDependency": <1-10, does this require a specific 'larger than life' or charismatic personality? 1=neutral delivery works, 10=requires specific persona>,
+    "actingSkillRequired": <1-10, level of acting/improv ability needed to pull this off. 1=just stand there, 10=method acting required>,
+    "castingNotes": "explanation of who could realistically perform this"
+  },
+  "production": {
+    "shotComplexity": <1-10, number of unique camera setups/angles required. 1=single static shot, 10=complex multi-camera>,
+    "editingDependency": <1-10, how much does this concept rely on editing to work? 1=works in single take, 10=editing IS the joke>,
+    "timeToRecreate": "15min|30min|1hr|2hr|half-day|full-day - estimated time to shoot and edit a replica",
+    "equipmentNeeded": ["list equipment beyond a smartphone that would be needed"],
+    "productionNotes": "explanation of production complexity"
+  },
+  "flexibility": {
+    "industryLock": <1-10, is this concept locked to a specific industry/business type? 1=works anywhere, 10=only works for this exact business type>,
+    "industryExamples": ["list 3-5 business types that could use this exact concept"],
+    "propDependency": <1-10, does this require specific props that others won't have? 1=no props, 10=requires specific branded/custom items>,
+    "swappableCore": <boolean, can the central object/topic be easily replaced?>,
+    "swapExamples": "examples of what could be swapped (e.g., 'snus→any craving, taco→any food')",
+    "flexibilityNotes": "explanation of how adaptable this concept is"
+  },
+  "trends": {
+    "memeDependent": <boolean, does this rely on a current meme/trend to land?>,
+    "trendName": "name of the meme/trend if applicable, or null",
+    "trendLifespan": "dead-meme|dying|current|evergreen-trope|not-trend-dependent",
+    "insideJokeDependency": <1-10, does this rely on creator's recurring jokes/persona? 1=standalone, 10=only makes sense to their audience>,
+    "culturalSpecificity": <1-10, how culture/region-specific is this? 1=universal, 10=only works in specific culture>,
+    "trendNotes": "explanation of trend/cultural dependencies"
+  },
+  "brand": {
+    "riskLevel": <1-10, how risky is this for a conservative brand? 1=safe/corporate-friendly, 10=edgy/could backfire>,
+    "toneMatch": ["corporate", "playful", "edgy", "youthful", "wholesome", "irreverent"] - select all that apply,
+    "adultThemes": <boolean, contains adult/suggestive content?>,
+    "brandExclusions": ["list brand types that should NOT use this concept"],
+    "brandNotes": "explanation of brand fit considerations"
+  },
+  "standalone": {
+    "worksWithoutContext": <1-10, does this work for someone who has never seen this creator? 1=needs backstory, 10=completely self-contained>,
+    "worksWithoutProduct": <boolean, can this work without featuring a specific product?>,
+    "requiresSetup": <boolean, does this need external context like a previous video or trend knowledge?>,
+    "standaloneNotes": "explanation of how self-contained this concept is"
+  },
+  "execution": {
+    "physicalComedyLevel": <1-10, how much does this rely on physical comedy/expressions? 1=dialogue-driven, 10=all physical/visual gags>,
+    "timingCriticality": <1-10, how much does success depend on perfect timing in delivery? 1=forgiving, 10=one beat off and it fails>,
+    "improvisationRoom": <1-10, how much can the performer improvise vs follow exact script? 1=must be exact, 10=lots of room to riff>,
+    "executionNotes": "explanation of execution requirements"
   },
   "technical": {
     "pacing": <1-10, how well the video maintains momentum>,
@@ -73,6 +165,16 @@ const COMPREHENSIVE_ANALYSIS_PROMPT = `Analyze this video comprehensively and pr
     "scrollStopPower": <1-10, ability to stop scrolling>
   }
 }
+
+IMPORTANT CONTEXT: This analysis is for a service that helps businesses replicate viral video concepts. The key question is: "Can another business recreate this concept successfully?" 
+
+Focus especially on:
+1. CASTING: Does success depend on the specific person's looks, personality, or acting ability?
+2. PRODUCTION: How much equipment/editing/time is needed?
+3. FLEXIBILITY: Can this work for different business types, or is it locked to one industry?
+4. STANDALONE: Does this work without knowing the creator or trend context?
+
+For the "script" section, analyze the CONCEPT and STRUCTURE as intellectual property that could be extracted and reused. Be specific about humor mechanics - don't just say "it's funny", explain WHY and HOW it creates humor.
 
 Be specific and detailed. Rate everything on 1-10 scales. Return valid JSON only.`;
 

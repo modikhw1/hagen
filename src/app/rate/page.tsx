@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface Video {
   id: string;
@@ -31,6 +32,8 @@ interface Prediction {
 type ViewMode = 'rate' | 'import' | 'queue';
 
 export default function RatePage() {
+  const router = useRouter();
+  
   // View state
   const [viewMode, setViewMode] = useState<ViewMode>('rate');
   
@@ -371,22 +374,41 @@ export default function RatePage() {
       {/* Navigation Tabs */}
       <div className="bg-white border-b sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4">
-          <div className="flex gap-1">
-            {(['rate', 'import', 'queue'] as ViewMode[]).map(mode => (
-              <button
-                key={mode}
-                onClick={() => setViewMode(mode)}
-                className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                  viewMode === mode
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
-                }`}
+          <div className="flex justify-between items-center">
+            <div className="flex gap-1">
+              {(['rate', 'import', 'queue'] as ViewMode[]).map(mode => (
+                <button
+                  key={mode}
+                  onClick={() => setViewMode(mode)}
+                  className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                    viewMode === mode
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  {mode === 'rate' && `Rate Videos (${videos.length - current})`}
+                  {mode === 'import' && 'Import URLs'}
+                  {mode === 'queue' && `Queue (${stats.pending})`}
+                </button>
+              ))}
+            </div>
+            
+            {/* Version Toggle */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-400">Mode:</span>
+              <select
+                value="v1"
+                onChange={(e) => {
+                  if (e.target.value === 'v2') {
+                    router.push('/rate-v2');
+                  }
+                }}
+                className="text-sm border rounded-lg px-2 py-1 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                {mode === 'rate' && `Rate Videos (${videos.length - current})`}
-                {mode === 'import' && 'Import URLs'}
-                {mode === 'queue' && `Queue (${stats.pending})`}
-              </button>
-            ))}
+                <option value="v1">Classic (Dimensions)</option>
+                <option value="v2">Limitless (Notes → AI)</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>

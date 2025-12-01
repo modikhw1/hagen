@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface Video {
   id: string;
@@ -37,6 +38,8 @@ interface Prediction {
 type ViewMode = 'rate' | 'import' | 'criteria';
 
 export default function RateV2Page() {
+  const router = useRouter();
+  
   // View state
   const [viewMode, setViewMode] = useState<ViewMode>('rate');
   
@@ -339,9 +342,19 @@ export default function RateV2Page() {
           <div className="flex items-center justify-between py-3">
             <div className="flex items-center gap-4">
               <h1 className="text-lg font-semibold text-gray-800">Rate Videos</h1>
-              <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                V2 - Limitless
-              </span>
+              {/* Version Toggle */}
+              <select
+                value="v2"
+                onChange={(e) => {
+                  if (e.target.value === 'v1') {
+                    router.push('/rate');
+                  }
+                }}
+                className="text-sm border rounded-lg px-2 py-1 bg-purple-50 text-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              >
+                <option value="v1">Classic (Dimensions)</option>
+                <option value="v2">Limitless (Notes → AI)</option>
+              </select>
             </div>
             <div className="flex gap-1">
               {(['rate', 'import', 'criteria'] as ViewMode[]).map(mode => (

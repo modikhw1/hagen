@@ -175,6 +175,49 @@ export class GeminiVideoAnalyzer implements VideoAnalysisProvider {
     "valueProposition": "what value this provides to viewers",
     "uniquenessFactors": ["what makes this stand out"]
   },
+  "script": {
+    "conceptCore": "one-sentence description of the replicable concept/format that could be copied",
+    "hasScript": <boolean, does this video follow a scripted narrative vs spontaneous content>,
+    "scriptQuality": <1-10, how well-written/structured is the script (null if unscripted)>,
+    "transcript": "approximate transcript or description of what is said/shown",
+    "humor": {
+      "isHumorous": <boolean>,
+      "humorType": "subversion|absurdist|observational|physical|wordplay|callback|contrast|deadpan|escalation|satire|parody|none",
+      "humorMechanism": "detailed explanation of HOW the humor works - what expectation is set up and how it's subverted",
+      "comedyTiming": <1-10, effectiveness of timing and beats>,
+      "absurdismLevel": <1-10, how much does this violate normal logic or expectations>,
+      "surrealismLevel": <1-10, how much does this distort reality or use dream-like elements>
+    },
+    "structure": {
+      "hookType": "question|statement|action|mystery|pattern-interrupt|relatable-situation|visual-shock",
+      "hook": "what happens in first 1-3 seconds to grab attention",
+      "setup": "what expectation, context, or premise is established",
+      "development": "how does the middle section build on the setup",
+      "payoff": "how is the expectation resolved, subverted, or paid off",
+      "payoffStrength": <1-10, how satisfying is the conclusion>,
+      "hasCallback": <boolean, does it reference earlier elements>,
+      "hasTwist": <boolean, is there an unexpected turn>
+    },
+    "emotional": {
+      "primaryEmotion": "the main emotion being engineered (humor, awe, curiosity, FOMO, nostalgia, satisfaction, shock, warmth, etc)",
+      "emotionalArc": "how emotion changes through the video",
+      "emotionalIntensity": <1-10, strength of emotional impact>,
+      "relatability": <1-10, how much can average viewer relate to this>
+    },
+    "replicability": {
+      "score": <1-10, how easy is this concept to recreate with different content>,
+      "template": "describe the templatable format in one sentence that another business could follow",
+      "requiredElements": ["list elements ESSENTIAL to make this concept work"],
+      "variableElements": ["list elements that can be swapped for different contexts"],
+      "resourceRequirements": "low|medium|high - what's needed to recreate this (actors, props, locations, skills)",
+      "contextDependency": <1-10, how much does this rely on specific context/brand/person (1=universal, 10=only works for this creator)>
+    },
+    "originality": {
+      "score": <1-10, how fresh/novel is this concept>,
+      "similarFormats": ["list any known formats this resembles"],
+      "novelElements": ["what makes this different from similar content"]
+    }
+  },
   "technical": {
     "pacing": <1-10, how well the video maintains momentum>,
     "pacingDescription": "specific pacing patterns and effectiveness",
@@ -199,6 +242,8 @@ export class GeminiVideoAnalyzer implements VideoAnalysisProvider {
     "timelessness": <1-10, lasting appeal beyond trends>
   }
 }
+
+IMPORTANT: For the "script" section, focus on analyzing the CONCEPT and STRUCTURE as intellectual property that could be extracted and reused. Think about what makes this format work and how another creator could adapt it. Be specific about humor mechanics - don't just say "it's funny", explain WHY and HOW it creates humor.
 
 Provide detailed, actionable analysis. Rate everything on 1-10 scales. Be specific about what works and what doesn't.`
   }
@@ -252,6 +297,49 @@ Provide detailed, actionable analysis. Rate everything on 1-10 scales. Be specif
           emotionalTone: parsed.content?.emotionalTone || '',
           valueProposition: parsed.content?.valueProposition || '',
           uniquenessFactors: parsed.content?.uniquenessFactors || []
+        },
+        script: {
+          conceptCore: parsed.script?.conceptCore || '',
+          hasScript: parsed.script?.hasScript ?? true,
+          scriptQuality: parsed.script?.scriptQuality || null,
+          transcript: parsed.script?.transcript || '',
+          humor: {
+            isHumorous: parsed.script?.humor?.isHumorous ?? false,
+            humorType: parsed.script?.humor?.humorType || 'none',
+            humorMechanism: parsed.script?.humor?.humorMechanism || '',
+            comedyTiming: parsed.script?.humor?.comedyTiming || null,
+            absurdismLevel: parsed.script?.humor?.absurdismLevel || 1,
+            surrealismLevel: parsed.script?.humor?.surrealismLevel || 1
+          },
+          structure: {
+            hookType: parsed.script?.structure?.hookType || 'statement',
+            hook: parsed.script?.structure?.hook || '',
+            setup: parsed.script?.structure?.setup || '',
+            development: parsed.script?.structure?.development || '',
+            payoff: parsed.script?.structure?.payoff || '',
+            payoffStrength: parsed.script?.structure?.payoffStrength || 5,
+            hasCallback: parsed.script?.structure?.hasCallback ?? false,
+            hasTwist: parsed.script?.structure?.hasTwist ?? false
+          },
+          emotional: {
+            primaryEmotion: parsed.script?.emotional?.primaryEmotion || 'neutral',
+            emotionalArc: parsed.script?.emotional?.emotionalArc || '',
+            emotionalIntensity: parsed.script?.emotional?.emotionalIntensity || 5,
+            relatability: parsed.script?.emotional?.relatability || 5
+          },
+          replicability: {
+            score: parsed.script?.replicability?.score || 5,
+            template: parsed.script?.replicability?.template || '',
+            requiredElements: parsed.script?.replicability?.requiredElements || [],
+            variableElements: parsed.script?.replicability?.variableElements || [],
+            resourceRequirements: parsed.script?.replicability?.resourceRequirements || 'medium',
+            contextDependency: parsed.script?.replicability?.contextDependency || 5
+          },
+          originality: {
+            score: parsed.script?.originality?.score || 5,
+            similarFormats: parsed.script?.originality?.similarFormats || [],
+            novelElements: parsed.script?.originality?.novelElements || []
+          }
         },
         technical: {
           pacing: parsed.technical?.pacing || 5,

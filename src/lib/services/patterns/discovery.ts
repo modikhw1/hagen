@@ -22,17 +22,14 @@ const GEMINI_NUMERIC_FEATURES = [
   'visual.overallQuality',
   'visual.colorDiversity',
   'visual.compositionQuality',
-  'visual.peopleCount',           // NEW: Solo vs duo vs group
+  'visual.peopleCount',           // Solo vs duo vs group
   // Audio
   'audio.quality',
   'audio.audioEnergy',
   'audio.audioVisualSync',
-  'audio.voiceoverQuality',       // NEW: Voiceover production quality
-  // Content - actionability metrics
+  'audio.voiceoverQuality',       // Voiceover production quality
+  // Content
   'content.duration',
-  'content.actingRequired',       // NEW: Can you recreate this? (1-10)
-  'content.productionBarrier',    // NEW: How hard to make? (1-10)
-  'content.replicability',        // NEW: Easy to copy format? (1-10)
   // Technical
   'technical.pacing',
   'technical.cutsPerMinute',
@@ -41,9 +38,56 @@ const GEMINI_NUMERIC_FEATURES = [
   'engagement.shareability',
   'engagement.replayValue',
   'engagement.scrollStopPower',
-  // Trends (if present)
+  // Trends
   'trends.trendAlignment',
   'trends.timelessness',
+  // Script - Core Quality
+  'script.scriptQuality',                    // Overall script quality
+  // Script - Humor Analysis
+  'script.humor.comedyTiming',               // Timing effectiveness
+  'script.humor.absurdismLevel',             // Logic violation level
+  'script.humor.surrealismLevel',            // Reality distortion level
+  // Script - Structure
+  'script.structure.payoffStrength',         // How satisfying is conclusion
+  // Script - Emotional
+  'script.emotional.emotionalIntensity',     // Strength of emotional impact
+  'script.emotional.relatability',           // How relatable to average viewer
+  // Script - Replicability (CRITICAL for user's use case)
+  'script.replicability.score',              // How easy to recreate
+  'script.replicability.contextDependency',  // How context-specific (inverse = more universal)
+  // Script - Originality
+  'script.originality.score',                // Novelty of concept
+  
+  // === V2 ADDITIONS: Casting, Production, Flexibility, etc. ===
+  
+  // Casting - Who can perform this?
+  'casting.minimumPeople',                   // Number of people required
+  'casting.attractivenessDependency',        // Does this only work with attractive people?
+  'casting.personalityDependency',           // Does this need a specific persona?
+  'casting.actingSkillRequired',             // Level of acting ability needed
+  
+  // Production - What's needed to make this?
+  'production.shotComplexity',               // Camera setups required
+  'production.editingDependency',            // How much does editing matter?
+  
+  // Flexibility - How adaptable is this concept?
+  'flexibility.industryLock',                // Is this locked to specific business type?
+  'flexibility.propDependency',              // Does this need specific props?
+  
+  // Trends - Dependency on current culture
+  'trends.insideJokeDependency',             // Creator-specific humor?
+  'trends.culturalSpecificity',              // Region/culture-specific?
+  
+  // Brand - Risk assessment
+  'brand.riskLevel',                         // How risky for conservative brands?
+  
+  // Standalone - Does this work without context?
+  'standalone.worksWithoutContext',          // Works for new viewers?
+  
+  // Execution - How hard to pull off?
+  'execution.physicalComedyLevel',           // Physical vs dialogue-driven
+  'execution.timingCriticality',             // How important is perfect timing?
+  'execution.improvisationRoom',             // Room to riff vs exact script?
 ] as const;
 
 // Categorical features to extract
@@ -51,18 +95,51 @@ const GEMINI_CATEGORICAL_FEATURES = [
   // Audio
   'audio.energyLevel',            // low/medium/high
   'audio.hasVoiceover',           // boolean
-  'audio.musicType',              // NEW: none, background, featured
-  'audio.musicGenre',             // NEW: pop, electronic, etc.
+  'audio.musicType',              // none, background, featured
+  'audio.musicGenre',             // pop, electronic, etc.
   // Content
   'content.style',                // Entertaining, Educational, etc.
   'content.format',               // Skit, Talking head, Montage, etc.
-  'content.humorStyle',           // NEW: Situational, absurdist, observational, etc.
-  'content.emotionalTone',        // NEW: Humorous, inspiring, dramatic, etc.
-  'content.targetAudience',       // NEW: Who this appeals to
+  'content.emotionalTone',        // Humorous, inspiring, dramatic, etc.
+  'content.targetAudience',       // Who this appeals to
   // Visual
-  'visual.settingType',           // NEW: indoor/outdoor/mixed/animated
+  'visual.settingType',           // indoor/outdoor/mixed/animated
   // Technical
-  'technical.editingStyle',       // NEW: Fast-paced, slow, cinematic, etc.
+  'technical.editingStyle',       // Fast-paced, slow, cinematic, etc.
+  // Script - Humor (IMPORTANT)
+  'script.humor.isHumorous',      // boolean
+  'script.humor.humorType',       // subversion, absurdist, observational, etc.
+  // Script - Structure
+  'script.hasScript',             // boolean
+  'script.structure.hookType',    // question, statement, action, mystery, etc.
+  'script.structure.hasCallback', // boolean
+  'script.structure.hasTwist',    // boolean
+  // Script - Emotional
+  'script.emotional.primaryEmotion',  // humor, awe, curiosity, etc.
+  // Script - Replicability
+  'script.replicability.resourceRequirements',  // low/medium/high
+  
+  // === V2 ADDITIONS: Casting, Production, Flexibility, etc. ===
+  
+  // Casting
+  'casting.requiresCustomer',     // boolean - needs stranger participation?
+  
+  // Production
+  'production.timeToRecreate',    // 15min, 30min, 1hr, 2hr, half-day, full-day
+  
+  // Flexibility
+  'flexibility.swappableCore',    // boolean - can central element be swapped?
+  
+  // Trends
+  'trends.memeDependent',         // boolean - relies on current meme?
+  'trends.trendLifespan',         // dead-meme, dying, current, evergreen-trope, not-trend-dependent
+  
+  // Brand
+  'brand.adultThemes',            // boolean - contains adult content?
+  
+  // Standalone
+  'standalone.worksWithoutProduct',  // boolean - works without featuring product?
+  'standalone.requiresSetup',        // boolean - needs external context?
 ] as const;
 
 export interface DiscoveredPattern {

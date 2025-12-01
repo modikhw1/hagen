@@ -383,7 +383,7 @@ export class VertexTuningService {
       ],
       generationConfig: {
         temperature: 0.1,
-        maxOutputTokens: 1024
+        maxOutputTokens: 8192  // Increased for comprehensive script analysis
       }
     };
 
