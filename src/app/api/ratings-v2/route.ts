@@ -31,6 +31,10 @@ export async function POST(request: NextRequest) {
       ai_prediction = null,
       rater_id = 'primary',
       skip_extraction = false,  // For quick saves, extract later
+      // V2 Conversational Rating additions
+      captured_factors = {},  // Human-judged factors from conversation
+      conversation_log = [],  // Full conversation history for reference
+      is_not_relevant = false, // Mark video as not relevant for training
     } = body;
 
     // Validate required fields
@@ -38,33 +42,49 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'video_id is required' }, { status: 400 });
     }
     
-    if (!notes || notes.trim().length < 10) {
-      return NextResponse.json(
-        { error: 'notes is required and must be at least 10 characters' },
-        { status: 400 }
-      );
+    // For "not relevant" videos, notes are optional but helpful
+    if (!is_not_relevant && (!notes || notes.trim().length < 5)) {
+      // Allow short notes if we have captured_factors from conversation
+      if (Object.keys(captured_factors).length === 0) {
+        return NextResponse.json(
+          { error: 'notes or captured_factors are required' },
+          { status: 400 }
+        );
+      }
     }
     
-    if (overall_score !== null && (overall_score < 0 || overall_score > 1)) {
+    if (!is_not_relevant && overall_score !== null && (overall_score < 0 || overall_score > 1)) {
       return NextResponse.json(
         { error: 'overall_score must be between 0 and 1' },
         { status: 400 }
       );
     }
 
-    // Extract criteria from notes (async)
-    let extractedCriteria = {};
+    // Extract criteria from notes (async) or use captured_factors
+    let extractedCriteria: Record<string, any> = {};
     let extractionModel = null;
     let extractionConfidence = null;
     
-    if (!skip_extraction) {
+    // Merge captured_factors from conversation first (these are human-verified)
+    if (captured_factors && Object.keys(captured_factors).length > 0) {
+      // Store in a dedicated namespace to distinguish from AI-extracted
+      extractedCriteria.human_judgment = captured_factors;
+      console.log(`✅ Added ${Object.keys(captured_factors).length} human-judged factors`);
+    }
+    
+    // Then extract from notes (if notes exist and extraction not skipped)
+    if (!skip_extraction && notes && notes.trim().length >= 10) {
       try {
         const extraction = await extractCriteria(notes, overall_score);
-        extractedCriteria = extraction.criteria;
+        // Merge AI-extracted criteria (don't overwrite human judgment)
+        extractedCriteria = {
+          ...extractedCriteria,
+          ...extraction.criteria,
+        };
         extractionModel = extraction.model_used;
         extractionConfidence = extraction.confidence;
         
-        console.log(`✅ Extracted ${Object.keys(extractedCriteria).length} criteria from notes`);
+        console.log(`✅ Extracted ${Object.keys(extraction.criteria).length} criteria from notes`);
       } catch (err) {
         console.error('Criteria extraction failed, continuing without:', err);
       }
@@ -73,10 +93,10 @@ export async function POST(request: NextRequest) {
     // Generate embedding for similarity search
     let embeddingVector = null;
     
-    if (!skip_extraction) {
+    if (!skip_extraction && !is_not_relevant) {
       try {
         const embedding = await generateRatingEmbedding({
-          notes,
+          notes: notes || '',
           extractedCriteria,
           overallScore: overall_score,
           tags,
@@ -94,11 +114,19 @@ export async function POST(request: NextRequest) {
       .from('ratings_v2')
       .upsert({
         video_id,
-        overall_score,
-        notes,
+        overall_score: is_not_relevant ? null : overall_score,
+        notes: notes || '',
         tags,
-        extracted_criteria: extractedCriteria,
-        extraction_model: extractionModel,
+        extracted_criteria: {
+          ...extractedCriteria,
+          // Store conversation metadata
+          _meta: {
+            is_not_relevant,
+            conversation_messages: conversation_log?.length || 0,
+            captured_at: new Date().toISOString(),
+          }
+        },
+        extraction_model: extractionModel || (Object.keys(captured_factors).length > 0 ? 'conversational-v2' : null),
         extraction_confidence: extractionConfidence,
         reasoning_embedding: embeddingVector,
         ai_prediction,
@@ -115,24 +143,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    // Update criteria statistics (fire and forget)
-    updateCriteriaStatistics(extractedCriteria, overall_score).catch(console.error);
+    // Update criteria statistics (fire and forget) - skip for not_relevant videos
+    if (!is_not_relevant) {
+      updateCriteriaStatistics(extractedCriteria, overall_score).catch(console.error);
+    }
 
     // Log extraction for review
-    if (!skip_extraction && data?.id) {
+    if (!skip_extraction && data?.id && !is_not_relevant) {
       supabase
         .from('extraction_log')
         .insert({
           rating_id: data.id,
-          notes_text: notes,
+          notes_text: notes || '',
           extracted_criteria: extractedCriteria,
-          model_used: extractionModel || 'none',
+          model_used: extractionModel || 'conversational-v2',
           confidence: extractionConfidence,
         });
       // Fire and forget - errors logged but don't block response
     }
 
-    console.log(`✅ Rating saved for video ${video_id}`);
+    console.log(`✅ Rating saved for video ${video_id}${is_not_relevant ? ' (not relevant)' : ''}`);
 
     return NextResponse.json({
       success: true,
@@ -141,8 +171,10 @@ export async function POST(request: NextRequest) {
         criteria: extractedCriteria,
         confidence: extractionConfidence,
         model: extractionModel,
+        captured_factors_count: Object.keys(captured_factors || {}).length,
       },
       has_embedding: !!embeddingVector,
+      is_not_relevant,
     });
 
   } catch (error) {

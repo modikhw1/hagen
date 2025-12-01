@@ -165,7 +165,21 @@ export default function RateV2Page() {
       });
       const data = await res.json();
       if (data.prediction) {
-        setPrediction(data.prediction);
+        // Map API response to UI expected format
+        const pred = data.prediction;
+        setPrediction({
+          overall: pred.overall,
+          confidence: pred.confidence,
+          reasoning: pred.reasoning,
+          similarVideos: (pred.similar_ratings || []).map((r: any) => ({
+            id: r.video_id,
+            title: r.notes_excerpt,
+            overall_score: r.score,
+            similarity: r.similarity,
+            notes: r.notes_excerpt,
+          })),
+          suggestedCriteria: [],
+        });
       }
     } catch (err) {
       console.error('Failed to get prediction:', err);
@@ -540,14 +554,14 @@ export default function RateV2Page() {
                           {prediction.reasoning}
                         </div>
                       </div>
-                      {prediction.similarVideos.length > 0 && (
+                      {prediction.similarVideos && prediction.similarVideos.length > 0 && (
                         <div className="border-t border-blue-200 pt-3 mt-3">
                           <div className="text-xs text-blue-600 mb-2">Similar rated videos:</div>
                           <div className="space-y-1">
                             {prediction.similarVideos.slice(0, 3).map(v => (
                               <div key={v.id} className="text-xs text-gray-600 flex justify-between">
                                 <span className="truncate flex-1">{v.title || v.id}</span>
-                                <span className="text-blue-600 font-medium ml-2">{v.overall_score.toFixed(2)}</span>
+                                <span className="text-blue-600 font-medium ml-2">{v.overall_score?.toFixed(2) ?? '—'}</span>
                               </div>
                             ))}
                           </div>
