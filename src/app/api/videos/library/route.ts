@@ -32,3 +32,47 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const videoId = searchParams.get('id');
+
+    if (!videoId) {
+      return NextResponse.json(
+        { error: 'Video ID is required' },
+        { status: 400 }
+      );
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Delete from video_ratings first (if exists)
+    await supabase
+      .from('video_ratings')
+      .delete()
+      .eq('video_id', videoId);
+
+    // Delete from analyzed_videos
+    const { error } = await supabase
+      .from('analyzed_videos')
+      .delete()
+      .eq('id', videoId);
+
+    if (error) {
+      console.error('Failed to delete video:', error);
+      return NextResponse.json(
+        { error: 'Failed to delete video' },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ success: true, deleted: videoId });
+  } catch (error) {
+    console.error('Delete API error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}

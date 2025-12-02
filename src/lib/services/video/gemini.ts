@@ -175,15 +175,37 @@ export class GeminiVideoAnalyzer implements VideoAnalysisProvider {
     "valueProposition": "what value this provides to viewers",
     "uniquenessFactors": ["what makes this stand out"]
   },
+  "scenes": {
+    "description": "CRITICAL: Analyze the video scene-by-scene, mapping visual edits to narrative/comedic beats. Each scene change or cut may carry meaning.",
+    "sceneBreakdown": [
+      {
+        "sceneNumber": <1, 2, 3...>,
+        "timestamp": "approximate start time",
+        "duration": "approximate length",
+        "visualContent": "what is shown visually in this scene",
+        "audioContent": "what is said/heard in this scene (dialogue, sound, music)",
+        "narrativeFunction": "hook|setup|development|misdirection|reveal|payoff|callback|tag",
+        "editSignificance": "why this cut/transition matters - does the edit itself convey information or comedy?",
+        "impliedMeaning": "what does this scene communicate that isn't explicitly stated?",
+        "viewerAssumption": "what assumption does the viewer make during this scene?"
+      }
+    ],
+    "editAsPunchline": <boolean, does a cut/edit itself serve as a reveal or punchline?>,
+    "editPunchlineExplanation": "if true, explain how the edit delivers the joke (e.g., 'cut reveals person was talking to nobody')",
+    "visualNarrativeSync": <1-10, how tightly are visuals and story/joke synchronized>,
+    "misdirectionTechnique": "how does the video set up false expectations visually before the reveal?"
+  },
   "script": {
     "conceptCore": "one-sentence description of the replicable concept/format that could be copied",
     "hasScript": <boolean, does this video follow a scripted narrative vs spontaneous content>,
     "scriptQuality": <1-10, how well-written/structured is the script (null if unscripted)>,
     "transcript": "approximate transcript or description of what is said/shown",
+    "visualTranscript": "scene-by-scene description integrating BOTH what is shown AND what is said, in sequence",
     "humor": {
       "isHumorous": <boolean>,
-      "humorType": "subversion|absurdist|observational|physical|wordplay|callback|contrast|deadpan|escalation|satire|parody|none",
-      "humorMechanism": "detailed explanation of HOW the humor works - what expectation is set up and how it's subverted",
+      "humorType": "subversion|absurdist|observational|physical|wordplay|callback|contrast|deadpan|escalation|satire|parody|visual-reveal|edit-punchline|none",
+      "humorMechanism": "detailed explanation of HOW the humor works - include VISUAL elements if the joke relies on what is shown, not just said",
+      "visualComedyElement": "describe any visual element essential to the joke (reveal shots, reaction cuts, visual contradictions)",
       "comedyTiming": <1-10, effectiveness of timing and beats>,
       "absurdismLevel": <1-10, how much does this violate normal logic or expectations>,
       "surrealismLevel": <1-10, how much does this distort reality or use dream-like elements>
@@ -191,12 +213,14 @@ export class GeminiVideoAnalyzer implements VideoAnalysisProvider {
     "structure": {
       "hookType": "question|statement|action|mystery|pattern-interrupt|relatable-situation|visual-shock",
       "hook": "what happens in first 1-3 seconds to grab attention",
-      "setup": "what expectation, context, or premise is established",
+      "setup": "what expectation, context, or premise is established - include VISUAL setup",
       "development": "how does the middle section build on the setup",
-      "payoff": "how is the expectation resolved, subverted, or paid off",
+      "payoff": "how is the expectation resolved, subverted, or paid off - CRITICAL: note if payoff is VISUAL (a cut, reveal, or shown element) vs VERBAL",
+      "payoffType": "verbal|visual|visual-reveal|edit-cut|combination",
       "payoffStrength": <1-10, how satisfying is the conclusion>,
       "hasCallback": <boolean, does it reference earlier elements>,
-      "hasTwist": <boolean, is there an unexpected turn>
+      "hasTwist": <boolean, is there an unexpected turn>,
+      "twistDelivery": "verbal|visual|edit - how is the twist delivered?"
     },
     "emotional": {
       "primaryEmotion": "the main emotion being engineered (humor, awe, curiosity, FOMO, nostalgia, satisfaction, shock, warmth, etc)",
@@ -243,7 +267,16 @@ export class GeminiVideoAnalyzer implements VideoAnalysisProvider {
   }
 }
 
-IMPORTANT: For the "script" section, focus on analyzing the CONCEPT and STRUCTURE as intellectual property that could be extracted and reused. Think about what makes this format work and how another creator could adapt it. Be specific about humor mechanics - don't just say "it's funny", explain WHY and HOW it creates humor.
+IMPORTANT: 
+1. SCENE-BY-SCENE ANALYSIS IS CRITICAL: Break down the video into individual scenes/shots. For each scene, note what is SHOWN and what is SAID. Many jokes rely on VISUAL reveals, not just dialogue.
+
+2. EDITS CAN BE PUNCHLINES: A cut or scene change can itself deliver the joke. Example: if someone says "I'm fine" but then a cut reveals they're talking to nobody, the EDIT is the punchline showing they're NOT fine.
+
+3. For the "script" section, focus on analyzing the CONCEPT and STRUCTURE as intellectual property that could be extracted and reused. Think about what makes this format work and how another creator could adapt it. Be specific about humor mechanics - don't just say "it's funny", explain WHY and HOW it creates humor.
+
+4. VISUAL COMEDY: If a joke depends on what is SHOWN (not said), you MUST capture this. The transcript alone may miss the point entirely if the punchline is visual.
+
+5. MISDIRECTION: Note when the video deliberately misleads viewers visually before a reveal. What assumptions does the framing create?
 
 Provide detailed, actionable analysis. Rate everything on 1-10 scales. Be specific about what works and what doesn't.`
   }
@@ -303,10 +336,12 @@ Provide detailed, actionable analysis. Rate everything on 1-10 scales. Be specif
           hasScript: parsed.script?.hasScript ?? true,
           scriptQuality: parsed.script?.scriptQuality || null,
           transcript: parsed.script?.transcript || '',
+          visualTranscript: parsed.script?.visualTranscript || '',
           humor: {
             isHumorous: parsed.script?.humor?.isHumorous ?? false,
             humorType: parsed.script?.humor?.humorType || 'none',
             humorMechanism: parsed.script?.humor?.humorMechanism || '',
+            visualComedyElement: parsed.script?.humor?.visualComedyElement || '',
             comedyTiming: parsed.script?.humor?.comedyTiming || null,
             absurdismLevel: parsed.script?.humor?.absurdismLevel || 1,
             surrealismLevel: parsed.script?.humor?.surrealismLevel || 1
@@ -317,9 +352,11 @@ Provide detailed, actionable analysis. Rate everything on 1-10 scales. Be specif
             setup: parsed.script?.structure?.setup || '',
             development: parsed.script?.structure?.development || '',
             payoff: parsed.script?.structure?.payoff || '',
+            payoffType: parsed.script?.structure?.payoffType || 'verbal',
             payoffStrength: parsed.script?.structure?.payoffStrength || 5,
             hasCallback: parsed.script?.structure?.hasCallback ?? false,
-            hasTwist: parsed.script?.structure?.hasTwist ?? false
+            hasTwist: parsed.script?.structure?.hasTwist ?? false,
+            twistDelivery: parsed.script?.structure?.twistDelivery || ''
           },
           emotional: {
             primaryEmotion: parsed.script?.emotional?.primaryEmotion || 'neutral',
@@ -363,6 +400,13 @@ Provide detailed, actionable analysis. Rate everything on 1-10 scales. Be specif
           trendingElements: parsed.trends.trendingElements || [],
           trendAlignment: parsed.trends.trendAlignment || 5,
           timelessness: parsed.trends.timelessness || 5
+        } : undefined,
+        scenes: parsed.scenes ? {
+          sceneBreakdown: parsed.scenes.sceneBreakdown || [],
+          editAsPunchline: parsed.scenes.editAsPunchline ?? false,
+          editPunchlineExplanation: parsed.scenes.editPunchlineExplanation || '',
+          visualNarrativeSync: parsed.scenes.visualNarrativeSync || 5,
+          misdirectionTechnique: parsed.scenes.misdirectionTechnique || ''
         } : undefined
       }
 

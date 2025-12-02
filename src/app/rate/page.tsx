@@ -64,6 +64,9 @@ export default function RatePage() {
   const [importing, setImporting] = useState(false);
   const [importProgress, setImportProgress] = useState({ current: 0, total: 0 });
   
+  // Queue management
+  const [removing, setRemoving] = useState<string | null>(null);
+  
   // Pipeline progress for current video
   const [pipelineStage, setPipelineStage] = useState<'idle' | 'uploading' | 'analyzing' | 'ready'>('idle');
   const [pipelineProgress, setPipelineProgress] = useState(0);
@@ -292,6 +295,35 @@ export default function RatePage() {
     fetchStats();
   };
 
+  // Remove video from queue
+  const removeFromQueue = async (videoId: string) => {
+    if (!confirm('Remove this video from queue? This will delete it from the database.')) return;
+    
+    setRemoving(videoId);
+    try {
+      const res = await fetch(`/api/videos/library?id=${videoId}`, {
+        method: 'DELETE'
+      });
+      
+      if (res.ok) {
+        setVideos(prev => prev.filter(v => v.id !== videoId));
+        // Adjust current index if needed
+        setCurrent(c => {
+          const removedIndex = videos.findIndex(v => v.id === videoId);
+          if (removedIndex < c) return c - 1;
+          return Math.min(c, videos.length - 2);
+        });
+      } else {
+        alert('Failed to remove video');
+      }
+    } catch (err) {
+      console.error('Failed to remove video:', err);
+      alert('Failed to remove video');
+    } finally {
+      setRemoving(null);
+    }
+  };
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -470,11 +502,11 @@ export default function RatePage() {
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <h2 className="text-lg font-semibold mb-4">Video Queue</h2>
             <p className="text-sm text-gray-500 mb-4">
-              Videos waiting to be rated. Click &quot;Upload All to GCS&quot; to prepare them for AI analysis.
+              Videos waiting to be rated. Click the × to remove a video from the queue.
             </p>
             <div className="space-y-2 max-h-96 overflow-auto">
               {videos.slice(current).map((video, i) => (
-                <div key={video.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                <div key={video.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg group">
                   <span className="text-xs text-gray-400 w-6">{i + 1}</span>
                   <span className="flex-1 text-sm truncate">{video.title || video.source_url}</span>
                   <span className={`text-xs px-2 py-0.5 rounded ${
@@ -482,6 +514,14 @@ export default function RatePage() {
                   }`}>
                     {video.gcs_uri ? 'Ready' : 'Pending'}
                   </span>
+                  <button
+                    onClick={() => removeFromQueue(video.id)}
+                    disabled={removing === video.id}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 text-red-500 hover:bg-red-50 rounded text-sm disabled:opacity-50"
+                    title="Remove from queue"
+                  >
+                    {removing === video.id ? '...' : '×'}
+                  </button>
                 </div>
               ))}
               {videos.length === 0 && (

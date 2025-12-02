@@ -58,15 +58,38 @@ const COMPREHENSIVE_ANALYSIS_PROMPT = `Analyze this video comprehensively and pr
     "targetAudience": "who this appeals to",
     "emotionalTone": "dominant emotion conveyed"
   },
+  "scenes": {
+    "description": "CRITICAL: Scene-by-scene breakdown mapping visual edits to narrative/comedic beats",
+    "sceneBreakdown": [
+      {
+        "sceneNumber": <1, 2, 3... sequential number>,
+        "timestamp": "approximate start time (e.g., '0:00', '0:05')",
+        "visualContent": "what is SHOWN visually in this scene - describe the shot, framing, who/what is visible. INCLUDE SMALL DETAILS that might be funny (overfilling cups, frozen expressions, background chaos)",
+        "audioContent": "what is SAID or HEARD in this scene - dialogue, sound effects, music",
+        "visualComedyDetail": "if this scene contains a visual gag, describe it specifically (e.g., 'drink overflowing while she stares blankly', 'visible mess in background contradicting what was said'). null if no visual comedy in this scene",
+        "narrativeFunction": "hook|setup|development|misdirection|reveal|payoff|callback|tag - what role does this scene play?",
+        "editSignificance": "why does this cut/transition matter? Does the edit itself convey meaning or comedy?",
+        "viewerAssumption": "what assumption does the viewer make during this scene that might be subverted later?"
+      }
+    ],
+    "totalScenes": <number of distinct scenes/shots>,
+    "editAsPunchline": <boolean - does a cut/edit itself serve as a reveal or punchline?>,
+    "editPunchlineExplanation": "if editAsPunchline is true, explain how the edit delivers the joke (e.g., 'cut reveals person was talking to nobody', 'cut shows aftermath contradicting what was said')",
+    "visualNarrativeSync": <1-10, how tightly are visuals and story/joke synchronized? 10 = edit timing IS the comedy>,
+    "misdirectionTechnique": "how does the video set up false expectations visually before the reveal? What does framing/editing make you ASSUME?",
+    "keyVisualComedyMoment": "THE most important visual element that makes this video funny - describe the specific image/action that IS the punchline. If the joke is verbal, write 'verbal-punchline'"
+  },
   "script": {
     "conceptCore": "one-sentence description of the replicable concept/format that could be copied by another creator",
     "hasScript": <boolean, does this video follow a scripted narrative vs spontaneous content>,
     "scriptQuality": <1-10, how well-written/structured is the script (null if unscripted)>,
     "transcript": "approximate transcript or description of what is said/shown",
+    "visualTranscript": "scene-by-scene description integrating BOTH what is SHOWN and what is SAID, in chronological order - this should read like a script with stage directions",
     "humor": {
       "isHumorous": <boolean>,
-      "humorType": "subversion|absurdist|observational|physical|wordplay|callback|contrast|deadpan|escalation|satire|parody|none",
-      "humorMechanism": "detailed explanation of HOW the humor works - what expectation is set up and how it's subverted or resolved",
+      "humorType": "subversion|absurdist|observational|physical|wordplay|callback|contrast|deadpan|escalation|satire|parody|visual-reveal|edit-punchline|none",
+      "humorMechanism": "detailed explanation of HOW the humor works - include VISUAL elements if the joke relies on what is shown, not just said",
+      "visualComedyElement": "describe any visual element essential to the joke (reveal shots, reaction cuts, visual contradictions, what a cut shows)",
       "comedyTiming": <1-10, effectiveness of timing and beats>,
       "absurdismLevel": <1-10, how much does this violate normal logic or expectations>,
       "surrealismLevel": <1-10, how much does this distort reality or use dream-like elements>
@@ -74,12 +97,14 @@ const COMPREHENSIVE_ANALYSIS_PROMPT = `Analyze this video comprehensively and pr
     "structure": {
       "hookType": "question|statement|action|mystery|pattern-interrupt|relatable-situation|visual-shock",
       "hook": "what happens in first 1-3 seconds to grab attention",
-      "setup": "what expectation, context, or premise is established",
+      "setup": "what expectation, context, or premise is established - include VISUAL setup",
       "development": "how does the middle section build on the setup",
-      "payoff": "how is the expectation resolved, subverted, or paid off",
+      "payoff": "how is the expectation resolved, subverted, or paid off - CRITICAL: note if payoff is VISUAL (a cut, reveal, or shown element) vs VERBAL",
+      "payoffType": "verbal|visual|visual-reveal|edit-cut|combination - how is the payoff delivered?",
       "payoffStrength": <1-10, how satisfying is the conclusion>,
       "hasCallback": <boolean, does it reference earlier elements>,
-      "hasTwist": <boolean, is there an unexpected turn>
+      "hasTwist": <boolean, is there an unexpected turn>,
+      "twistDelivery": "verbal|visual|edit - if hasTwist, how is it delivered?"
     },
     "emotional": {
       "primaryEmotion": "the main emotion being engineered (humor, awe, curiosity, FOMO, nostalgia, satisfaction, shock, warmth, etc)",
@@ -124,7 +149,81 @@ const COMPREHENSIVE_ANALYSIS_PROMPT = `Analyze this video comprehensively and pr
     "swapExamples": "examples of what could be swapped (e.g., 'snus→any craving, taco→any food')",
     "flexibilityNotes": "explanation of how adaptable this concept is"
   },
+  "comedyStyle": {
+    "isHumorFocused": <boolean, is humor the PRIMARY purpose of this video, or is it secondary to other goals (informational, inspirational, promotional)?>,
+    "primaryTechnique": "visual-metaphor|verbal-subversion|absurdist-contrast|reaction-comedy|physical-slapstick|deadpan-delivery|escalation|anti-humor|cringe|wholesome-twist|dramatic-irony|meta-commentary|power-dynamic-absurdism|genre-transplant|third-party-reaction|hidden-malice-reveal|none",
+    "visualMetaphor": {
+      "present": <boolean, does a visual element represent an internal state or abstract concept?>,
+      "element": "describe the visual (e.g., 'overfilling drinks', 'slow-motion walk', 'thousand-yard stare', 'frozen expression')",
+      "represents": "what it symbolizes (e.g., 'mental overwhelm', 'being checked out', 'trauma', 'dissociation')",
+      "whyEffective": "explain why this visual metaphor works in context (for humor or emotional impact)"
+    },
+    "genreTransplant": {
+      "present": <boolean, does this borrow conventions from a dramatic genre (war, horror, thriller, drama) and place them in a mundane setting?>,
+      "sourceGenre": "the dramatic genre being referenced (e.g., 'war film', 'horror movie', 'thriller', 'soap opera', 'infomercial', 'documentary')",
+      "mundaneSetting": "the everyday context it's transplanted into (e.g., 'restaurant kitchen', 'office', 'retail store')",
+      "dramaticElement": "what specific dramatic convention is borrowed (e.g., 'PTSD response', 'thousand-yard stare', 'dramatic zoom', 'ominous music')",
+      "whyEffective": "the effect comes from the CONTRAST between dramatic genre conventions and mundane reality"
+    },
+    "powerDynamicAbsurdism": {
+      "present": <boolean, does humor come from one person treating another in a way that violates normal social contracts?>,
+      "dynamicType": "pet-owner|parent-child|trainer-animal|authority-subordinate|abuser-victim|teacher-student|exploiter-exploited|other",
+      "violatedNorm": "what social expectation is being violated (e.g., 'cashiers don't spray customers', 'service workers are agreeable', 'bosses shouldn't exploit language barriers')",
+      "playedStraight": <boolean, is the absurd dynamic presented matter-of-factly without acknowledgment?>,
+      "whyEffective": "humor comes from blatantly playing out an unhealthy/absurd dynamic as if it were normal"
+    },
+    "thirdPartyReaction": {
+      "present": <boolean, is the punchline delivered through a THIRD PARTY's reaction to a situation between others?>,
+      "primaryActors": "describe the main interaction (e.g., 'two customers fighting to pay')",
+      "reactingParty": "who is the third party reacting (e.g., 'the cashier')",
+      "reactionType": "frustration|confusion|exasperation|deadpan|shock|amusement|resignation",
+      "whyEffective": "the comedy comes from the observer's reaction to a situation that is normally positive but becomes annoying/absurd in excess"
+    },
+    "hiddenMaliceReveal": {
+      "present": <boolean, does a final line or moment reveal that a character had hidden ill intent or was scheming all along?>,
+      "revealLine": "the specific line or moment that reveals the malice (e.g., 'Luckily he doesn't know English', 'It'll be the original price')",
+      "characterAppearance": "how the character appeared before the reveal (e.g., 'friendly boss offering a choice', 'agreeable cashier')",
+      "actualIntent": "what the reveal shows about their true intentions (e.g., 'intentionally exploiting language barrier', 'planned to deny the prize')",
+      "whyEffective": "the shock of realizing a seemingly innocent interaction was actually manipulative"
+    },
+    "contrastMechanism": {
+      "present": <boolean, does the video's effect come from contrast between two elements?>,
+      "element1": "describe first element (e.g., 'traumatized response', 'dramatic genre convention', 'positive social norm')",
+      "element2": "describe contrasting element (e.g., 'mundane restaurant job', 'everyday situation', 'frustrating outcome')",
+      "contrastType": "tone-shift|scale-mismatch|expectation-reality|dramatic-mundane|sincere-absurd|genre-reality|positive-negative"
+    },
+    "physicalComedyDetails": {
+      "present": <boolean, is physical action/visual gag central to the video's effect?>,
+      "action": "describe the physical element (e.g., 'slaps the bottle', 'drinks overflow', 'blank stare', 'sprays customer', 'swagger walk')",
+      "suddenness": <boolean, does the physical action happen suddenly/unexpectedly for shock value?>,
+      "timing": "when in the video this occurs and why timing matters",
+      "wouldWorkWithoutVisual": <boolean, would this concept work as audio-only?>
+    },
+    "punchlineStructure": {
+      "layeredPunchline": <boolean, are there multiple punchlines that stack or compound?>,
+      "punchlineCount": <integer, how many distinct payoff moments are there?>,
+      "punchlines": [
+        {
+          "type": "physical-shock|verbal-reveal|visual-reveal|edit-cut|realization|callback|third-party-reaction|malice-reveal",
+          "description": "what the punchline is",
+          "whatItReveals": "what new information or subversion this punchline delivers"
+        }
+      ],
+      "finalTwist": "if there's a final line/moment that recontextualizes everything, describe it (e.g., 'It'll be the original price' reveals the trick was premeditated, 'Luckily he doesn't know English' reveals exploitation)",
+      "characterSubversion": "does the punchline reveal a character is not who they seemed? (e.g., 'agreeable cashier was actually scheming', 'friendly boss was exploiting')"
+    },
+    "musicMomentAmplifier": {
+      "present": <boolean, does music or sound kick in to amplify a character moment or emotional beat?>,
+      "momentType": "swagger|triumph|dramatic-reveal|tension|comedy-sting|main-character-energy|emotional-payoff",
+      "musicStyle": "describe the music/sound (e.g., 'confident hip-hop beat', 'dramatic orchestral hit', 'comedic sound effect')",
+      "characterEffect": "how the music elevates the character or moment (e.g., 'transforms barista into confident swagger moment', 'punctuates the awkwardness')",
+      "essentialToEffect": <boolean, would the moment land without this music?>
+    }
+  },
   "trends": {
+    "usesPremadeSound": <boolean, does this use a TikTok 'sound' or trending audio that viewers would recognize?>,
+    "soundName": "name or description of the sound/audio trend if applicable",
+    "soundEssential": <boolean, is the premade sound essential to the joke, or just background?>,
     "memeDependent": <boolean, does this rely on a current meme/trend to land?>,
     "trendName": "name of the meme/trend if applicable, or null",
     "trendLifespan": "dead-meme|dying|current|evergreen-trope|not-trend-dependent",
@@ -166,15 +265,77 @@ const COMPREHENSIVE_ANALYSIS_PROMPT = `Analyze this video comprehensively and pr
   }
 }
 
-IMPORTANT CONTEXT: This analysis is for a service that helps businesses replicate viral video concepts. The key question is: "Can another business recreate this concept successfully?" 
+CRITICAL INSTRUCTIONS:
 
-Focus especially on:
-1. CASTING: Does success depend on the specific person's looks, personality, or acting ability?
-2. PRODUCTION: How much equipment/editing/time is needed?
-3. FLEXIBILITY: Can this work for different business types, or is it locked to one industry?
-4. STANDALONE: Does this work without knowing the creator or trend context?
+1. SCENE-BY-SCENE ANALYSIS IS ESSENTIAL: You MUST break down the video into individual scenes/shots in the "scenes.sceneBreakdown" array. For EACH scene, describe:
+   - What is SHOWN visually (who is on screen, what are they doing, camera angle)
+   - What is SAID or HEARD (dialogue, sounds)
+   - What narrative role this scene plays
+   - What the EDIT/CUT to this scene communicates
+   - Any VISUAL DETAIL in this specific scene (small visual gags, background details, physical actions, expressions)
 
-For the "script" section, analyze the CONCEPT and STRUCTURE as intellectual property that could be extracted and reused. Be specific about humor mechanics - don't just say "it's funny", explain WHY and HOW it creates humor.
+2. EDITS CAN BE PUNCHLINES: A cut or scene change can itself deliver the joke. Example: if someone says "I'm fine" but then a cut reveals they're talking to nobody, the EDIT is the punchline. Look for reveal cuts, reaction shots, or scene changes that contradict or subvert what was just established.
+
+3. VISUAL ELEMENTS: If the video's effect depends on what is SHOWN (not just said), you MUST capture this in "script.humor.visualComedyElement". The transcript alone may miss the point if the payoff is visual.
+
+4. COMPLETE THE SCENE: If a scene is cut short or ends abruptly (e.g., "Serena? Serena?" with no response), what does NOT happen is often the point. Note what the viewer expects vs what they get.
+
+5. MISDIRECTION: Note when the video deliberately misleads viewers visually before a reveal. What assumptions does the framing create that get subverted?
+
+6. VISUAL METAPHORS FOR INTERNAL STATES: Look for visual elements that represent mental/emotional states through physical imagery:
+   - Drinks overflowing = mental overflow/being "checked out"
+   - Thousand-yard stare = trauma/disassociation
+   - Slow motion = internal experience of time
+   - Background chaos while person is calm = disconnect from reality
+   Capture in "comedyStyle.visualMetaphor" - these can work for humor OR emotional impact.
+
+7. GENRE TRANSPLANTATION (dramatic/mundane contrast): Look for DRAMATIC GENRE CONVENTIONS (war films, horror movies, thrillers, soap operas) placed in MUNDANE SETTINGS (restaurants, offices, retail). Examples:
+   - PTSD/shell-shocked response after a busy restaurant shift
+   - Horror movie tension in an office supply closet
+   - War film thousand-yard stare at a cash register
+   The effect comes from CONTRAST between dramatic genre weight and everyday triviality. Capture in "comedyStyle.genreTransplant".
+
+8. POWER DYNAMIC ABSURDISM: Look for one person treating another in a way that VIOLATES NORMAL SOCIAL CONTRACTS:
+   - Spraying a customer like training a pet
+   - Treating a coworker like a child
+   - Boss exploiting an employee's language barrier
+   The effect is playing out an unhealthy/absurd power dynamic BLATANTLY, as if normal. Capture in "comedyStyle.powerDynamicAbsurdism".
+
+9. THIRD-PARTY REACTION COMEDY: Sometimes the payoff is a THIRD PARTY's reaction to a situation between others:
+   - Two customers fight over who pays → CASHIER's frustrated reaction is the punchline
+   - Couple argues → Server's awkward expression is the comedy
+   The primary actors create the situation, but the OBSERVER's reaction delivers the payoff. Capture in "comedyStyle.thirdPartyReaction".
+
+10. HIDDEN MALICE REVEAL: Look for a final line or moment that reveals a character had HIDDEN ILL INTENT all along:
+    - "Luckily he doesn't know English" → reveals boss was exploiting language barrier
+    - "It'll be the original price" → reveals cashier planned to deny the prize
+    - Taking her card to pay "for her" → reveals the "gentleman" used her money
+    The shock comes from realizing a seemingly innocent interaction was actually manipulative. Capture in "comedyStyle.hiddenMaliceReveal".
+
+11. LAYERED/COMPOUND PUNCHLINES: Many viral videos have MULTIPLE payoffs that stack:
+    - First punchline: Physical shock (e.g., slapping a bottle)
+    - Second punchline: Verbal reveal that recontextualizes everything
+    The second often SUBVERTS CHARACTER ASSUMPTIONS (the agreeable person was scheming). Count ALL punchlines in "comedyStyle.punchlineStructure".
+
+12. MUSIC AS MOMENT AMPLIFIER: Note when music/sound kicks in to elevate a character moment:
+    - Confident beat when barista puts on sunglasses and struts
+    - Dramatic sting for a reveal
+    - "Main character energy" music for swagger moments
+    Capture in "comedyStyle.musicMomentAmplifier" - note if the moment would land without the music.
+
+13. SUDDEN PHYSICAL ACTIONS: Physical comedy often relies on SUDDENNESS for shock value. A slap, spray, or unexpected action that comes without warning creates visceral impact. Note the "suddenness" boolean in physicalComedyDetails.
+
+14. PRE-MADE SOUNDS/TRENDS: Flag if the video uses a recognizable TikTok sound or trend format in "trends.usesPremadeSound". Note whether the sound is essential or just background.
+
+15. NOT ALL VIDEOS ARE HUMOR-FOCUSED: Set "comedyStyle.isHumorFocused" to false if humor is secondary to other goals (informational, inspirational, promotional, creative/artistic). Still analyze any comedic elements present, but recognize the primary purpose.
+
+BUSINESS CONTEXT: This analysis helps businesses replicate viral video concepts. Focus on:
+- CASTING: Does success depend on specific person's looks, personality, or acting?
+- PRODUCTION: How much equipment/editing/time is needed?
+- FLEXIBILITY: Can this work for different business types?
+- STANDALONE: Does this work without knowing the creator or trend context?
+
+For "script" section, analyze CONCEPT and STRUCTURE as intellectual property. Be specific about mechanics - explain WHY and HOW elements work, including visual elements.
 
 Be specific and detailed. Rate everything on 1-10 scales. Return valid JSON only.`;
 
