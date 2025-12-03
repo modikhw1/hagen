@@ -87,6 +87,7 @@ export async function GET(request: NextRequest) {
           video_id,
           platform,
           metadata,
+          gcs_uri,
           created_at
         `)
         .order('created_at', { ascending: false })
@@ -112,6 +113,7 @@ export async function GET(request: NextRequest) {
         video_id: string;
         platform: string;
         metadata?: { title?: string; thumbnail_url?: string };
+        gcs_uri?: string;
         created_at: string;
       }) => ({
         id: v.id,
@@ -119,18 +121,19 @@ export async function GET(request: NextRequest) {
         title: v.metadata?.title || v.video_id,
         platform: v.platform,
         thumbnail_url: v.metadata?.thumbnail_url,
+        gcs_uri: v.gcs_uri,
         created_at: v.created_at
       }));
       
       return NextResponse.json(transformed);
     }
     
-    // Get all ratings with video info
+    // Get all ratings with video info (including visual_analysis for correlation)
     const { data, error } = await supabase
       .from('video_ratings')
       .select(`
         *,
-        video:analyzed_videos(id, video_url, video_id, platform, metadata)
+        video:analyzed_videos(id, video_url, video_id, platform, metadata, visual_analysis, gcs_uri)
       `)
       .eq('rater_id', raterId)
       .order('rated_at', { ascending: false })
