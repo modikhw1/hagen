@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { VoiceInput } from '@/components/ui/VoiceInput';
 
 interface Video {
   id: string;
@@ -800,12 +801,12 @@ export default function RatePage() {
 
               {/* Notes */}
               <div className="bg-white rounded-xl shadow-sm border p-4 mb-4">
-                <textarea
+                <VoiceInput
                   value={notes}
-                  onChange={e => setNotes(e.target.value)}
+                  onChange={setNotes}
                   placeholder={isNotRelevant 
                     ? "Why is this video not relevant? (optional)" 
-                    : "Quick notes (optional)... why this score?"}
+                    : "Quick notes (optional)... why this score? 🎤 Click mic to dictate"}
                   className="w-full border-0 resize-none text-sm focus:outline-none focus:ring-0 p-0"
                   rows={3}
                 />
