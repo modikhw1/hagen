@@ -11,7 +11,18 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     
-    const { video_id, overall_score, dimensions, tags, notes, rater_id, ai_prediction } = body;
+    const { 
+      video_id, 
+      overall_score, 
+      dimensions, 
+      tags, 
+      notes, 
+      rater_id, 
+      ai_prediction,
+      replicability_notes,
+      brand_context,
+      humor_type
+    } = body;
     
     if (!video_id) {
       return NextResponse.json({ error: 'video_id is required' }, { status: 400 });
@@ -46,6 +57,9 @@ export async function POST(request: NextRequest) {
         dimensions: dimensions || {},
         tags: tags || [],
         notes: notes || null,
+        replicability_notes: replicability_notes || null,
+        brand_context: brand_context || null,
+        humor_type: humor_type || null,
         rated_at: new Date().toISOString(),
         rater_id: rater_id || 'primary',
         ai_prediction: aiPredictionWithDelta,

@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { VoiceInput } from '@/components/ui/VoiceInput';
 
 interface Video {
   id: string;
@@ -49,6 +48,9 @@ export default function RatePage() {
     hook: null, pacing: null, originality: null, payoff: null, rewatchable: null
   });
   const [notes, setNotes] = useState('');
+  const [replicabilityNotes, setReplicabilityNotes] = useState('');
+  const [brandContext, setBrandContext] = useState('');
+  const [humorType, setHumorType] = useState('');
   const [isNotRelevant, setIsNotRelevant] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   
@@ -202,6 +204,9 @@ export default function RatePage() {
             Object.entries(dimensions).filter(([_, v]) => v !== null)
           ),
           notes: notes || null,
+          replicability_notes: replicabilityNotes || null,
+          brand_context: brandContext || null,
+          humor_type: humorType || null,
           tags: isNotRelevant ? ['not_relevant'] : [],
           ai_prediction: prediction || null  // Include AI prediction for disagreement tracking
         })
@@ -220,12 +225,15 @@ export default function RatePage() {
     } finally {
       setSubmitting(false);
     }
-  }, [videos, current, overall, dimensions, notes, submitting, isNotRelevant, prediction]);
+  }, [videos, current, overall, dimensions, notes, replicabilityNotes, brandContext, humorType, submitting, isNotRelevant, prediction]);
 
   const resetForm = () => {
     setOverall(null);
     setDimensions({ hook: null, pacing: null, originality: null, payoff: null, rewatchable: null });
     setNotes('');
+    setReplicabilityNotes('');
+    setBrandContext('');
+    setHumorType('');
     setIsNotRelevant(false);
     setPrediction(null);
     setPipelineStage('idle');
@@ -801,16 +809,73 @@ export default function RatePage() {
 
               {/* Notes */}
               <div className="bg-white rounded-xl shadow-sm border p-4 mb-4">
-                <VoiceInput
+                <textarea
                   value={notes}
-                  onChange={setNotes}
+                  onChange={(e) => setNotes(e.target.value)}
                   placeholder={isNotRelevant 
                     ? "Why is this video not relevant? (optional)" 
-                    : "Quick notes (optional)... why this score? 🎤 Click mic to dictate"}
+                    : "Quick notes (optional)... why this score?"}
                   className="w-full border-0 resize-none text-sm focus:outline-none focus:ring-0 p-0"
                   rows={3}
                 />
               </div>
+
+              {/* Brand Context Fields */}
+              {!isNotRelevant && (
+                <div className="bg-white rounded-xl shadow-sm border p-4 mb-4 space-y-4">
+                  <div className="text-xs text-gray-400 uppercase tracking-wide font-medium">Brand Context (Optional)</div>
+                  
+                  {/* Humor Type Selector */}
+                  <div>
+                    <label className="text-xs text-gray-500 block mb-1">Humor Type</label>
+                    <select
+                      value={humorType}
+                      onChange={(e) => setHumorType(e.target.value)}
+                      className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">Select humor type...</option>
+                      <option value="wordplay">Wordplay / Puns</option>
+                      <option value="visual">Visual Punchline</option>
+                      <option value="subversion">Subversion / Misdirection</option>
+                      <option value="reaction">Exaggerated Reaction</option>
+                      <option value="absurd">Absurdist / Surreal</option>
+                      <option value="relatable">Relatable Exaggeration</option>
+                      <option value="contrast">Contrast / Juxtaposition</option>
+                      <option value="deadpan">Deadpan / Understated</option>
+                      <option value="escalation">Escalation / Pattern Break</option>
+                      <option value="cultural">Generational / Cultural</option>
+                    </select>
+                  </div>
+                  
+                  {/* Replicability */}
+                  <div>
+                    <label className="text-xs text-gray-500 block mb-1">
+                      Replicability — How easy to recreate?
+                    </label>
+                    <textarea
+                      value={replicabilityNotes}
+                      onChange={(e) => setReplicabilityNotes(e.target.value)}
+                      placeholder="e.g., 'Simple concept, any café can do this with 2 people' or 'Requires specific equipment/location'"
+                      className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={2}
+                    />
+                  </div>
+                  
+                  {/* Brand Context */}
+                  <div>
+                    <label className="text-xs text-gray-500 block mb-1">
+                      Brand Fit — What type of establishment suits this? (or doesn't)
+                    </label>
+                    <textarea
+                      value={brandContext}
+                      onChange={(e) => setBrandContext(e.target.value)}
+                      placeholder="e.g., 'Not for upscale dining, better for casual spots' or 'Works for any restaurant willing to be playful'"
+                      className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={2}
+                    />
+                  </div>
+                </div>
+              )}
 
               {/* Actions */}
               <div className="flex gap-3">

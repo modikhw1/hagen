@@ -9,9 +9,10 @@ export async function GET(request: NextRequest) {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Fetch all rated videos, ordered by most recent first
+    // Include visual_analysis to check for deep analysis
     const { data: videos, error } = await supabase
       .from('analyzed_videos')
-      .select('id, video_url, platform, metadata, rated_at, user_ratings')
+      .select('id, video_url, platform, metadata, rated_at, user_ratings, visual_analysis, user_notes')
       .not('user_ratings', 'is', null)
       .order('rated_at', { ascending: false });
 
@@ -23,7 +24,26 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ videos: videos || [] });
+    // Transform videos to include has_deep_analysis flag
+    const transformedVideos = (videos || []).map(video => {
+      // Check if visual_analysis has deep_analysis data (150+ features)
+      const hasDeepAnalysis = video.visual_analysis?.deep_analysis || 
+        (video.visual_analysis?.analysis?.features && 
+         Object.keys(video.visual_analysis.analysis.features).length > 50);
+      
+      return {
+        id: video.id,
+        video_url: video.video_url,
+        platform: video.platform,
+        metadata: video.metadata,
+        rated_at: video.rated_at,
+        user_ratings: video.user_ratings,
+        user_notes: video.user_notes,
+        has_deep_analysis: !!hasDeepAnalysis
+      };
+    });
+
+    return NextResponse.json({ videos: transformedVideos });
   } catch (error) {
     console.error('Library API error:', error);
     return NextResponse.json(

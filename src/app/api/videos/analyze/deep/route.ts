@@ -91,33 +91,19 @@ export async function POST(request: NextRequest) {
         console.log(`✅ Downloaded: ${localFilePath}`)
       }
 
-      // Step 3: Upload to cloud storage (required for Gemini)
+      // Step 3: Upload to Gemini File API (required for Gemini analysis)
+      // Note: GCS URLs don't work directly with Gemini - must use Gemini's File API
       if (localFilePath) {
-        console.log('☁️ Uploading to cloud storage...')
+        console.log('☁️ Uploading to Gemini File API...')
+        const storage = createVideoStorageService()
+        const uploadResult = await storage.uploadToGeminiFileAPI(localFilePath)
         
-        // Check if GCS is configured
-        if (process.env.GOOGLE_CLOUD_PROJECT_ID && process.env.GOOGLE_CLOUD_STORAGE_BUCKET) {
-          const storage = createVideoStorageService()
-          const uploadResult = await storage.uploadVideo(localFilePath, videoId)
-          
-          if (!uploadResult.success) {
-            throw new Error(`Cloud upload failed: ${uploadResult.error}`)
-          }
-          
-          cloudUrl = uploadResult.gsUrl
-          console.log(`✅ Uploaded: ${cloudUrl}`)
-        } else {
-          // Fallback: Use Gemini File API for temporary upload
-          console.log('☁️ Using Gemini File API (temporary storage)...')
-          const storage = createVideoStorageService()
-          const uploadResult = await storage.uploadToGeminiFileAPI(localFilePath)
-          
-          if (!uploadResult.success) {
-            throw new Error(`Gemini upload failed: ${uploadResult.error}`)
-          }
-          
-          cloudUrl = uploadResult.gsUrl
+        if (!uploadResult.success) {
+          throw new Error(`Gemini upload failed: ${uploadResult.error}`)
         }
+        
+        cloudUrl = uploadResult.gsUrl
+        console.log(`✅ Uploaded to Gemini: ${cloudUrl}`)
       }
 
       // Step 4: Analyze with Gemini
