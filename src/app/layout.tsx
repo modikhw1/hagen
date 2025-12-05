@@ -1,11 +1,12 @@
 import { Inter } from 'next/font/google'
 import './globals.css'
+import { Navigation } from '@/components/ui/Navigation'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'Hagen - AI-Powered App',
-  description: 'Next.js app with React, TypeScript, Supabase, and OpenAI',
+  title: 'Hagen - AI Video Analysis',
+  description: 'Analyze and rate video content with AI-powered insights',
 }
 
 export default function RootLayout({
@@ -16,7 +17,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-950">
+          <Navigation />
           {children}
         </div>
       </body>
