@@ -1,5 +1,3 @@
-export { TextAnalyzer } from './TextAnalyzer'
-export { TikTokFetcher } from './TikTokFetcher'
 export { VideoRating } from './VideoRating'
 export { SimilarVideos } from './SimilarVideos'
 export { DeepAnalysisButton } from './DeepAnalysisButton'

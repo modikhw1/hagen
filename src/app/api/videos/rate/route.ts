@@ -95,6 +95,33 @@ export async function POST(request: NextRequest) {
       console.log('✅ Embedding updated successfully')
     }
 
+    // DUAL WRITE: Also save to video_ratings table (primary ratings table)
+    // This ensures compatibility with /analyze-rate workflow
+    const overallScore = typeof ratings.overall === 'number' ? ratings.overall : 0.7;
+    const { error: ratingsError } = await supabase
+      .from('video_ratings')
+      .upsert({
+        video_id: videoId,
+        overall_score: overallScore,
+        dimensions: {
+          hook: ratings.hook || overallScore,
+          pacing: ratings.pacing || overallScore,
+          originality: ratings.originality || overallScore,
+          payoff: ratings.payoff || overallScore,
+          rewatchable: ratings.rewatchable || overallScore
+        },
+        notes: notes || '',
+        tags: tags || [],
+        rated_at: new Date().toISOString()
+      }, { onConflict: 'video_id' });
+    
+    if (ratingsError) {
+      console.warn('⚠️ Failed to dual-write to video_ratings:', ratingsError.message);
+      // Don't fail - legacy write succeeded
+    } else {
+      console.log('✅ Dual-write to video_ratings successful');
+    }
+
     // Check if we should update rating schema
     const { data: currentSchema } = await supabase
       .from('rating_schema_versions')
