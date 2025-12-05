@@ -8,6 +8,7 @@ const navItems = [
   { href: '/rate', label: 'Quick Rate' },
   { href: '/library', label: 'Library' },
   { href: '/discern', label: 'Discern' },
+  { href: '/brand-profile', label: 'Brand Profile' },
 ];
 
 export function Navigation() {
