@@ -90,7 +90,34 @@ curl -s "http://localhost:$PORT/api/ratings?limit=1" | jq '.[0] | {
 }'
 echo ""
 
-# 5. Reminder
+# 5. Brand Profiles
+echo "🏷️  BRAND PROFILES"
+echo "------------------"
+BRAND_PROFILES=$(curl -s "http://localhost:$PORT/api/brand-profile" | jq '.profiles | length // 0' 2>/dev/null || echo "0")
+echo "Total brand profiles: $BRAND_PROFILES"
+
+if [ "$BRAND_PROFILES" != "0" ] && [ "$BRAND_PROFILES" != "null" ]; then
+    COMPLETE_PROFILES=$(curl -s "http://localhost:$PORT/api/brand-profile?status=complete" | jq '.profiles | length // 0' 2>/dev/null || echo "0")
+    DRAFT_PROFILES=$(curl -s "http://localhost:$PORT/api/brand-profile?status=draft" | jq '.profiles | length // 0' 2>/dev/null || echo "0")
+    echo "  Complete: $COMPLETE_PROFILES"
+    echo "  Draft: $DRAFT_PROFILES"
+    
+    # Sample profile
+    echo ""
+    echo "Sample brand profile:"
+    curl -s "http://localhost:$PORT/api/brand-profile?limit=1" | jq '.profiles[0] | {
+      name: .name,
+      business_type: .business_type,
+      status: .status,
+      has_characteristics: (.characteristics != null and .characteristics != {}),
+      has_tone: (.tone != null and .tone != {})
+    }' 2>/dev/null || echo "  (none)"
+else
+    echo "  No brand profiles created yet"
+fi
+echo ""
+
+# 6. Reminder
 echo "=========================================="
 echo "  📖 See DATA_ARCHITECTURE.md for details"
 echo "  🔧 Update that doc before changing data structures"

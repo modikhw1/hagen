@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     if (videoId && !providedEmbedding) {
       const { data: video, error } = await supabase
         .from('analyzed_videos')
-        .select('embedding')
+        .select('content_embedding')
         .eq('id', videoId)
         .single()
 
@@ -47,14 +47,14 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      if (!video.embedding) {
+      if (!video.content_embedding) {
         return NextResponse.json(
           { error: 'no-embedding', message: 'Video has no embedding' },
           { status: 400 }
         )
       }
 
-      queryEmbedding = video.embedding
+      queryEmbedding = video.content_embedding
     }
 
     if (!queryEmbedding) {

@@ -1,11 +1,16 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { Button, Card, Input, LoadingSpinner } from '@/components/ui'
+import { VideoInterpretationCard, type VideoInterpretation } from '@/components/features'
 
 interface Message {
   role: 'user' | 'assistant'
   content: string
+  id: string
+  dbMessageId?: string  // ID from database for persisting notes
+  trainingNote?: string
+  videoInterpretations?: VideoInterpretation[]  // Associated video analyses
 }
 
 interface ConversationInfo {
@@ -14,6 +19,13 @@ interface ConversationInfo {
   brandName: string
   currentPhase: string
 }
+
+interface ConversationNotes {
+  masterNote: string
+}
+
+// Helper to generate unique message IDs
+const generateMessageId = () => `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 
 interface BrandSynthesis {
   narrative_summary: string
@@ -62,6 +74,15 @@ export default function BrandProfilePage() {
   const [matchedVideos, setMatchedVideos] = useState<VideoMatch[]>([])
   const [isFindingMatches, setIsFindingMatches] = useState(false)
   const [referenceUrl, setReferenceUrl] = useState('')
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null)
+  const [noteInputValue, setNoteInputValue] = useState('')
+  const [conversationNotes, setConversationNotes] = useState<ConversationNotes>({
+    masterNote: ''
+  })
+  const [showMasterNotes, setShowMasterNotes] = useState(false)
+  const [isSavingNotes, setIsSavingNotes] = useState(false)
+  const [notesSaved, setNotesSaved] = useState(false)
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
@@ -102,6 +123,7 @@ export default function BrandProfilePage() {
       })
 
       setMessages([{
+        id: generateMessageId(),
         role: 'assistant',
         content: data.openingMessage
       }])
@@ -109,6 +131,7 @@ export default function BrandProfilePage() {
     } catch (error) {
       console.error('Start conversation error:', error)
       setMessages([{
+        id: generateMessageId(),
         role: 'assistant',
         content: `Sorry, I couldn't start the conversation. ${error instanceof Error ? error.message : 'Please try again.'}`
       }])
@@ -124,7 +147,8 @@ export default function BrandProfilePage() {
     setInputValue('')
     setIsLoading(true)
 
-    setMessages(prev => [...prev, { role: 'user', content: messageToSend }])
+    const userMsgId = generateMessageId()
+    setMessages(prev => [...prev, { id: userMsgId, role: 'user', content: messageToSend }])
 
     try {
       const response = await fetch('/api/brand-profile/message', {
@@ -151,14 +175,39 @@ export default function BrandProfilePage() {
         } : null)
       }
 
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: data.message
-      }])
+      // Convert video analyses to VideoInterpretation format
+      const videoInterpretations: VideoInterpretation[] | undefined = data.videoAnalyses?.map((v: any) => ({
+        url: v.url,
+        platform: v.platform,
+        videoId: v.videoId,
+        analyzedVideoId: v.videoId, // The DB ID for corrections
+        analysis: v.analysis,
+        fromCache: v.fromCache
+      }))
+
+      // Update user message with database ID, video interpretations, and add assistant message
+      setMessages(prev => {
+        const updated = prev.map(msg => 
+          msg.id === userMsgId 
+            ? { 
+                ...msg, 
+                dbMessageId: data.userMessageId,
+                videoInterpretations 
+              }
+            : msg
+        )
+        return [...updated, {
+          id: generateMessageId(),
+          dbMessageId: data.assistantMessageId,
+          role: 'assistant' as const,
+          content: data.message
+        }]
+      })
 
     } catch (error) {
       console.error('Send message error:', error)
       setMessages(prev => [...prev, {
+        id: generateMessageId(),
         role: 'assistant',
         content: `Sorry, something went wrong. ${error instanceof Error ? error.message : ''}`
       }])
@@ -195,6 +244,7 @@ export default function BrandProfilePage() {
       } : null)
 
       setMessages(prev => [...prev, {
+        id: generateMessageId(),
         role: 'assistant',
         content: data.message
       }])
@@ -211,6 +261,7 @@ export default function BrandProfilePage() {
 
     setIsLoading(true)
     setMessages(prev => [...prev, {
+      id: generateMessageId(),
       role: 'user',
       content: '[Generating brand profile...]'
     }])
@@ -234,6 +285,7 @@ export default function BrandProfilePage() {
       setSynthesis(data.synthesis)
 
       setMessages(prev => [...prev, {
+        id: generateMessageId(),
         role: 'assistant',
         content: `✨ I've created your brand profile! Here's what I learned about ${conversationInfo.brandName}:\n\n${data.synthesis.narrative_summary}`
       }])
@@ -246,6 +298,7 @@ export default function BrandProfilePage() {
     } catch (error) {
       console.error('Synthesis error:', error)
       setMessages(prev => [...prev, {
+        id: generateMessageId(),
         role: 'assistant',
         content: `Sorry, I couldn't generate the brand profile. ${error instanceof Error ? error.message : ''}`
       }])
@@ -301,6 +354,7 @@ export default function BrandProfilePage() {
       if (response.ok) {
         setReferenceUrl('')
         setMessages(prev => [...prev, {
+          id: generateMessageId(),
           role: 'assistant',
           content: `Great, I've saved that video as a reference! It helps me understand what you're going for. Let's continue - what is it about that video that resonates with you?`
         }])
@@ -316,6 +370,119 @@ export default function BrandProfilePage() {
       sendMessage()
     }
   }
+
+  // Handle corrections to Gemini interpretations
+  const handleVideoCorrection = async (
+    videoId: string, 
+    corrections: Record<string, string>, 
+    note: string
+  ) => {
+    try {
+      const response = await fetch('/api/brand-profile/video-correction', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          analyzedVideoId: videoId,
+          corrections,
+          correctionNote: note,
+          conversationId: conversationInfo?.conversationId
+        })
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to save correction')
+      }
+
+      console.log('✅ Correction saved to Gemini training data')
+    } catch (error) {
+      console.error('Correction error:', error)
+      throw error
+    }
+  }
+
+  // Handle saving a note for a specific message
+  const handleSaveNote = (messageId: string) => {
+    setMessages(prev => prev.map(msg => 
+      msg.id === messageId 
+        ? { ...msg, trainingNote: noteInputValue }
+        : msg
+    ))
+    setEditingNoteId(null)
+    setNoteInputValue('')
+  }
+
+  // Handle starting to edit a note
+  const handleEditNote = (messageId: string, existingNote?: string) => {
+    setEditingNoteId(messageId)
+    setNoteInputValue(existingNote || '')
+  }
+
+  // Handle canceling note edit
+  const handleCancelNote = () => {
+    setEditingNoteId(null)
+    setNoteInputValue('')
+  }
+
+  // Auto-save notes to database (debounced)
+  const saveNotesToDatabase = useCallback(async () => {
+    if (!conversationInfo) return
+
+    setIsSavingNotes(true)
+    setNotesSaved(false)
+
+    try {
+      // Collect message notes that have dbMessageId (from database)
+      const messageNotes = messages
+        .filter(m => m.dbMessageId && m.trainingNote)
+        .map(m => ({
+          messageId: m.dbMessageId!,
+          note: m.trainingNote!
+        }))
+
+      await fetch('/api/brand-profile/notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          conversationId: conversationInfo.conversationId,
+          messageNotes,
+          sessionNotes: conversationNotes.masterNote
+        })
+      })
+
+      setNotesSaved(true)
+      // Clear saved indicator after 2 seconds
+      setTimeout(() => setNotesSaved(false), 2000)
+    } catch (error) {
+      console.error('Failed to save notes:', error)
+    } finally {
+      setIsSavingNotes(false)
+    }
+  }, [conversationInfo, messages, conversationNotes.masterNote])
+
+  // Debounced auto-save when notes change
+  useEffect(() => {
+    if (!conversationInfo) return
+    
+    // Clear existing timeout
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current)
+    }
+
+    // Set new timeout for 2 seconds after last change
+    saveTimeoutRef.current = setTimeout(() => {
+      const hasNotes = messages.some(m => m.trainingNote) || conversationNotes.masterNote
+      if (hasNotes) {
+        saveNotesToDatabase()
+      }
+    }, 2000)
+
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current)
+      }
+    }
+  }, [messages, conversationNotes.masterNote, conversationInfo, saveNotesToDatabase])
 
   const currentPhaseLabel = conversationInfo 
     ? PHASE_LABELS[conversationInfo.currentPhase] || conversationInfo.currentPhase
@@ -379,30 +546,71 @@ export default function BrandProfilePage() {
                 {currentPhaseLabel}
               </span>
             </div>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => {
-                setConversationInfo(null)
-                setMessages([])
-                setSynthesis(null)
-                setMatchedVideos([])
-                setBrandName('')
-              }}
-            >
-              Start Over
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setShowMasterNotes(!showMasterNotes)}
+                className={showMasterNotes ? 'bg-yellow-600/20 text-yellow-400' : ''}
+              >
+                📋 {showMasterNotes ? 'Hide Notes' : 'Session Notes'}
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  setConversationInfo(null)
+                  setMessages([])
+                  setSynthesis(null)
+                  setMatchedVideos([])
+                  setBrandName('')
+                  setConversationNotes({ masterNote: '' })
+                  setShowMasterNotes(false)
+                }}
+              >
+                Start Over
+              </Button>
+            </div>
           </div>
+        )}
+
+        {/* Master Notes Panel */}
+        {conversationInfo && showMasterNotes && (
+          <Card className="mb-4 bg-yellow-900/10 border border-yellow-600/30">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-medium text-yellow-400">📋 Session Notes</h3>
+              <div className="flex items-center gap-2">
+                {isSavingNotes && (
+                  <span className="text-xs text-gray-400 flex items-center gap-1">
+                    <LoadingSpinner size="sm" /> Saving...
+                  </span>
+                )}
+                {notesSaved && !isSavingNotes && (
+                  <span className="text-xs text-green-400">✓ Saved</span>
+                )}
+                {!isSavingNotes && !notesSaved && (
+                  <span className="text-xs text-gray-500">Auto-saves after changes</span>
+                )}
+              </div>
+            </div>
+            <textarea
+              value={conversationNotes.masterNote}
+              onChange={(e) => setConversationNotes(prev => ({ ...prev, masterNote: e.target.value }))}
+              placeholder="Overall thoughts on this conversation...&#10;&#10;What worked well? What felt unnatural? What questions should be asked differently? What data would be useful to capture? Any patterns or insights about the conversation flow?"
+              className="w-full bg-gray-800 text-white text-sm px-3 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-yellow-500 resize-y min-h-[120px]"
+              rows={5}
+            />
+          </Card>
         )}
 
         {/* Chat Messages */}
         {messages.length > 0 && (
           <Card className="mb-4 max-h-[450px] overflow-y-auto">
             <div className="space-y-4">
-              {messages.map((msg, idx) => (
+              {messages.map((msg) => (
                 <div
-                  key={idx}
-                  className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                  key={msg.id}
+                  className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
                 >
                   <div
                     className={`max-w-[85%] rounded-lg px-4 py-3 ${
@@ -412,6 +620,90 @@ export default function BrandProfilePage() {
                     }`}
                   >
                     <div className="whitespace-pre-wrap">{msg.content}</div>
+                  </div>
+
+                  {/* Video Interpretation Cards (shown under user messages that contain links) */}
+                  {msg.role === 'user' && msg.videoInterpretations && msg.videoInterpretations.length > 0 && (
+                    <div className="mt-2 w-full max-w-[85%] ml-auto space-y-2">
+                      {msg.videoInterpretations.map((interpretation, idx) => (
+                        <VideoInterpretationCard
+                          key={`${msg.id}-video-${idx}`}
+                          interpretation={interpretation}
+                          onCorrection={handleVideoCorrection}
+                          compact={true}
+                        />
+                      ))}
+                    </div>
+                  )}
+                  
+                  {/* Note button and display */}
+                  <div className={`mt-1 w-full max-w-[85%] ${msg.role === 'user' ? 'ml-auto' : ''}`}>
+                    {editingNoteId === msg.id ? (
+                      <div className="bg-gray-800 rounded-lg p-3 mt-1 border border-yellow-600/30">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs text-yellow-400">
+                            {msg.role === 'assistant' ? '🤖 Claude Feedback' : '📝 Training Note'}
+                          </span>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleSaveNote(msg.id)}
+                              className="text-green-400 hover:text-green-300 text-xs px-2 py-1 bg-green-900/30 rounded"
+                            >
+                              Save
+                            </button>
+                            <button
+                              onClick={handleCancelNote}
+                              className="text-red-400 hover:text-red-300 text-xs px-2 py-1 bg-red-900/30 rounded"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                        <textarea
+                          value={noteInputValue}
+                          onChange={(e) => setNoteInputValue(e.target.value)}
+                          placeholder={msg.role === 'assistant' 
+                            ? "Feedback for Claude's response: Was this helpful? What was wrong? How should it respond instead?"
+                            : "Note about this message or the video link shared"
+                          }
+                          className="w-full bg-gray-700 text-white text-sm px-3 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-yellow-500 resize-y min-h-[80px]"
+                          rows={4}
+                          autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === 'Escape') {
+                              handleCancelNote()
+                            }
+                          }}
+                        />
+                        {msg.role === 'assistant' && (
+                          <p className="text-xs text-gray-500 mt-2">
+                            💡 This feedback trains Claude&apos;s conversation style. For video interpretation corrections, use the &quot;Correct Gemini&quot; button on the video card above.
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                      <div className={`flex items-start gap-2 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+                        <button
+                          onClick={() => handleEditNote(msg.id, msg.trainingNote)}
+                          className={`text-xs px-2 py-1 rounded transition-colors flex-shrink-0 ${
+                            msg.trainingNote 
+                              ? 'bg-yellow-600/20 text-yellow-400 hover:bg-yellow-600/30' 
+                              : 'text-gray-500 hover:text-gray-400 hover:bg-gray-700/50'
+                          }`}
+                          title={msg.trainingNote ? 'Edit note' : 'Add training note'}
+                        >
+                          {msg.trainingNote ? '📝' : '+'}
+                        </button>
+                        {msg.trainingNote && (
+                          <div 
+                            className="text-xs text-yellow-400/80 italic bg-yellow-900/10 px-2 py-1 rounded cursor-pointer hover:bg-yellow-900/20"
+                            onClick={() => handleEditNote(msg.id, msg.trainingNote)}
+                          >
+                            {msg.trainingNote}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}

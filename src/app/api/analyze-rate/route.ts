@@ -20,6 +20,7 @@ export async function POST(request: NextRequest) {
       notes,
       replicability_notes,
       brand_tone_notes,
+      analysis_notes,  // User's corrections/notes on the Gemini analysis
       gemini_analysis,
       similar_videos
     } = body;
@@ -105,15 +106,20 @@ export async function POST(request: NextRequest) {
       embeddingParts.push(`Brand/Tone: ${brand_tone_notes}`);
     }
     
-    // Include Gemini's interpretation for context
-    if (gemini_analysis?.humor_analysis?.primary_type) {
-      embeddingParts.push(`Gemini saw: ${gemini_analysis.humor_analysis.primary_type}`);
+    // Include user's corrections to the AI analysis
+    if (analysis_notes) {
+      embeddingParts.push(`Analysis corrections: ${analysis_notes}`);
     }
-    if (gemini_analysis?.joke_structure?.mechanism) {
-      embeddingParts.push(`Mechanism: ${gemini_analysis.joke_structure.mechanism}`);
+    
+    // Include Gemini's interpretation for context (using correct structure)
+    if (gemini_analysis?.script?.humor?.humorType) {
+      embeddingParts.push(`Gemini saw: ${gemini_analysis.script.humor.humorType}`);
     }
-    if (gemini_analysis?.humor_analysis?.why_funny) {
-      embeddingParts.push(`Why funny: ${gemini_analysis.humor_analysis.why_funny}`);
+    if (gemini_analysis?.script?.humor?.humorMechanism) {
+      embeddingParts.push(`Mechanism: ${gemini_analysis.script.humor.humorMechanism}`);
+    }
+    if (gemini_analysis?.visual?.summary) {
+      embeddingParts.push(`Visual: ${gemini_analysis.visual.summary}`);
     }
 
     const embeddingText = embeddingParts.join('\n');
@@ -127,19 +133,13 @@ export async function POST(request: NextRequest) {
     };
     const overallScore = tierToScore[quality_tier] || 0.5;
 
-    // Step 4: Build dimensions from Gemini scores
-    const dimensions = gemini_analysis?.scores ? {
-      hook: gemini_analysis.scores.hook || overallScore,
-      pacing: gemini_analysis.scores.pacing || overallScore,
-      originality: gemini_analysis.scores.originality || overallScore,
-      payoff: gemini_analysis.scores.payoff || overallScore,
-      rewatchable: gemini_analysis.scores.rewatchable || overallScore
-    } : {
-      hook: overallScore,
-      pacing: overallScore,
-      originality: overallScore,
-      payoff: overallScore,
-      rewatchable: overallScore
+    // Step 4: Build dimensions from Gemini scores (using correct structure)
+    const dimensions = {
+      hook: (gemini_analysis?.visual?.hookStrength || 0) / 10 || overallScore,
+      pacing: (gemini_analysis?.technical?.pacing || 0) / 10 || overallScore,
+      originality: (gemini_analysis?.script?.originality?.score || 0) / 10 || overallScore,
+      payoff: (gemini_analysis?.script?.structure?.payoffStrength || 0) / 10 || overallScore,
+      rewatchable: (gemini_analysis?.engagement?.replayValue || 0) / 10 || overallScore
     };
 
     // Step 5: Build combined notes
@@ -147,25 +147,54 @@ export async function POST(request: NextRequest) {
       `[${quality_tier.toUpperCase()}]`,
       notes,
       replicability_notes ? `Replicability: ${replicability_notes}` : null,
-      brand_tone_notes ? `Brand/Tone: ${brand_tone_notes}` : null
+      brand_tone_notes ? `Brand/Tone: ${brand_tone_notes}` : null,
+      analysis_notes ? `Analysis Notes: ${analysis_notes}` : null
     ].filter(Boolean).join('\n\n');
 
-    // Step 6: Insert into video_ratings
-    const { data, error } = await supabase
+    // Step 6: Upsert into video_ratings (update if already rated, insert if new)
+    const ratingData = {
+      video_id: videoId,
+      overall_score: overallScore,
+      dimensions,
+      notes: combinedNotes,
+      tags: [quality_tier, gemini_analysis?.script?.humor?.humorType].filter(Boolean),
+      ai_prediction: gemini_analysis,
+      replicability_notes: replicability_notes || null,
+      brand_context: brand_tone_notes || null,
+      humor_type: gemini_analysis?.script?.humor?.humorType || null
+    };
+
+    // Check if rating exists
+    const { data: existingRating } = await supabase
       .from('video_ratings')
-      .insert({
-        video_id: videoId,
-        overall_score: overallScore,
-        dimensions,
-        notes: combinedNotes,
-        tags: [quality_tier, gemini_analysis?.humor_analysis?.primary_type].filter(Boolean),
-        ai_prediction: gemini_analysis,
-        replicability_notes: replicability_notes || null,
-        brand_context: brand_tone_notes || null,
-        humor_type: gemini_analysis?.humor_analysis?.primary_type || null
-      })
-      .select()
+      .select('id')
+      .eq('video_id', videoId)
+      .eq('rater_id', 'primary')
       .single();
+
+    let data;
+    let error;
+
+    if (existingRating) {
+      // Update existing rating
+      const result = await supabase
+        .from('video_ratings')
+        .update(ratingData)
+        .eq('id', existingRating.id)
+        .select()
+        .single();
+      data = result.data;
+      error = result.error;
+    } else {
+      // Insert new rating
+      const result = await supabase
+        .from('video_ratings')
+        .insert({ ...ratingData, rater_id: 'primary' })
+        .select()
+        .single();
+      data = result.data;
+      error = result.error;
+    }
 
     if (error) {
       console.error('Supabase error:', error);

@@ -62,7 +62,10 @@ export async function POST(request: NextRequest) {
       insights: result.insights,
       phaseComplete: result.phaseComplete,
       nextPhase: result.nextPhase,
-      tokensUsed: result.tokensUsed
+      tokensUsed: result.tokensUsed,
+      userMessageId: result.userMessageId,
+      assistantMessageId: result.assistantMessageId,
+      videoAnalyses: result.videoAnalyses
     })
   } catch (error) {
     console.error('Brand message processing error:', error)

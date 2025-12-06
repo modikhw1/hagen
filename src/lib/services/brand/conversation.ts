@@ -8,12 +8,18 @@
 import { createClient } from '@supabase/supabase-js'
 import { chat, chatWithExtraction } from '@/lib/claude/client'
 import { 
-  BRAND_CONSULTANT_PERSONA, 
   CONVERSATION_PHASES, 
   INSIGHT_EXTRACTION_INSTRUCTIONS,
   SYNTHESIS_PROMPT,
-  buildPhasePrompt 
+  buildPhasePrompt,
+  buildPersonaWithFeedback
 } from './prompts'
+import {
+  extractVideoUrls,
+  analyzeVideoForBrandContext,
+  formatVideoContextForPrompt,
+  type VideoAnalysisContext
+} from './video-context'
 import type { 
   BrandConversation, 
   BrandConversationMessage,
@@ -36,6 +42,28 @@ const PHASE_ORDER: ConversationPhase[] = [
   'references',
   'synthesis'
 ]
+
+/**
+ * Fetch session notes from past conversations to inform the AI
+ * Returns an array of actionable feedback points
+ */
+async function fetchLearnedFeedback(): Promise<string[]> {
+  const { data: conversations } = await supabase
+    .from('brand_conversations')
+    .select('session_notes')
+    .not('session_notes', 'is', null)
+    .order('updated_at', { ascending: false })
+    .limit(10)  // Get most recent 10 conversations with feedback
+
+  if (!conversations || conversations.length === 0) {
+    return []
+  }
+
+  // Extract and clean up the notes
+  return conversations
+    .map(c => c.session_notes?.trim())
+    .filter((note): note is string => !!note && note.length > 10)
+}
 
 /**
  * Start a new brand profiling conversation
@@ -76,8 +104,42 @@ export async function startConversation(brandName: string, userId?: string): Pro
     throw new Error(`Failed to create conversation: ${convError?.message}`)
   }
 
-  // Generate opening message
-  const openingMessage = CONVERSATION_PHASES.introduction.sampleOpener
+  // Fetch learned feedback to inform the opening message
+  const feedbackNotes = await fetchLearnedFeedback()
+  
+  // Generate dynamic opening message using Claude
+  let openingMessage: string
+  
+  // Always generate dynamically now with the improved persona
+  const persona = buildPersonaWithFeedback(feedbackNotes)
+  const openingPrompt = `${persona}
+
+You are starting a brand discovery conversation with a business owner.
+Their business is called: "${brandName}"
+
+Generate an opening message that:
+1. Brief intro (one line max)
+2. Immediately asks about their ACTUAL content - what does their feed look like, what have they posted recently
+3. Maximum 2 sentences total
+4. Direct and professional - you're a consultant, not making small talk
+
+BAD example (too chatty): "Hi! I'm so excited to learn about your business! Tell me your story..."
+GOOD example: "I help businesses clarify their content voice. Let's start with what's real - describe your last few social posts. What content are you actually putting out there?"
+
+Generate the opening now.`
+
+  try {
+    const response = await chat(
+      openingPrompt,
+      [{ role: 'user', content: 'Generate the opening message.' }],
+      { maxTokens: 100, temperature: 0.5 }  // Lower temp for more consistency
+    )
+    openingMessage = response.content
+  } catch (error) {
+    // Fall back to static opener on error
+    console.error('Failed to generate dynamic opener:', error)
+    openingMessage = "I help businesses find their content voice. To start - can you describe what your social media feed actually looks like? What kind of posts have you been sharing recently?"
+  }
 
   // Store the opening message
   await supabase
@@ -110,6 +172,9 @@ export async function processMessage(
   phaseComplete: boolean
   nextPhase?: ConversationPhase
   tokensUsed: number
+  userMessageId: string
+  assistantMessageId: string
+  videoAnalyses?: VideoAnalysisContext[]
 }> {
   // Load conversation context
   const context = await loadConversationContext(conversationId)
@@ -121,7 +186,7 @@ export async function processMessage(
   const messageIndex = context.messages.length
 
   // Store user message
-  await supabase
+  const { data: userMsgData, error: userMsgError } = await supabase
     .from('brand_conversation_messages')
     .insert({
       conversation_id: conversationId,
@@ -131,6 +196,12 @@ export async function processMessage(
       phase: context.conversation.current_phase,
       extracted_insights: {}
     })
+    .select('id')
+    .single()
+
+  if (userMsgError) {
+    throw new Error(`Failed to store user message: ${userMsgError.message}`)
+  }
 
   // Build conversation history for Claude
   const messageHistory = context.messages.map(m => ({
@@ -139,11 +210,44 @@ export async function processMessage(
   }))
   messageHistory.push({ role: 'user', content: userMessage })
 
-  // Build phase-specific system prompt
-  const systemPrompt = buildPhasePrompt(
+  // Fetch learned feedback from past conversations
+  const feedbackNotes = await fetchLearnedFeedback()
+
+  // Check for video URLs in the user message and analyze them
+  const videoUrls = extractVideoUrls(userMessage)
+  let videoContextPrompt = ''
+  let videoAnalyses: VideoAnalysisContext[] = []
+  
+  if (videoUrls.length > 0) {
+    console.log(`🎬 Detected ${videoUrls.length} video link(s) in message`)
+    
+    // Analyze each video (in parallel for speed)
+    const analysisPromises = videoUrls.map(url => 
+      analyzeVideoForBrandContext(url, context.conversation.current_phase)
+    )
+    const analyses = await Promise.all(analysisPromises)
+    
+    // Filter out failed analyses
+    const successfulAnalyses = analyses.filter((a): a is VideoAnalysisContext => a !== null)
+    videoAnalyses = successfulAnalyses
+    
+    if (successfulAnalyses.length > 0) {
+      videoContextPrompt = formatVideoContextForPrompt(successfulAnalyses)
+      console.log(`✅ Analyzed ${successfulAnalyses.length} video(s) for brand context`)
+    }
+  }
+
+  // Build phase-specific system prompt with learned behaviors
+  let systemPrompt = buildPhasePrompt(
     context.conversation.current_phase as keyof typeof CONVERSATION_PHASES,
-    context.conversation.accumulated_insights
+    context.conversation.accumulated_insights,
+    feedbackNotes
   )
+  
+  // Inject video context if available
+  if (videoContextPrompt) {
+    systemPrompt = systemPrompt + '\n\n' + videoContextPrompt
+  }
 
   // Get response with insight extraction
   const result = await chatWithExtraction<MessageInsights>(
@@ -167,7 +271,7 @@ export async function processMessage(
   )
 
   // Store assistant response
-  await supabase
+  const { data: assistantMsgData, error: assistantMsgError } = await supabase
     .from('brand_conversation_messages')
     .insert({
       conversation_id: conversationId,
@@ -178,6 +282,12 @@ export async function processMessage(
       extracted_insights: result.extraction,
       tokens_used: result.usage.inputTokens + result.usage.outputTokens
     })
+    .select('id')
+    .single()
+
+  if (assistantMsgError) {
+    throw new Error(`Failed to store assistant message: ${assistantMsgError.message}`)
+  }
 
   // Update conversation state
   await supabase
@@ -195,7 +305,10 @@ export async function processMessage(
     insights: result.extraction,
     phaseComplete: shouldAdvance,
     nextPhase: shouldAdvance ? nextPhase : undefined,
-    tokensUsed: result.usage.inputTokens + result.usage.outputTokens
+    tokensUsed: result.usage.inputTokens + result.usage.outputTokens,
+    userMessageId: userMsgData.id,
+    assistantMessageId: assistantMsgData.id,
+    videoAnalyses: videoAnalyses.length > 0 ? videoAnalyses : undefined
   }
 }
 
@@ -228,7 +341,11 @@ export async function transitionPhase(conversationId: string): Promise<{
     content: m.content
   }));
 
-  const transitionSystemPrompt = `${BRAND_CONSULTANT_PERSONA}
+  // Fetch learned feedback for transition messages too
+  const feedbackNotes = await fetchLearnedFeedback()
+  const persona = buildPersonaWithFeedback(feedbackNotes)
+
+  const transitionSystemPrompt = `${persona}
 
 You are transitioning to the next phase of the conversation.
 CURRENT INSIGHTS: ${JSON.stringify(context.conversation.accumulated_insights, null, 2)}
@@ -291,7 +408,11 @@ export async function generateSynthesis(conversationId: string): Promise<BrandSy
     .map(m => `${m.role.toUpperCase()}: ${m.content}`)
     .join('\n\n')
 
-  const systemPrompt = `${BRAND_CONSULTANT_PERSONA}
+  // Fetch learned feedback for synthesis too
+  const feedbackNotes = await fetchLearnedFeedback()
+  const persona = buildPersonaWithFeedback(feedbackNotes)
+
+  const systemPrompt = `${persona}
 
 You have completed a brand discovery conversation. Now generate a comprehensive synthesis.
 

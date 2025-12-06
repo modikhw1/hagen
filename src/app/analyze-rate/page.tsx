@@ -2,29 +2,51 @@
 
 import { useState } from 'react';
 
-interface AnalysisResult {
-  joke_structure: {
-    setup: string;
-    mechanism: string;
-    twist: string;
-    payoff: string;
-    payoff_type: string;
+// Matches actual Gemini visual_analysis output structure
+interface GeminiAnalysis {
+  script?: {
+    structure?: {
+      hook?: string;
+      setup?: string;
+      payoff?: string;
+      payoffType?: string;
+      payoffStrength?: number;
+    };
+    humor?: {
+      humorType?: string;
+      humorMechanism?: string;
+      isHumorous?: boolean;
+      comedyTiming?: number;
+    };
+    originality?: {
+      score?: number;
+      novelElements?: string[];
+    };
+    replicability?: {
+      score?: number;
+      template?: string;
+      requiredElements?: string[];
+    };
   };
-  humor_analysis: {
-    primary_type: string;
-    secondary_type: string | null;
-    why_funny: string;
-    what_could_be_missed: string;
+  visual?: {
+    hookStrength?: number;
+    overallQuality?: number;
+    summary?: string;
   };
-  scores: {
-    hook: number;
-    pacing: number;
-    originality: number;
-    payoff: number;
-    rewatchable: number;
-    overall: number;
+  technical?: {
+    pacing?: number;
   };
-  reasoning: string;
+  engagement?: {
+    replayValue?: number;
+    shareability?: number;
+    attentionRetention?: number;
+  };
+  content?: {
+    keyMessage?: string;
+    emotionalTone?: string;
+  };
+  // Allow any other properties from Gemini
+  [key: string]: unknown;
 }
 
 interface RAGReference {
@@ -36,7 +58,7 @@ interface RAGReference {
 interface ApiResponse {
   success: boolean;
   url: string;
-  analysis: AnalysisResult;
+  analysis: GeminiAnalysis;
   rag_context: {
     similar_count: number;
     references: RAGReference[];
@@ -59,6 +81,10 @@ export default function AnalyzeRatePage() {
   const [brandToneNotes, setBrandToneNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  
+  // Analysis notes/corrections state
+  const [analysisNotes, setAnalysisNotes] = useState('');
+  const [editingAnalysis, setEditingAnalysis] = useState(false);
 
   const handleAnalyze = async () => {
     if (!url.trim()) {
@@ -69,7 +95,6 @@ export default function AnalyzeRatePage() {
     setLoading(true);
     setError(null);
     setResult(null);
-    setStatus('Downloading video...');
     setQualityTier(null);
     setNotes('');
     setReplicabilityNotes('');
@@ -77,21 +102,76 @@ export default function AnalyzeRatePage() {
     setSubmitted(false);
 
     try {
-      const response = await fetch('/api/analyze-v36', {
+      // Step 1: Create minimal video record (no expensive metadata fetch)
+      setStatus('Creating video record...');
+      const createRes = await fetch('/api/videos/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: url.trim() })
       });
 
-      setStatus('Processing with Gemini + RAG...');
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Analysis failed');
+      if (!createRes.ok) {
+        const error = await createRes.json();
+        throw new Error(error.message || 'Failed to create video record');
       }
 
-      setResult(data);
+      const createData = await createRes.json();
+      const videoId = createData.id;
+
+      // If already has analysis, use it
+      if (createData.hasAnalysis) {
+        setStatus('Found existing analysis, fetching similar videos...');
+        
+        // Fetch full record
+        const fullRes = await fetch(`/api/videos/analyze?id=${videoId}`);
+        if (fullRes.ok) {
+          const fullData = await fullRes.json();
+          console.log('📊 Full video data:', fullData);
+          console.log('📊 visual_analysis:', fullData.visual_analysis);
+          
+          const ragContext = await fetchSimilarVideos(videoId);
+          
+          const analysisResult = {
+            success: true,
+            url: fullData.video_url,
+            analysis: fullData.visual_analysis,
+            rag_context: ragContext
+          };
+          console.log('📊 Setting result:', analysisResult);
+          
+          setResult(analysisResult);
+          setStatus('');
+          setLoading(false);  // Ensure loading is reset
+          return;
+        } else {
+          console.error('❌ Failed to fetch full video data:', await fullRes.text());
+        }
+      }
+
+      // Step 2: Run deep analysis (download → Gemini → save)
+      setStatus('Downloading and analyzing with Gemini (this may take 30-60s)...');
+      const deepRes = await fetch('/api/videos/analyze/deep', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ videoId })
+      });
+
+      const deepData = await deepRes.json();
+
+      if (!deepRes.ok) {
+        throw new Error(deepData.message || deepData.error || 'Deep analysis failed');
+      }
+
+      // Step 4: Fetch similar videos for RAG context
+      setStatus('Finding similar videos...');
+      const ragContext = await fetchSimilarVideos(videoId);
+
+      setResult({
+        success: true,
+        url: url.trim(),
+        analysis: deepData.analysis,
+        rag_context: ragContext
+      });
       setStatus('');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
@@ -99,6 +179,22 @@ export default function AnalyzeRatePage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchSimilarVideos = async (videoId: string) => {
+    try {
+      const res = await fetch(`/api/videos/similar?videoId=${videoId}&limit=5`);
+      if (res.ok) {
+        const data = await res.json();
+        return {
+          similar_count: data.videos?.length || 0,
+          references: data.videos || []
+        };
+      }
+    } catch (e) {
+      console.error('Failed to fetch similar videos:', e);
+    }
+    return { similar_count: 0, references: [] };
   };
 
   const handleSubmitRating = async () => {
@@ -115,6 +211,7 @@ export default function AnalyzeRatePage() {
           notes,
           replicability_notes: replicabilityNotes,
           brand_tone_notes: brandToneNotes,
+          analysis_notes: analysisNotes,
           gemini_analysis: result.analysis,
           similar_videos: result.rag_context?.references || []
         })
@@ -140,24 +237,30 @@ export default function AnalyzeRatePage() {
     setNotes('');
     setReplicabilityNotes('');
     setBrandToneNotes('');
+    setAnalysisNotes('');
+    setEditingAnalysis(false);
     setSubmitted(false);
     setError(null);
   };
 
-  const ScoreBar = ({ label, value }: { label: string; value: number }) => (
-    <div className="flex items-center gap-3">
-      <span className="w-28 text-sm text-gray-400">{label}</span>
-      <div className="flex-1 h-2 bg-gray-700 rounded-full overflow-hidden">
-        <div 
-          className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 transition-all duration-500"
-          style={{ width: `${value * 100}%` }}
-        />
+  // Gemini returns 0-10 scores, normalize to 0-100%
+  const ScoreBar = ({ label, value }: { label: string; value: number }) => {
+    const normalizedValue = Math.min(value * 10, 100); // 0-10 → 0-100%
+    return (
+      <div className="flex items-center gap-3">
+        <span className="w-28 text-sm text-gray-400">{label}</span>
+        <div className="flex-1 h-2 bg-gray-700 rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 transition-all duration-500"
+            style={{ width: `${normalizedValue}%` }}
+          />
+        </div>
+        <span className="w-12 text-right text-sm font-mono text-white">
+          {value}/10
+        </span>
       </div>
-      <span className="w-12 text-right text-sm font-mono text-white">
-        {(value * 100).toFixed(0)}%
-      </span>
-    </div>
-  );
+    );
+  };
 
   const tierColors: Record<QualityTier, string> = {
     excellent: 'bg-green-600 hover:bg-green-700',
@@ -232,43 +335,114 @@ export default function AnalyzeRatePage() {
           <div className="mt-8 space-y-6">
             {/* Gemini Analysis */}
             <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
-              <h2 className="text-lg font-semibold mb-4">Gemini Analysis</h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold">Gemini Analysis</h2>
+                <button
+                  onClick={() => setEditingAnalysis(!editingAnalysis)}
+                  className="px-3 py-1 text-sm bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg transition-colors flex items-center gap-1"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  {editingAnalysis ? 'Done' : 'Add Notes'}
+                </button>
+              </div>
               
-              {/* Scores */}
+              {/* Scores - mapped from actual Gemini structure */}
               <div className="space-y-3 mb-6">
-                <ScoreBar label="Hook" value={result.analysis.scores?.hook || 0} />
-                <ScoreBar label="Pacing" value={result.analysis.scores?.pacing || 0} />
-                <ScoreBar label="Originality" value={result.analysis.scores?.originality || 0} />
-                <ScoreBar label="Payoff" value={result.analysis.scores?.payoff || 0} />
-                <ScoreBar label="Rewatchable" value={result.analysis.scores?.rewatchable || 0} />
+                <ScoreBar label="Hook" value={result.analysis.visual?.hookStrength || 0} />
+                <ScoreBar label="Pacing" value={result.analysis.technical?.pacing || 0} />
+                <ScoreBar label="Originality" value={result.analysis.script?.originality?.score || 0} />
+                <ScoreBar label="Payoff" value={result.analysis.script?.structure?.payoffStrength || 0} />
+                <ScoreBar label="Rewatchable" value={result.analysis.engagement?.replayValue || 0} />
                 <div className="pt-2 border-t border-gray-700">
-                  <ScoreBar label="Overall" value={result.analysis.scores?.overall || 0} />
+                  <ScoreBar label="Quality" value={result.analysis.visual?.overallQuality || 0} />
                 </div>
               </div>
 
-              {/* Humor Analysis */}
+              {/* Humor Analysis - mapped from actual Gemini structure */}
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div>
                   <span className="text-sm text-gray-400">Humor Type</span>
-                  <p className="text-white">{result.analysis.humor_analysis?.primary_type || 'Unknown'}</p>
+                  <p className="text-white">{result.analysis.script?.humor?.humorType || 'Unknown'}</p>
                 </div>
                 <div>
-                  <span className="text-sm text-gray-400">Mechanism</span>
-                  <p className="text-white">{result.analysis.joke_structure?.mechanism || 'Unknown'}</p>
+                  <span className="text-sm text-gray-400">Comedy Timing</span>
+                  <p className="text-white">{result.analysis.script?.humor?.comedyTiming || 0}/10</p>
                 </div>
               </div>
 
-              {/* Why Funny */}
+              {/* Why It Works */}
               <div className="mb-4">
-                <span className="text-sm text-gray-400">Why It Works</span>
-                <p className="text-white text-sm mt-1">{result.analysis.humor_analysis?.why_funny || 'N/A'}</p>
+                <span className="text-sm text-gray-400">Humor Mechanism</span>
+                <p className="text-white text-sm mt-1">{result.analysis.script?.humor?.humorMechanism || 'N/A'}</p>
               </div>
 
-              {/* What Could Be Missed */}
-              {result.analysis.humor_analysis?.what_could_be_missed && (
-                <div>
-                  <span className="text-sm text-gray-400">What Could Be Missed</span>
-                  <p className="text-white text-sm mt-1">{result.analysis.humor_analysis.what_could_be_missed}</p>
+              {/* Visual Summary */}
+              {result.analysis.visual?.summary && (
+                <div className="mb-4">
+                  <span className="text-sm text-gray-400">Visual Summary</span>
+                  <p className="text-white text-sm mt-1">{result.analysis.visual.summary}</p>
+                </div>
+              )}
+
+              {/* Replicability */}
+              {result.analysis.script?.replicability?.template && (
+                <div className="mb-4">
+                  <span className="text-sm text-gray-400">Replicability Template</span>
+                  <p className="text-white text-sm mt-1">{result.analysis.script.replicability.template}</p>
+                </div>
+              )}
+
+              {/* Analysis Notes/Corrections */}
+              {editingAnalysis && (
+                <div className="mt-4 pt-4 border-t border-gray-700">
+                  <label className="block text-sm text-gray-400 mb-2">
+                    Correct Gemini's Analysis
+                    <span className="text-gray-500 ml-2">(corrections will be saved for model learning)</span>
+                  </label>
+                  <textarea
+                    value={analysisNotes}
+                    onChange={(e) => setAnalysisNotes(e.target.value)}
+                    placeholder="e.g., 'The humor is actually self-deprecating, not contrast-based' or 'Missing: the callback to their previous viral video'..."
+                    className="w-full h-32 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  />
+                  {analysisNotes && (
+                    <button
+                      onClick={async () => {
+                        try {
+                          await fetch('/api/corrections', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              videoUrl: result.url,
+                              originalAnalysis: result.analysis,
+                              correction: {
+                                humor_type: analysisNotes.includes('humor') ? analysisNotes : undefined,
+                                joke_structure: analysisNotes.includes('structure') || analysisNotes.includes('setup') || analysisNotes.includes('payoff') ? analysisNotes : undefined
+                              },
+                              correctionType: 'humor_analysis',
+                              notes: analysisNotes
+                            })
+                          });
+                          setEditingAnalysis(false);
+                        } catch (e) {
+                          console.error('Failed to save correction:', e);
+                        }
+                      }}
+                      className="mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm transition-colors"
+                    >
+                      Save Correction
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* Show saved notes even when not editing */}
+              {!editingAnalysis && analysisNotes && (
+                <div className="mt-4 pt-4 border-t border-gray-700">
+                  <span className="text-sm text-gray-400">Your Notes</span>
+                  <p className="text-white text-sm mt-1 bg-gray-800 p-3 rounded-lg">{analysisNotes}</p>
                 </div>
               )}
             </div>

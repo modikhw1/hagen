@@ -8,6 +8,8 @@
 > **Critical facts:**
 > - Human ratings → `video_ratings` table (NOT `analyzed_videos.user_ratings`)
 > - Deep analysis (150-200 features) → `analyzed_videos.visual_analysis`
+> - Brand profiles → `brand_profiles` table (with `brand_conversations` for chat history)
+> - Brand-video matching → `find_videos_for_brand()` function using embeddings
 > - Verify with actual API queries before assumptions
 
 ---
@@ -32,6 +34,12 @@
 │  Human Rating ──► /rate page ──► video_ratings table                        │
 │                                                                              │
 │  AI Prediction ──► /api/predict-v2 ──► video_ratings.ai_prediction          │
+│                                                                              │
+│  Brand Conversation ──► /brand-profile ──► brand_profiles + conversations   │
+│       │                                                                      │
+│       └──► Reference Videos ──► brand_reference_videos                       │
+│       └──► Profile Embedding ──► brand_profiles.embedding                    │
+│       └──► Video Matching ──► find_videos_for_brand() ──► matched videos    │
 │                                                                              │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -119,6 +127,141 @@ Human ratings are stored in `video_ratings` table instead.
 ### 1.4 `rating_schema_versions` (Schema evolution)
 
 Tracks changes to rating dimensions over time.
+
+### 1.5 `brand_profiles` (Brand identity profiles)
+
+| Column | Type | Description | Populated By |
+|--------|------|-------------|--------------|
+| `id` | uuid | Primary key | Auto-generated |
+| `name` | text | Brand/business name | User input |
+| `business_type` | text | e.g., 'cafe', 'retail', 'saas' | AI extracted |
+| `characteristics` | jsonb | Business characteristics | Conversation AI |
+| `tone` | jsonb | Brand tone profile | Conversation AI |
+| `current_state` | jsonb | Current brand state | Conversation AI |
+| `goals` | jsonb | Business & social goals | Conversation AI |
+| `target_audience` | jsonb | Audience definition | Conversation AI |
+| `reference_videos` | jsonb | Videos they admire | User input |
+| `conversation_synthesis` | text | Full narrative summary | AI synthesis |
+| `key_insights` | text[] | Key takeaways | AI synthesis |
+| `embedding` | vector(1536) | For video matching | OpenAI |
+| `user_id` | uuid | FK to auth.users | Auth |
+| `status` | text | 'draft', 'complete', 'archived' | System |
+| `created_at` | timestamp | Creation time | Auto |
+| `updated_at` | timestamp | Last update | Auto |
+
+#### `characteristics` structure:
+```json
+{
+  "team_size": "small",
+  "business_age": "startup",
+  "owner_background": "professional-pivot",
+  "social_media_experience": "beginner",
+  "content_creation_capacity": "limited",
+  "brand_personality_inferred": ["approachable", "professional"]
+}
+```
+
+#### `tone` structure:
+```json
+{
+  "primary": "casual",
+  "secondary": ["warm", "authentic"],
+  "avoid": ["corporate-speak", "overly-salesy"],
+  "energy_level": 7,
+  "humor_tolerance": 6,
+  "formality": 3
+}
+```
+
+### 1.6 `brand_conversations` (Conversation sessions)
+
+| Column | Type | Description | Populated By |
+|--------|------|-------------|--------------|
+| `id` | uuid | Primary key | Auto-generated |
+| `brand_profile_id` | uuid | FK to brand_profiles | System |
+| `status` | text | 'active', 'completed', 'abandoned' | System |
+| `current_phase` | text | Current conversation phase | System |
+| `accumulated_insights` | jsonb | Insights gathered so far | AI extraction |
+| `session_notes` | text | Human feedback on session | Training UI |
+| `training_quality` | text | 'unreviewed', 'good', 'needs_improvement', 'bad', 'excluded' | Human review |
+| `message_count` | integer | Total messages | Auto |
+| `total_tokens_used` | integer | Token usage | System |
+| `created_at` | timestamp | Session start | Auto |
+| `updated_at` | timestamp | Last activity | Auto |
+| `completed_at` | timestamp | When completed | System |
+
+**Phases**: `introduction` → `business_goals` → `social_goals` → `tone_discovery` → `audience` → `references` → `synthesis`
+
+### 1.7 `brand_conversation_messages` (Individual messages)
+
+| Column | Type | Description | Populated By |
+|--------|------|-------------|--------------|
+| `id` | uuid | Primary key | Auto-generated |
+| `conversation_id` | uuid | FK to brand_conversations | System |
+| `role` | text | 'user', 'assistant', 'system' | System |
+| `content` | text | Message text | User/AI |
+| `message_index` | integer | Order in conversation | Auto |
+| `extracted_insights` | jsonb | What message reveals | AI extraction |
+| `training_note` | text | Human feedback on this message | Training UI |
+| `phase` | text | Phase when sent | System |
+| `tokens_used` | integer | Token count | System |
+| `created_at` | timestamp | When sent | Auto |
+
+### 1.8 `brand_reference_videos` (Inspiration videos)
+
+| Column | Type | Description | Populated By |
+|--------|------|-------------|--------------|
+| `id` | uuid | Primary key | Auto-generated |
+| `brand_profile_id` | uuid | FK to brand_profiles | System |
+| `video_url` | text | URL of inspiration video | User input |
+| `platform` | text | 'tiktok', 'youtube', 'instagram' | Detected |
+| `reason` | text | Why they like it | User input |
+| `aspects_admired` | text[] | e.g., ['humor', 'energy'] | AI extraction |
+| `analyzed_video_id` | uuid | FK to analyzed_videos | If analyzed |
+| `extracted_tone` | jsonb | Tone analysis | AI extraction |
+| `created_at` | timestamp | When added | Auto |
+
+### 1.9 `brand_training_examples` (RAG training examples)
+
+| Column | Type | Description | Populated By |
+|--------|------|-------------|--------------|
+| `id` | uuid | Primary key | Auto-generated |
+| `conversation_id` | uuid | FK to source conversation | System |
+| `message_id` | uuid | FK to source message | System |
+| `example_type` | text | Type of example | Human/Auto |
+| `context` | text | What came before | Extraction |
+| `content` | text | The example content | Extraction |
+| `outcome` | text | What came after | Extraction |
+| `explanation` | text | Why this is good/bad | Human |
+| `tags` | text[] | Classification tags | Human/Auto |
+| `phase` | text | Conversation phase | System |
+| `business_type` | text | Type of business | System |
+| `embedding` | vector(1536) | For RAG retrieval | OpenAI |
+| `quality_score` | float | 0-1, higher = better | Human |
+| `times_used` | integer | Retrieval count | System |
+| `last_used_at` | timestamp | Last retrieval | System |
+| `created_at` | timestamp | When created | Auto |
+
+**Example types**: `good_question`, `good_response`, `good_transition`, `insight_extraction`, `bad_example`, `conversation_flow`, `brand_synthesis`
+
+### 1.10 `brand_training_patterns` (Higher-level patterns)
+
+| Column | Type | Description | Populated By |
+|--------|------|-------------|--------------|
+| `id` | uuid | Primary key | Auto-generated |
+| `pattern_name` | text | Name of pattern | Human |
+| `pattern_type` | text | Type of pattern | Human |
+| `description` | text | What this pattern is | Human |
+| `when_to_use` | text | When to apply | Human |
+| `how_to_apply` | text | Implementation guide | Human |
+| `example_ids` | uuid[] | Related examples | System |
+| `applies_to_phases` | text[] | Applicable phases | Human |
+| `applies_to_business_types` | text[] | Applicable businesses | Human |
+| `embedding` | vector(1536) | For semantic matching | OpenAI |
+| `effectiveness_score` | float | How well it works | Human |
+| `created_at` | timestamp | When created | Auto |
+
+**Pattern types**: `question_strategy`, `tone_matching`, `insight_extraction`, `phase_transition`, `difficult_situation`, `business_specific`
 
 ---
 
@@ -291,6 +434,15 @@ When `/api/videos/reanalyze` runs Gemini on a video, it populates `visual_analys
 | `/api/ratings/export` | GET/POST | Export ratings for training |
 | `/api/patterns/discover` | POST | Find patterns in ratings |
 
+### Brand Profiling
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/brand-profile` | GET | List brand profiles |
+| `/api/brand-profile` | POST | Start new brand conversation |
+| `/api/brand-profile/[id]` | GET | Get specific profile |
+| `/api/brand-profile/[id]` | PATCH | Update profile |
+| `/api/brand-profile/message` | POST | Send message in conversation |
+
 ---
 
 ## 5. Data Relationships
@@ -305,6 +457,16 @@ analyzed_videos (1) ──────► (1) video_ratings
        
 The correlation between visual_analysis features 
 and human overall_score is NOT YET COMPUTED.
+
+brand_profiles (1) ──────► (n) brand_conversations
+       │                           │
+       │                           └──► (n) brand_conversation_messages
+       │
+       └──────► (n) brand_reference_videos ──► analyzed_videos (optional)
+       │
+       │ embedding ◄───── find_videos_for_brand() ─────► analyzed_videos.embedding
+       │
+       └──────► Matched videos based on tone/style similarity
 ```
 
 ---
@@ -479,4 +641,7 @@ When modifying data structures:
 |------|--------|-----|
 | 2025-12-03 | Initial document created | System |
 | 2025-12-03 | Added `visual_analysis` to ratings API join | System |
+| 2025-12-05 | Added brand profiling tables (brand_profiles, brand_conversations, brand_conversation_messages, brand_reference_videos) | System |
+| 2025-12-05 | Added training system tables (brand_training_examples, brand_training_patterns) with RAG retrieval | System |
+| 2025-12-05 | Added training_note to messages, session_notes/training_quality to conversations | System |
 | | | |
