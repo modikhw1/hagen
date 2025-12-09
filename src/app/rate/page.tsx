@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 interface Video {
   id: string;
@@ -412,6 +413,30 @@ export default function RatePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Migration Notice */}
+      <div className="bg-amber-50 border-b border-amber-200">
+        <div className="max-w-5xl mx-auto px-4 py-3">
+          <div className="flex items-start gap-3">
+            <div className="text-amber-600 font-semibold mt-0.5">⚠️</div>
+            <div className="flex-1">
+              <p className="text-sm text-amber-800 font-medium">
+                This rating interface is being deprecated
+              </p>
+              <p className="text-xs text-amber-700 mt-1">
+                The system is transitioning to <Link href="/analyze-rate" className="underline font-semibold hover:text-amber-900">/analyze-rate</Link> for improved analysis and simplified rating workflow. 
+                This page remains functional for comparison purposes only.
+              </p>
+            </div>
+            <Link 
+              href="/analyze-rate"
+              className="px-3 py-1.5 bg-amber-600 text-white text-xs font-medium rounded hover:bg-amber-700 whitespace-nowrap"
+            >
+              Switch to New System
+            </Link>
+          </div>
+        </div>
+      </div>
+
       {/* Navigation Tabs */}
       <div className="bg-white border-b sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4">

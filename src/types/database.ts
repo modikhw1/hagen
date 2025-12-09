@@ -47,7 +47,6 @@ export interface Database {
           metadata: Json | null
           visual_analysis: Json | null
           audio_analysis: Json | null
-          user_ratings: Json
           user_tags: string[]
           user_notes: string | null
           rating_schema_version: number
@@ -66,7 +65,6 @@ export interface Database {
           metadata?: Json | null
           visual_analysis?: Json | null
           audio_analysis?: Json | null
-          user_ratings?: Json
           user_tags?: string[]
           user_notes?: string | null
           rating_schema_version?: number
@@ -85,7 +83,6 @@ export interface Database {
           metadata?: Json | null
           visual_analysis?: Json | null
           audio_analysis?: Json | null
-          user_ratings?: Json
           user_tags?: string[]
           user_notes?: string | null
           rating_schema_version?: number

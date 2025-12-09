@@ -28,18 +28,25 @@ export async function POST(request: NextRequest) {
     if (skipIfExists) {
       const { data: existing } = await supabase
         .from('analyzed_videos')
-        .select('id, video_url, metadata, visual_analysis, user_ratings')
+        .select('id, video_url, metadata, visual_analysis')
         .eq('video_url', url)
         .single()
 
       if (existing) {
+        // Get rating from video_ratings table
+        const { data: rating } = await supabase
+          .from('video_ratings')
+          .select('overall_score, dimensions')
+          .eq('video_id', existing.id)
+          .single()
+
         console.log('✅ Video already analyzed, returning existing data')
         return NextResponse.json({
           id: existing.id,
           url: existing.video_url,
           metadata: existing.metadata,
           analysis: existing.visual_analysis,
-          userRatings: existing.user_ratings,
+          rating: rating,
           alreadyExists: true
         })
       }
@@ -136,10 +143,11 @@ export async function GET(request: NextRequest) {
     if (!id && !url) {
       let query = supabase
         .from('analyzed_videos')
-        .select('*', { count: 'exact' })
+        .select('*, rating:video_ratings(overall_score, dimensions)', { count: 'exact' })
 
       if (rated) {
-        query = query.not('user_ratings', 'is', null)
+        // Filter to only videos with ratings
+        query = query.not('rating', 'is', null)
       }
 
       if (count) {

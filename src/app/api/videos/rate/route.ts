@@ -37,19 +37,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Merge with existing ratings
-    const existingRatings = video.user_ratings || {}
-    const updatedRatings = {
-      ...existingRatings,
-      ...ratings,
-      rated_at: new Date().toISOString()
-    }
-
-    // Update ratings in database
+    // Update tags and notes only (ratings go to video_ratings table)
     const { error: updateError } = await supabase
       .from('analyzed_videos')
       .update({
-        user_ratings: updatedRatings,
         user_tags: tags || video.user_tags,
         user_notes: notes || video.user_notes,
         rated_at: new Date().toISOString()
@@ -57,7 +48,7 @@ export async function POST(request: NextRequest) {
       .eq('id', videoId)
 
     if (updateError) {
-      throw new Error(`Failed to update ratings: ${updateError.message}`)
+      throw new Error(`Failed to update video metadata: ${updateError.message}`)
     }
 
     // Regenerate embedding with new ratings
@@ -66,11 +57,18 @@ export async function POST(request: NextRequest) {
       
       const embeddingProvider = serviceRegistry.getEmbeddingProvider()
       
+      // Get existing ratings from video_ratings table
+      const { data: existingRating } = await supabase
+        .from('video_ratings')
+        .select('overall_score, dimensions')
+        .eq('video_id', videoId)
+        .single()
+
       // Prepare text representation combining all data
       const embeddingText = embeddingProvider.prepareTextForEmbedding({
         metadata: video.metadata,
         analysis: video.visual_analysis,
-        userRatings: updatedRatings,
+        userRatings: existingRating || { overall_score: ratings.overall, dimensions: ratings },
         userTags: tags || video.user_tags,
         computedMetrics: video.video_metrics?.[0] || {}
       })
@@ -95,8 +93,7 @@ export async function POST(request: NextRequest) {
       console.log('✅ Embedding updated successfully')
     }
 
-    // DUAL WRITE: Also save to video_ratings table (primary ratings table)
-    // This ensures compatibility with /analyze-rate workflow
+    // Save ratings to video_ratings table (primary storage)
     const overallScore = typeof ratings.overall === 'number' ? ratings.overall : 0.7;
     const { error: ratingsError } = await supabase
       .from('video_ratings')
@@ -116,11 +113,10 @@ export async function POST(request: NextRequest) {
       }, { onConflict: 'video_id' });
     
     if (ratingsError) {
-      console.warn('⚠️ Failed to dual-write to video_ratings:', ratingsError.message);
-      // Don't fail - legacy write succeeded
-    } else {
-      console.log('✅ Dual-write to video_ratings successful');
+      throw new Error(`Failed to save rating: ${ratingsError.message}`);
     }
+    
+    console.log('✅ Rating saved to video_ratings table');
 
     // Check if we should update rating schema
     const { data: currentSchema } = await supabase
@@ -145,8 +141,15 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       videoId,
-      ratings: updatedRatings,
-      tags: tags || video.tags,
+      overall_score: overallScore,
+      dimensions: {
+        hook: ratings.hook || overallScore,
+        pacing: ratings.pacing || overallScore,
+        originality: ratings.originality || overallScore,
+        payoff: ratings.payoff || overallScore,
+        rewatchable: ratings.rewatchable || overallScore
+      },
+      tags: tags || video.user_tags,
       embeddingRegenerated: regenerateEmbedding,
       message: 'Rating saved successfully'
     })
@@ -184,20 +187,20 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const { data, error } = await supabase
-      .from('analyzed_videos')
-      .select('user_ratings, tags, notes')
-      .eq('id', videoId)
+    const { data: rating, error } = await supabase
+      .from('video_ratings')
+      .select('overall_score, dimensions, notes, tags')
+      .eq('video_id', videoId)
       .single()
 
-    if (error || !data) {
+    if (error || !rating) {
       return NextResponse.json(
-        { error: 'not-found', message: 'Video not found' },
+        { error: 'not-found', message: 'Rating not found' },
         { status: 404 }
       )
     }
 
-    return NextResponse.json(data)
+    return NextResponse.json(rating)
 
   } catch (error) {
     console.error('❌ Fetch ratings failed:', error)

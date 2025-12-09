@@ -140,11 +140,18 @@ export async function POST(request: NextRequest) {
       const { serviceRegistry } = await import('@/lib/services/registry')
       const embeddingProvider = serviceRegistry.getEmbeddingProvider()
       
+      // Get existing ratings from video_ratings table
+      const { data: existingRating } = await supabase
+        .from('video_ratings')
+        .select('overall_score, dimensions')
+        .eq('video_id', videoId)
+        .single()
+
       // Prepare comprehensive text for embedding
       const embeddingText = embeddingProvider.prepareTextForEmbedding({
         metadata: video.metadata,
         analysis,
-        userRatings: video.user_ratings,
+        userRatings: existingRating,
         userTags: video.user_tags,
         computedMetrics: {} // Could recalculate with new data
       })

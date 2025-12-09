@@ -105,9 +105,9 @@ export async function POST(request: NextRequest) {
 
       if (filters.rated !== undefined) {
         if (filters.rated) {
-          filtered = filtered.filter((v: any) => v.user_ratings !== null)
+          filtered = filtered.filter((v: any) => v.rating !== null)
         } else {
-          filtered = filtered.filter((v: any) => v.user_ratings === null)
+          filtered = filtered.filter((v: any) => v.rating === null)
         }
       }
     }
@@ -125,15 +125,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       count: filtered.length,
       threshold,
-      videos: filtered.map((v: any) => ({
+      similarVideos: filtered.map((v: any) => ({
         id: v.id,
-        url: v.video_url,
+        video_url: v.video_url,
         platform: v.platform,
         similarity: v.similarity,
         metadata: v.metadata,
-        userRatings: v.user_ratings,
-        tags: v.tags,
-        analyzedAt: v.analyzed_at
+        rating: v.rating,
+        user_tags: v.tags,
+        analyzed_at: v.analyzed_at
       }))
     })
 

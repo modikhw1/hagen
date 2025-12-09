@@ -9,11 +9,20 @@ export async function GET(request: NextRequest) {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Fetch all rated videos, ordered by most recent first
-    // Include visual_analysis to check for deep analysis
+    // Join with video_ratings table to get ratings
     const { data: videos, error } = await supabase
       .from('analyzed_videos')
-      .select('id, video_url, platform, metadata, rated_at, user_ratings, visual_analysis, user_notes')
-      .not('user_ratings', 'is', null)
+      .select(`
+        id, 
+        video_url, 
+        platform, 
+        metadata, 
+        rated_at, 
+        visual_analysis, 
+        user_notes,
+        rating:video_ratings(overall_score, dimensions, notes)
+      `)
+      .not('rating', 'is', null)
       .order('rated_at', { ascending: false });
 
     if (error) {
@@ -37,7 +46,7 @@ export async function GET(request: NextRequest) {
         platform: video.platform,
         metadata: video.metadata,
         rated_at: video.rated_at,
-        user_ratings: video.user_ratings,
+        rating: video.rating,
         user_notes: video.user_notes,
         has_deep_analysis: !!hasDeepAnalysis
       };

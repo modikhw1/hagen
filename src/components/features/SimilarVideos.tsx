@@ -9,7 +9,10 @@ interface SimilarVideo {
   video_url: string
   platform: string
   metadata: any
-  user_ratings: any
+  rating?: {
+    overall_score: number
+    dimensions: Record<string, number>
+  }
   user_tags: string[]
   similarity: number
 }
@@ -125,14 +128,13 @@ export function SimilarVideos({ videoId, refreshTrigger = 0 }: SimilarVideosProp
               </p>
             )}
 
-            {video.user_ratings && (
+            {video.rating && (
               <div className="flex gap-4 text-xs text-gray-500">
-                {video.user_ratings.overall_rating && (
-                  <span>Rating: {video.user_ratings.overall_rating}/10</span>
-                )}
-                {video.user_ratings.would_replicate !== undefined && (
+                <span>Rating: {(video.rating.overall_score * 10).toFixed(1)}/10</span>
+                {video.rating.dimensions && (
                   <span>
-                    {video.user_ratings.would_replicate ? '✓ Would replicate' : '✗ Won\'t replicate'}
+                    Hook: {(video.rating.dimensions.hook * 10).toFixed(1)} | 
+                    Payoff: {(video.rating.dimensions.payoff * 10).toFixed(1)}
                   </span>
                 )}
               </div>
