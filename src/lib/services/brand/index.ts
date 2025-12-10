@@ -3,5 +3,8 @@
  */
 
 export * from './types'
+export * from './brand'
+export * from './brand-analysis.types'
+export * from './brand-analyzer'
 export * from './conversation'
 export * from './prompts'
