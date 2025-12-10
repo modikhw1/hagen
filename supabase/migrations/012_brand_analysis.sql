@@ -232,9 +232,11 @@ ALTER TABLE video_brand_ratings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE creator_brand_profiles ENABLE ROW LEVEL SECURITY;
 
 -- Public access for now
+DROP POLICY IF EXISTS "Allow all for video_brand_ratings" ON video_brand_ratings;
 CREATE POLICY "Allow all for video_brand_ratings" ON video_brand_ratings
     FOR ALL USING (true) WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Allow all for creator_brand_profiles" ON creator_brand_profiles;
 CREATE POLICY "Allow all for creator_brand_profiles" ON creator_brand_profiles
     FOR ALL USING (true) WITH CHECK (true);
 
