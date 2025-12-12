@@ -28,7 +28,7 @@ interface VideoRecord {
   id: string
   video_url: string
   platform: string
-  embedding: number[] | null
+  content_embedding: number[] | null
   visual_analysis: Record<string, unknown> | null
   metadata: Record<string, unknown> | null
 }
@@ -57,7 +57,7 @@ interface BrandRatingRecord {
 export async function fetchOrCreateVideos(videoUrls: string[]): Promise<VideoRecord[]> {
   const { data: existing, error } = await supabase
     .from('analyzed_videos')
-    .select('id, video_url, platform, embedding, visual_analysis, metadata')
+    .select('id, video_url, platform, content_embedding, visual_analysis, metadata')
     .in('video_url', videoUrls)
 
   if (error) throw error
@@ -306,13 +306,13 @@ export async function computeFingerprint(input: FingerprintInput): Promise<Profi
   }
 
   // Compute weighted centroid embedding
-  const videosWithEmbeddings = videoSignals.filter((v) => v.video.embedding && v.video.embedding.length === 1536)
+  const videosWithEmbeddings = videoSignals.filter((v) => v.video.content_embedding && v.video.content_embedding.length === 1536)
 
   let centroid: number[] = new Array(1536).fill(0)
   let totalWeight = 0
 
   for (const { video, weight } of videosWithEmbeddings) {
-    centroid = addVectors(centroid, scaleVector(video.embedding!, weight))
+    centroid = addVectors(centroid, scaleVector(video.content_embedding!, weight))
     totalWeight += weight
   }
 
@@ -407,7 +407,7 @@ export async function computeMatch(
   // Fetch candidate video
   const { data: candidateVideo, error: videoError } = await supabase
     .from('analyzed_videos')
-    .select('id, video_url, embedding')
+    .select('id, video_url, content_embedding')
     .eq('id', candidateVideoId)
     .single()
 
@@ -428,7 +428,7 @@ export async function computeMatch(
   )
 
   // Embedding similarity (raw cosine)
-  const candidateEmbedding = candidateVideo.embedding as number[] | null
+  const candidateEmbedding = candidateVideo.content_embedding as number[] | null
   let embeddingSimilarity = 0
   if (candidateEmbedding && candidateEmbedding.length === 1536 && fingerprint.embedding.length === 1536) {
     embeddingSimilarity = cosineSimilarity(candidateEmbedding, fingerprint.embedding)
@@ -479,12 +479,12 @@ export async function computeMatch(
   if (candidateEmbedding && candidateEmbedding.length === 1536) {
     const { data: profileVideos } = await supabase
       .from('analyzed_videos')
-      .select('id, embedding')
+      .select('id, content_embedding')
       .in('id', fingerprint.video_ids)
 
     for (const pv of profileVideos || []) {
-      if (pv.embedding && (pv.embedding as number[]).length === 1536) {
-        const sim = cosineSimilarity(candidateEmbedding, pv.embedding as number[])
+      if (pv.content_embedding && (pv.content_embedding as number[]).length === 1536) {
+        const sim = cosineSimilarity(candidateEmbedding, pv.content_embedding as number[])
         if (sim > closestSimilarity) {
           closestSimilarity = sim
           closestVideoId = pv.id
