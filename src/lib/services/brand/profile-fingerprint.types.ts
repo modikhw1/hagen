@@ -55,6 +55,15 @@ export interface ProfileFingerprint {
   /** Confidence based on data completeness */
   confidence: number; // 0-1
   missing_data_notes: string[];
+
+  /** URLs that were requested but not found in the database */
+  urls_not_found: string[];
+
+  /** URLs that were found */
+  urls_found: string[];
+
+  /** Generated text summary of the profile personality (optional) */
+  personality_summary?: string;
 }
 
 /** Input for fingerprint computation */

@@ -881,50 +881,103 @@ https://www.tiktok.com/@username/video/67890..."
                         </span>
                       </div>
 
+                      {/* Personality Summary */}
+                      {profileFingerprint.personality_summary && (
+                        <div className="bg-blue-900/20 border border-blue-800/50 rounded-lg p-3">
+                          <p className="text-sm text-blue-200">
+                            <span className="font-medium">Profile Personality: </span>
+                            {profileFingerprint.personality_summary}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Layer Cards with Tooltips */}
                       <div className="grid grid-cols-3 gap-4 text-sm">
-                        <div className="bg-gray-800/50 p-3 rounded">
-                          <div className="text-gray-400 text-xs mb-1">L1: Quality</div>
+                        <div className="bg-gray-800/50 p-3 rounded group relative">
+                          <div className="text-gray-400 text-xs mb-1 flex items-center gap-1">
+                            L1: Quality
+                            <span className="cursor-help text-gray-500 hover:text-gray-300" title="Content quality & virality. Based on /analyze-rate scores and execution coherence. Higher = proven performance.">ⓘ</span>
+                          </div>
                           <div className="text-white">
                             {Math.round((profileFingerprint.layers.l1_quality.avg_quality_score || 0) * 100)}% avg
                           </div>
                         </div>
-                        <div className="bg-gray-800/50 p-3 rounded">
-                          <div className="text-gray-400 text-xs mb-1">L2: Energy</div>
+                        <div className="bg-gray-800/50 p-3 rounded group relative">
+                          <div className="text-gray-400 text-xs mb-1 flex items-center gap-1">
+                            L2: Likeness
+                            <span className="cursor-help text-gray-500 hover:text-gray-300" title="Personality & tone match. Includes energy, warmth, humor type, age targeting, and vibe. This is the 'would I be friends with them?' layer.">ⓘ</span>
+                          </div>
                           <div className="text-white">
-                            {profileFingerprint.layers.l2_likeness.avg_energy?.toFixed(1) || '—'} / 10
+                            Energy {profileFingerprint.layers.l2_likeness.avg_energy?.toFixed(1) || '—'}/10
                           </div>
                         </div>
-                        <div className="bg-gray-800/50 p-3 rounded">
-                          <div className="text-gray-400 text-xs mb-1">L3: Production</div>
+                        <div className="bg-gray-800/50 p-3 rounded group relative">
+                          <div className="text-gray-400 text-xs mb-1 flex items-center gap-1">
+                            L3: Visual
+                            <span className="cursor-help text-gray-500 hover:text-gray-300" title="Production style match. How polished vs raw the content is. Less important than concept/personality.">ⓘ</span>
+                          </div>
                           <div className="text-white">
-                            {profileFingerprint.layers.l3_visual.avg_production_investment?.toFixed(1) || '—'} / 10
+                            Production {profileFingerprint.layers.l3_visual.avg_production_investment?.toFixed(1) || '—'}/10
                           </div>
                         </div>
                       </div>
 
-                      {profileFingerprint.layers.l2_likeness.dominant_humor_types?.length > 0 && (
-                        <div className="text-sm">
-                          <span className="text-gray-400">Humor: </span>
-                          <span className="text-white">
-                            {profileFingerprint.layers.l2_likeness.dominant_humor_types.join(', ')}
+                      {/* Additional L2 details */}
+                      <div className="flex flex-wrap gap-2 text-xs">
+                        {profileFingerprint.layers.l2_likeness.dominant_humor_types?.length > 0 && (
+                          <span className="px-2 py-1 bg-purple-900/30 border border-purple-700/50 rounded">
+                            Humor: {profileFingerprint.layers.l2_likeness.dominant_humor_types.join(', ')}
                           </span>
+                        )}
+                        {profileFingerprint.layers.l2_likeness.dominant_vibe?.length > 0 && (
+                          <span className="px-2 py-1 bg-green-900/30 border border-green-700/50 rounded">
+                            Vibe: {profileFingerprint.layers.l2_likeness.dominant_vibe.join(', ')}
+                          </span>
+                        )}
+                        {profileFingerprint.layers.l2_likeness.dominant_age_code && (
+                          <span className="px-2 py-1 bg-orange-900/30 border border-orange-700/50 rounded">
+                            Age: {profileFingerprint.layers.l2_likeness.dominant_age_code}
+                          </span>
+                        )}
+                        {profileFingerprint.layers.l2_likeness.dominant_price_tier && profileFingerprint.layers.l2_likeness.dominant_price_tier !== 'mixed' && (
+                          <span className="px-2 py-1 bg-yellow-900/30 border border-yellow-700/50 rounded">
+                            Tier: {profileFingerprint.layers.l2_likeness.dominant_price_tier}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* URLs Not Found */}
+                      {profileFingerprint.urls_not_found?.length > 0 && (
+                        <div className="bg-red-900/20 border border-red-800/50 rounded-lg p-3">
+                          <p className="text-xs text-red-300 font-medium mb-2">
+                            ❌ {profileFingerprint.urls_not_found.length} URL(s) not found in database:
+                          </p>
+                          <ul className="text-xs text-red-400/80 space-y-1 font-mono">
+                            {profileFingerprint.urls_not_found.map((url: string, i: number) => (
+                              <li key={i} className="truncate">• {url}</li>
+                            ))}
+                          </ul>
+                          <p className="text-xs text-gray-500 mt-2">
+                            → Analyze these via /analyze-rate first, then recompute fingerprint
+                          </p>
                         </div>
                       )}
 
-                      {profileFingerprint.layers.l2_likeness.dominant_vibe?.length > 0 && (
-                        <div className="text-sm">
-                          <span className="text-gray-400">Vibe: </span>
-                          <span className="text-white">
-                            {profileFingerprint.layers.l2_likeness.dominant_vibe.join(', ')}
-                          </span>
-                        </div>
-                      )}
-
+                      {/* Other warnings */}
                       {profileFingerprint.missing_data_notes?.length > 0 && (
                         <div className="text-xs text-yellow-400/70">
                           ⚠ {profileFingerprint.missing_data_notes.join('; ')}
                         </div>
                       )}
+
+                      {/* How Matching Works */}
+                      <div className="border-t border-gray-700 pt-3 mt-3">
+                        <p className="text-xs text-gray-500 mb-2">
+                          <strong>How matching works:</strong> Each library video is compared using a weighted formula:
+                          L1 Quality (25%) + L2 Likeness (35%) + L3 Visual (10%) + Embedding similarity (30%).
+                          Scores ≥85% are strong matches; 70-84% are worth considering.
+                        </p>
+                      </div>
 
                       <button
                         onClick={runBatchMatch}

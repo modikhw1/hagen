@@ -52,9 +52,13 @@ interface BrandRatingRecord {
 }
 
 /**
- * Fetch video records by URL, creating them if they don't exist.
+ * Fetch video records by URL. Returns found videos and lists missing URLs.
  */
-export async function fetchOrCreateVideos(videoUrls: string[]): Promise<VideoRecord[]> {
+export async function fetchOrCreateVideos(videoUrls: string[]): Promise<{
+  videos: VideoRecord[];
+  found: string[];
+  missing: string[];
+}> {
   const { data: existing, error } = await supabase
     .from('analyzed_videos')
     .select('id, video_url, platform, content_embedding, visual_analysis, metadata')
@@ -64,13 +68,17 @@ export async function fetchOrCreateVideos(videoUrls: string[]): Promise<VideoRec
 
   const existingUrls = new Set((existing || []).map((v) => v.video_url))
   const missing = videoUrls.filter((url) => !existingUrls.has(url))
+  const found = videoUrls.filter((url) => existingUrls.has(url))
 
-  // For missing videos, we just return what we have. Caller should analyze missing ones first.
   if (missing.length > 0) {
     console.warn(`[fingerprint] ${missing.length} videos not in DB:`, missing)
   }
 
-  return (existing || []) as VideoRecord[]
+  return {
+    videos: (existing || []) as VideoRecord[],
+    found,
+    missing
+  }
 }
 
 /**
@@ -281,14 +289,111 @@ function computeVideoWeight(signals: VideoSignals): number {
 }
 
 // -----------------------------------------------------------------------------
+// Personality summary generation
+// -----------------------------------------------------------------------------
+
+/**
+ * Generate a human-readable personality summary from fingerprint layers.
+ * This provides interpretable text that can guide content recommendations.
+ */
+function generatePersonalitySummary(
+  l1: L1QualityLayer,
+  l2: L2LikenessLayer,
+  l3: L3VisualLayer,
+  videoCount: number
+): string {
+  const parts: string[] = []
+
+  // Quality assessment
+  const qualityPct = Math.round((l1.avg_quality_score || 0) * 100)
+  if (qualityPct >= 80) {
+    parts.push('High-quality content creator')
+  } else if (qualityPct >= 60) {
+    parts.push('Solid content quality')
+  } else if (qualityPct >= 40) {
+    parts.push('Mixed content quality')
+  } else {
+    parts.push('Emerging content quality')
+  }
+
+  // Energy/warmth personality
+  const energy = l2.avg_energy || 5
+  const warmth = l2.avg_warmth || 5
+  if (energy >= 7 && warmth >= 7) {
+    parts.push('with an energetic and warm personality')
+  } else if (energy >= 7) {
+    parts.push('with high-energy, dynamic presence')
+  } else if (warmth >= 7) {
+    parts.push('with a warm, approachable tone')
+  } else if (energy <= 3 && warmth <= 3) {
+    parts.push('with a reserved, professional demeanor')
+  } else if (energy <= 3) {
+    parts.push('with a calm, measured approach')
+  }
+
+  // Humor style
+  if (l2.dominant_humor_types.length > 0) {
+    const humorStr = l2.dominant_humor_types.slice(0, 2).join(' and ')
+    parts.push(`using ${humorStr} humor`)
+  }
+
+  // Vibe
+  if (l2.dominant_vibe.length > 0) {
+    const vibeStr = l2.dominant_vibe.slice(0, 2).join(', ')
+    parts.push(`projecting a ${vibeStr} vibe`)
+  }
+
+  // Age targeting
+  if (l2.dominant_age_code && l2.dominant_age_code !== 'mixed') {
+    if (l2.dominant_age_code === 'younger') {
+      parts.push('targeting a younger demographic')
+    } else if (l2.dominant_age_code === 'older') {
+      parts.push('appealing to a mature audience')
+    } else if (l2.dominant_age_code === 'balanced') {
+      parts.push('with broad age appeal')
+    }
+  }
+
+  // Production style
+  const production = l3.avg_production_investment || 5
+  const effortlessness = l3.avg_effortlessness || 5
+  if (production >= 7 && effortlessness >= 7) {
+    parts.push('with polished yet natural-looking production')
+  } else if (production >= 7) {
+    parts.push('with high production value')
+  } else if (effortlessness >= 7) {
+    parts.push('with an effortless, authentic aesthetic')
+  } else if (production <= 3) {
+    parts.push('with lo-fi, raw production style')
+  }
+
+  // Price tier context
+  if (l2.dominant_price_tier && l2.dominant_price_tier !== 'mixed') {
+    if (l2.dominant_price_tier === 'luxury' || l2.dominant_price_tier === 'premium') {
+      parts.push(`positioning in the ${l2.dominant_price_tier} segment`)
+    }
+  }
+
+  // Combine into readable summary
+  let summary = parts.join(', ') + '.'
+
+  // Add reliability note
+  if (videoCount < 5) {
+    summary += ` (Based on ${videoCount} video${videoCount === 1 ? '' : 's'} — add more for better accuracy.)`
+  }
+
+  return summary
+}
+
+// -----------------------------------------------------------------------------
 // Fingerprint computation
 // -----------------------------------------------------------------------------
 
 export async function computeFingerprint(input: FingerprintInput): Promise<ProfileFingerprint> {
-  const videos = await fetchOrCreateVideos(input.video_urls)
+  const { videos, found: urlsFound, missing: urlsNotFound } = await fetchOrCreateVideos(input.video_urls)
 
   if (videos.length === 0) {
-    throw new Error('No videos found for fingerprint computation')
+    throw new Error('No videos found for fingerprint computation. Make sure videos are analyzed via /analyze-rate first.')
   }
 
   const videoIds = videos.map((v) => v.id)
@@ -371,12 +476,16 @@ export async function computeFingerprint(input: FingerprintInput): Promise<Profi
   const confidence = (hasEmbedding + hasQuality + hasBrandSignals) / 3
 
   const missingDataNotes: string[] = []
+  if (urlsNotFound.length > 0) missingDataNotes.push(`${urlsNotFound.length} URLs not found in database`)
   if (hasEmbedding < 1) missingDataNotes.push(`${videos.length - videosWithEmbeddings.length} videos missing embeddings`)
   if (hasQuality < 1) missingDataNotes.push(`${allSignals.filter((s) => s.quality_score == null).length} videos missing quality scores`)
   if (hasBrandSignals < 1)
     missingDataNotes.push(`${allSignals.filter((s) => s.execution_coherence == null).length} videos missing Schema v1 analysis`)
 
   const profileId = input.profile_id ?? `profile_${Date.now()}`
+
+  // Generate personality summary from layer data
+  const personalitySummary = generatePersonalitySummary(l1Quality, l2Likeness, l3Visual, videos.length)
 
   return {
     profile_id: profileId,
@@ -392,7 +501,10 @@ export async function computeFingerprint(input: FingerprintInput): Promise<Profi
       l3_visual: l3Visual
     },
     confidence,
-    missing_data_notes: missingDataNotes
+    missing_data_notes: missingDataNotes,
+    urls_not_found: urlsNotFound,
+    urls_found: urlsFound,
+    personality_summary: personalitySummary
   }
 }
 
