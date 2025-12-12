@@ -225,47 +225,67 @@ function extractSignals(
   }
 
   // From brand_ratings (Schema v1)
+  // The data may be in two locations:
+  // 1. model_analysis.signals (flattened format: personality_signals.energy)
+  // 2. model_analysis.raw_output.signals (original format: personality.energy_1_10)
   const ai = brandRating?.ai_analysis
   if (ai?.kind === 'schema_v1_review' && ai.model_analysis) {
-    const m = ai.model_analysis
-    const s = m.signals as Record<string, unknown> | undefined
-    const sc = m.scores as Record<string, unknown> | undefined
-
-    if (sc) {
-      signals.execution_coherence = (sc.execution_coherence_0_1 as number) ?? null
-      signals.distinctiveness = (sc.distinctiveness_0_1 as number) ?? null
+    const m = ai.model_analysis as Record<string, unknown>
+    
+    // Try raw_output first (original schema v1 format), then fallback to flattened
+    const rawOutput = m.raw_output as Record<string, unknown> | undefined
+    const rawSignals = rawOutput?.signals as Record<string, unknown> | undefined
+    const rawScores = rawOutput?.scores as Record<string, unknown> | undefined
+    
+    // Flattened format (processed)
+    const flatSignals = m.signals as Record<string, unknown> | undefined
+    
+    // Extract scores - try raw_output first
+    if (rawScores) {
+      signals.execution_coherence = (rawScores.execution_coherence_0_1 as number) ?? null
+      signals.distinctiveness = (rawScores.distinctiveness_0_1 as number) ?? null
     }
 
+    // Use raw_output.signals if available (original schema format)
+    const s = rawSignals || flatSignals
+    
     if (s) {
-      const p = s.personality as Record<string, unknown> | undefined
+      // Personality - handle both formats
+      const p = (s.personality || s.personality_signals) as Record<string, unknown> | undefined
       if (p) {
-        signals.energy = (p.energy_1_10 as number) ?? null
-        signals.warmth = (p.warmth_1_10 as number) ?? null
-        signals.formality = (p.formality_1_10 as number) ?? null
+        // Original format: energy_1_10, flattened format: energy
+        signals.energy = (p.energy_1_10 as number) ?? (p.energy as number) ?? null
+        signals.warmth = (p.warmth_1_10 as number) ?? (p.warmth as number) ?? null
+        signals.formality = (p.formality_1_10 as number) ?? (p.formality as number) ?? null
       }
 
-      const h = s.humor as Record<string, unknown> | undefined
+      // Humor - handle both formats
+      const h = (s.humor || s.humor_mix) as Record<string, unknown> | undefined
       if (h) {
         signals.humor_types = (h.humor_types as string[]) ?? []
         signals.age_code = (h.age_code as string) ?? null
       }
 
-      const hosp = s.hospitality as Record<string, unknown> | undefined
+      // Hospitality - handle both formats  
+      const hosp = (s.hospitality || s.hospitality_signals) as Record<string, unknown> | undefined
       if (hosp) {
         signals.vibe = (hosp.vibe as string[]) ?? []
         signals.price_tier = (hosp.price_tier as string) ?? null
       }
 
-      const st = s.statement as Record<string, unknown> | undefined
+      // Statement - handle both formats
+      const st = (s.statement || s.statement_signals) as Record<string, unknown> | undefined
       if (st) {
-        signals.primary_intent = (st.primary_intent as string) ?? null
+        signals.primary_intent = (st.primary_intent as string) ?? (st.content_intent as string) ?? null
       }
 
-      const ex = s.execution as Record<string, unknown> | undefined
+      // Execution - handle both formats
+      const ex = (s.execution || s.execution_signals) as Record<string, unknown> | undefined
       if (ex) {
-        signals.production_investment = (ex.production_investment_1_10 as number) ?? null
-        signals.effortlessness = (ex.effortlessness_1_10 as number) ?? null
-        signals.intentionality = (ex.intentionality_1_10 as number) ?? null
+        // Original format: production_investment_1_10, flattened: production_investment
+        signals.production_investment = (ex.production_investment_1_10 as number) ?? (ex.production_investment as number) ?? null
+        signals.effortlessness = (ex.effortlessness_1_10 as number) ?? (ex.effortlessness as number) ?? null
+        signals.intentionality = (ex.intentionality_1_10 as number) ?? (ex.intentionality as number) ?? null
       }
     }
   }
