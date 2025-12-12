@@ -271,7 +271,16 @@ export default function BrandAnalysisClient() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   
   // Tab state
-  const [activeTab, setActiveTab] = useState<'schema' | 'signals' | 'brand'>('schema');
+  const [activeTab, setActiveTab] = useState<'schema' | 'signals' | 'brand' | 'profile'>('schema');
+
+  // Profile fingerprint state
+  const [profileVideoUrls, setProfileVideoUrls] = useState('');
+  const [profileName, setProfileName] = useState('');
+  const [profileFingerprint, setProfileFingerprint] = useState<any | null>(null);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
+  const [matchResults, setMatchResults] = useState<any[]>([]);
+  const [matchLoading, setMatchLoading] = useState(false);
 
   const isObject = (value: unknown): value is Record<string, unknown> => {
     return typeof value === 'object' && value !== null;
@@ -406,6 +415,67 @@ export default function BrandAnalysisClient() {
       setUploadingGcs(false);
     }
   }, [selectedVideo]);
+
+  // Profile fingerprint computation
+  const computeProfileFingerprint = useCallback(async () => {
+    const urls = profileVideoUrls
+      .split('\n')
+      .map((u) => u.trim())
+      .filter((u) => u.startsWith('http'));
+
+    if (urls.length === 0) {
+      setProfileError('Enter at least one video URL');
+      return;
+    }
+
+    setProfileLoading(true);
+    setProfileError(null);
+
+    try {
+      const res = await fetch('/api/brand-analysis/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          profile_name: profileName || undefined,
+          video_urls: urls
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || 'Failed to compute fingerprint');
+
+      setProfileFingerprint(data.fingerprint);
+    } catch (err) {
+      setProfileError(err instanceof Error ? err.message : 'Failed');
+    } finally {
+      setProfileLoading(false);
+    }
+  }, [profileVideoUrls, profileName]);
+
+  // Match all videos against profile fingerprint
+  const runBatchMatch = useCallback(async () => {
+    if (!profileFingerprint) return;
+
+    setMatchLoading(true);
+    try {
+      const videoIds = videos.map((v) => v.id);
+      const res = await fetch('/api/brand-analysis/match', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          candidate_video_ids: videoIds,
+          fingerprint: profileFingerprint
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || 'Failed to match');
+
+      setMatchResults(data.matches || []);
+    } catch (err) {
+      console.error('Batch match error:', err);
+    } finally {
+      setMatchLoading(false);
+    }
+  }, [profileFingerprint, videos]);
 
 
   // Fetch rated videos from library
@@ -814,7 +884,7 @@ export default function BrandAnalysisClient() {
                 </div>
 
                 {/* Tab Navigation */}
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   <button
                     onClick={() => setActiveTab('schema')}
                     className={`px-4 py-2 rounded-lg font-medium transition-colors ${
@@ -824,6 +894,16 @@ export default function BrandAnalysisClient() {
                     }`}
                   >
                     🧩 Schema v1 (Primary)
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('profile')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                      activeTab === 'profile'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                    }`}
+                  >
+                    🎯 Profile Matching
                   </button>
                   <button
                     onClick={() => setActiveTab('signals')}
@@ -1183,6 +1263,197 @@ export default function BrandAnalysisClient() {
                         </pre>
                       )}
                     </div>
+                  </>
+                ) : activeTab === 'profile' ? (
+                  <>
+                    {/* Profile Fingerprint Section */}
+                    <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 space-y-4">
+                      <div>
+                        <h3 className="font-semibold text-lg mb-2">🎯 Profile Fingerprint</h3>
+                        <p className="text-sm text-gray-400">
+                          Paste 5-10 video URLs from the target brand profile (one per line). 
+                          This creates a "fingerprint" to match other videos against.
+                        </p>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                          Profile Name (optional)
+                        </label>
+                        <input
+                          type="text"
+                          value={profileName}
+                          onChange={(e) => setProfileName(e.target.value)}
+                          placeholder="e.g., @espressobar_berlin"
+                          className="w-full p-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                          Video URLs (one per line)
+                        </label>
+                        <textarea
+                          value={profileVideoUrls}
+                          onChange={(e) => setProfileVideoUrls(e.target.value)}
+                          placeholder="https://www.tiktok.com/@username/video/12345...
+https://www.tiktok.com/@username/video/67890..."
+                          rows={6}
+                          className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm font-mono"
+                        />
+                      </div>
+
+                      <button
+                        onClick={computeProfileFingerprint}
+                        disabled={profileLoading}
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium rounded-lg"
+                      >
+                        {profileLoading ? 'Computing…' : 'Compute Fingerprint'}
+                      </button>
+
+                      {profileError && (
+                        <p className="text-sm text-red-400">{profileError}</p>
+                      )}
+
+                      {profileFingerprint && (
+                        <div className="border border-gray-700 rounded-lg p-4 space-y-3 mt-4">
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-medium text-green-400">
+                              ✓ Fingerprint Ready
+                            </h4>
+                            <span className="text-xs text-gray-400">
+                              {profileFingerprint.video_count} videos • {Math.round(profileFingerprint.confidence * 100)}% confidence
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-3 gap-4 text-sm">
+                            <div className="bg-gray-800/50 p-3 rounded">
+                              <div className="text-gray-400 text-xs mb-1">L1: Quality</div>
+                              <div className="text-white">
+                                {Math.round((profileFingerprint.layers.l1_quality.avg_quality_score || 0) * 100)}% avg
+                              </div>
+                            </div>
+                            <div className="bg-gray-800/50 p-3 rounded">
+                              <div className="text-gray-400 text-xs mb-1">L2: Energy</div>
+                              <div className="text-white">
+                                {profileFingerprint.layers.l2_likeness.avg_energy?.toFixed(1) || '—'} / 10
+                              </div>
+                            </div>
+                            <div className="bg-gray-800/50 p-3 rounded">
+                              <div className="text-gray-400 text-xs mb-1">L3: Production</div>
+                              <div className="text-white">
+                                {profileFingerprint.layers.l3_visual.avg_production_investment?.toFixed(1) || '—'} / 10
+                              </div>
+                            </div>
+                          </div>
+
+                          {profileFingerprint.layers.l2_likeness.dominant_humor_types?.length > 0 && (
+                            <div className="text-sm">
+                              <span className="text-gray-400">Humor: </span>
+                              <span className="text-white">
+                                {profileFingerprint.layers.l2_likeness.dominant_humor_types.join(', ')}
+                              </span>
+                            </div>
+                          )}
+
+                          {profileFingerprint.layers.l2_likeness.dominant_vibe?.length > 0 && (
+                            <div className="text-sm">
+                              <span className="text-gray-400">Vibe: </span>
+                              <span className="text-white">
+                                {profileFingerprint.layers.l2_likeness.dominant_vibe.join(', ')}
+                              </span>
+                            </div>
+                          )}
+
+                          {profileFingerprint.missing_data_notes?.length > 0 && (
+                            <div className="text-xs text-yellow-400/70">
+                              ⚠ {profileFingerprint.missing_data_notes.join('; ')}
+                            </div>
+                          )}
+
+                          <button
+                            onClick={runBatchMatch}
+                            disabled={matchLoading}
+                            className="w-full px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium rounded-lg mt-2"
+                          >
+                            {matchLoading ? 'Matching…' : 'Match All Library Videos'}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Match Results */}
+                    {matchResults.length > 0 && (
+                      <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
+                        <h3 className="font-semibold text-lg mb-4">
+                          Match Results
+                          <span className="text-gray-400 font-normal text-sm ml-2">
+                            (sorted by match %)
+                          </span>
+                        </h3>
+
+                        <div className="space-y-3 max-h-[500px] overflow-y-auto">
+                          {matchResults.map((m: any) => {
+                            const video = videos.find((v) => v.id === m.candidate_video_id);
+                            const matchPct = Math.round(m.overall_match * 100);
+                            const isGoodMatch = matchPct >= 85;
+                            const isOkMatch = matchPct >= 70;
+
+                            return (
+                              <div
+                                key={m.candidate_video_id}
+                                className={`p-4 rounded-lg border ${
+                                  isGoodMatch
+                                    ? 'border-green-700 bg-green-900/20'
+                                    : isOkMatch
+                                    ? 'border-yellow-700 bg-yellow-900/10'
+                                    : 'border-gray-700 bg-gray-800/30'
+                                }`}
+                              >
+                                <div className="flex items-start justify-between gap-4">
+                                  <div className="flex-1 min-w-0">
+                                    <p className="font-medium truncate">
+                                      {video?.metadata?.title || video?.video_id || m.candidate_video_id}
+                                    </p>
+                                    <p className="text-xs text-gray-400 mt-1">
+                                      {m.explanation}
+                                    </p>
+                                  </div>
+                                  <div className="text-right flex-shrink-0">
+                                    <div
+                                      className={`text-2xl font-bold ${
+                                        isGoodMatch
+                                          ? 'text-green-400'
+                                          : isOkMatch
+                                          ? 'text-yellow-400'
+                                          : 'text-gray-400'
+                                      }`}
+                                    >
+                                      {matchPct}%
+                                    </div>
+                                    <div className="text-xs text-gray-500 mt-1">
+                                      L1:{Math.round(m.layer_scores.l1_quality_compatible * 100)}
+                                      {' '}L2:{Math.round(m.layer_scores.l2_likeness_match * 100)}
+                                      {' '}L3:{Math.round(m.layer_scores.l3_visual_proximity * 100)}
+                                    </div>
+                                  </div>
+                                </div>
+                                {video && (
+                                  <a
+                                    href={video.video_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-400 hover:text-blue-300 text-xs mt-2 inline-block"
+                                  >
+                                    Open Video ↗
+                                  </a>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </>
                 ) : activeTab === 'signals' ? (
                   <>
