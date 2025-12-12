@@ -181,20 +181,49 @@ function scaleVector(v: number[], s: number): number[] {
 // -----------------------------------------------------------------------------
 
 interface VideoSignals {
-  quality_score: number | null
-  execution_coherence: number | null
-  distinctiveness: number | null
+  // L1: Quality signals
+  quality_score: number | null           // Service fit from /analyze-rate
+  execution_coherence: number | null     // From Schema v1 scores
+  distinctiveness: number | null         // From Schema v1 scores
+  confidence: number | null              // NEW: personality.confidence_1_10
+  message_alignment: number | null       // NEW: coherence.personality_message_alignment_0_1
+  
+  // L2: Personality - Tone
   energy: number | null
   warmth: number | null
   formality: number | null
+  self_seriousness: number | null        // NEW: statement.self_seriousness_1_10
+  
+  // L2: Personality - Humor
   humor_types: string[]
   age_code: string | null
-  vibe: string[]
+  humor_target: string | null            // NEW: humor.target
+  meanness_risk: string | null           // NEW: humor.meanness_risk
+  
+  // L2: Personality - Positioning
+  accessibility: string | null           // NEW: personality.social_positioning.accessibility
   price_tier: string | null
+  edginess: string | null                // NEW: statement.opinion_stance.edginess
+  vibe: string[]
+  occasion: string[]                     // NEW: hospitality.occasion
+  
+  // L2: Personality - Intent
   primary_intent: string | null
+  cta_types: string[]                    // NEW: conversion.cta_types
+  subtext: string[]                      // NEW: statement.subtext
+  apparent_audience: string | null       // NEW: statement.apparent_audience
+  
+  // L2: Personality - Traits
+  traits_observed: string[]              // NEW: personality.traits_observed
+  service_ethos: string[]                // NEW: hospitality.service_ethos
+  
+  // L3: Production
   production_investment: number | null
   effortlessness: number | null
   intentionality: number | null
+  social_permission: number | null       // NEW: execution.social_permission_1_10
+  has_repeatable_format: boolean | null  // NEW: execution.has_repeatable_format
+  format_name: string | null             // NEW: execution.format_name_if_any
 }
 
 function extractSignals(
@@ -203,23 +232,46 @@ function extractSignals(
   brandRating: BrandRatingRecord | undefined
 ): VideoSignals {
   const signals: VideoSignals = {
+    // L1
     quality_score: null,
     execution_coherence: null,
     distinctiveness: null,
+    confidence: null,
+    message_alignment: null,
+    // L2 Tone
     energy: null,
     warmth: null,
     formality: null,
+    self_seriousness: null,
+    // L2 Humor
     humor_types: [],
     age_code: null,
-    vibe: [],
+    humor_target: null,
+    meanness_risk: null,
+    // L2 Positioning
+    accessibility: null,
     price_tier: null,
+    edginess: null,
+    vibe: [],
+    occasion: [],
+    // L2 Intent
     primary_intent: null,
+    cta_types: [],
+    subtext: [],
+    apparent_audience: null,
+    // L2 Traits
+    traits_observed: [],
+    service_ethos: [],
+    // L3
     production_investment: null,
     effortlessness: null,
-    intentionality: null
+    intentionality: null,
+    social_permission: null,
+    has_repeatable_format: null,
+    format_name: null
   }
 
-  // From video_ratings (quality)
+  // From video_ratings (quality / service fit)
   if (rating?.overall_score != null) {
     signals.quality_score = rating.overall_score
   }
@@ -257,6 +309,14 @@ function extractSignals(
         signals.energy = (p.energy_1_10 as number) ?? (p.energy as number) ?? null
         signals.warmth = (p.warmth_1_10 as number) ?? (p.warmth as number) ?? null
         signals.formality = (p.formality_1_10 as number) ?? (p.formality as number) ?? null
+        signals.confidence = (p.confidence_1_10 as number) ?? (p.confidence as number) ?? null
+        signals.traits_observed = (p.traits_observed as string[]) ?? []
+        
+        // Social positioning (nested in personality)
+        const sp = p.social_positioning as Record<string, unknown> | undefined
+        if (sp) {
+          signals.accessibility = (sp.accessibility as string) ?? null
+        }
       }
 
       // Humor - handle both formats
@@ -264,6 +324,8 @@ function extractSignals(
       if (h) {
         signals.humor_types = (h.humor_types as string[]) ?? []
         signals.age_code = (h.age_code as string) ?? null
+        signals.humor_target = (h.target as string) ?? null
+        signals.meanness_risk = (h.meanness_risk as string) ?? null
       }
 
       // Hospitality - handle both formats  
@@ -271,12 +333,23 @@ function extractSignals(
       if (hosp) {
         signals.vibe = (hosp.vibe as string[]) ?? []
         signals.price_tier = (hosp.price_tier as string) ?? null
+        signals.occasion = (hosp.occasion as string[]) ?? []
+        signals.service_ethos = (hosp.service_ethos as string[]) ?? []
       }
 
       // Statement - handle both formats
       const st = (s.statement || s.statement_signals) as Record<string, unknown> | undefined
       if (st) {
         signals.primary_intent = (st.primary_intent as string) ?? (st.content_intent as string) ?? null
+        signals.self_seriousness = (st.self_seriousness_1_10 as number) ?? (st.self_seriousness as number) ?? null
+        signals.subtext = (st.subtext as string[]) ?? []
+        signals.apparent_audience = (st.apparent_audience as string) ?? null
+        
+        // Opinion stance (nested in statement)
+        const os = st.opinion_stance as Record<string, unknown> | undefined
+        if (os) {
+          signals.edginess = (os.edginess as string) ?? null
+        }
       }
 
       // Execution - handle both formats
@@ -286,6 +359,21 @@ function extractSignals(
         signals.production_investment = (ex.production_investment_1_10 as number) ?? (ex.production_investment as number) ?? null
         signals.effortlessness = (ex.effortlessness_1_10 as number) ?? (ex.effortlessness as number) ?? null
         signals.intentionality = (ex.intentionality_1_10 as number) ?? (ex.intentionality as number) ?? null
+        signals.social_permission = (ex.social_permission_1_10 as number) ?? (ex.social_permission as number) ?? null
+        signals.has_repeatable_format = (ex.has_repeatable_format as boolean) ?? null
+        signals.format_name = (ex.format_name_if_any as string) ?? null
+      }
+      
+      // Conversion
+      const conv = (s.conversion || s.conversion_signals) as Record<string, unknown> | undefined
+      if (conv) {
+        signals.cta_types = (conv.cta_types as string[]) ?? []
+      }
+      
+      // Coherence
+      const coh = (s.coherence || s.coherence_signals) as Record<string, unknown> | undefined
+      if (coh) {
+        signals.message_alignment = (coh.personality_message_alignment_0_1 as number) ?? null
       }
     }
   }
@@ -312,11 +400,128 @@ function computeVideoWeight(signals: VideoSignals): number {
 // Personality summary generation
 // -----------------------------------------------------------------------------
 
+import { chat, CLAUDE_MODELS } from '@/lib/claude/client'
+
 /**
- * Generate a human-readable personality summary from fingerprint layers.
- * This provides interpretable text that can guide content recommendations.
+ * Generate a human-readable personality summary using Claude LLM.
+ * Falls back to template-based generation if LLM fails.
  */
-function generatePersonalitySummary(
+async function generatePersonalitySummaryLLM(
+  l1: L1QualityLayer,
+  l2: L2LikenessLayer,
+  l3: L3VisualLayer,
+  videoCount: number,
+  profileName?: string
+): Promise<string> {
+  const systemPrompt = `You are a creative strategist writing brand personality summaries for social media content creators.
+
+Your task: Write a vivid, specific paragraph (2-4 sentences) describing this brand's content identity based on their video analysis data.
+
+STYLE GUIDELINES:
+- Write like a creative brief, not a data report
+- Use specific, memorable language (avoid generic phrases like "quality content" or "engaging presence")
+- Describe what makes them distinctive, not just what they do
+- Focus on their content philosophy, not just metrics
+- Note who they appeal to and why their approach works (or doesn't)
+
+ANTI-PATTERNS TO AVOID:
+❌ "Using situational humor" → ✅ "Their comedy comes from real customer moments, not scripted bits"
+❌ "Casual vibe" → ✅ "They talk to the camera like you're already a regular"
+❌ "High energy content" → ✅ "Everything moves fast—quick cuts, rapid-fire jokes, zero dead air"
+❌ "Professional quality" → ✅ "Clean enough to feel intentional, rough enough to feel real"
+
+WHAT TO INCLUDE:
+1. Their dominant content approach/philosophy
+2. Their humor or communication style (be specific about HOW they're funny, not just that they use humor)
+3. Who they're talking to (audience vibe)
+4. Production/visual identity
+5. Any contradictions or tensions in their content (if notable)
+
+Keep it to ONE paragraph. No bullet points. No headers.`
+
+  const layerData = {
+    profile_name: profileName || 'Unknown Profile',
+    video_count: videoCount,
+    quality: {
+      service_fit_pct: Math.round((l1.avg_service_fit || 0) * 100),
+      execution_quality_pct: Math.round((l1.avg_execution_quality || 0) * 100),
+      distinctiveness_pct: Math.round((l1.avg_distinctiveness || 0) * 100)
+    },
+    personality: {
+      energy: l2.avg_energy?.toFixed(1) || 'N/A',
+      warmth: l2.avg_warmth?.toFixed(1) || 'N/A',
+      formality: l2.avg_formality?.toFixed(1) || 'N/A',
+      self_seriousness: l2.avg_self_seriousness?.toFixed(1) || 'N/A',
+      confidence: l2.avg_confidence?.toFixed(1) || 'N/A'
+    },
+    humor: {
+      types: l2.dominant_humor_types.length > 0 ? l2.dominant_humor_types : ['none detected'],
+      target: l2.dominant_humor_target || 'varied',
+      meanness_risk: l2.dominant_meanness_risk || 'unknown',
+      age_appeal: l2.dominant_age_code
+    },
+    positioning: {
+      accessibility: l2.dominant_accessibility || 'mixed',
+      price_tier: l2.dominant_price_tier,
+      edginess: l2.dominant_edginess || 'unknown',
+      vibe: l2.dominant_vibe.length > 0 ? l2.dominant_vibe : ['unclear'],
+      occasions: l2.dominant_occasion.length > 0 ? l2.dominant_occasion : []
+    },
+    intent: {
+      primary: l2.dominant_intent || 'unclear',
+      cta_style: l2.dominant_cta_types.length > 0 ? l2.dominant_cta_types : [],
+      themes: l2.collected_subtext.length > 0 ? l2.collected_subtext : []
+    },
+    character: {
+      traits: l2.dominant_traits.length > 0 ? l2.dominant_traits : [],
+      service_ethos: l2.dominant_service_ethos.length > 0 ? l2.dominant_service_ethos : []
+    },
+    production: {
+      investment: l3.avg_production_investment?.toFixed(1) || 'N/A',
+      effortlessness: l3.avg_effortlessness?.toFixed(1) || 'N/A',
+      intentionality: l3.avg_intentionality?.toFixed(1) || 'N/A',
+      shareability: l3.avg_social_permission?.toFixed(1) || 'N/A',
+      has_format: l3.has_repeatable_format_pct > 0.5,
+      format_names: l3.collected_format_names.length > 0 ? l3.collected_format_names : []
+    }
+  }
+
+  const userMessage = `Write a personality summary for this brand's content:
+
+${JSON.stringify(layerData, null, 2)}
+
+Scale reference: 1-10 where 1=low, 5=neutral, 10=high. Percentages are 0-100%.`
+
+  try {
+    const response = await chat(
+      systemPrompt,
+      [{ role: 'user', content: userMessage }],
+      { 
+        model: CLAUDE_MODELS.EXTRACTION, 
+        maxTokens: 300,
+        temperature: 0.8  // Slightly higher for creative writing
+      }
+    )
+    
+    let summary = response.content.trim()
+    
+    // Add reliability note for low video counts
+    if (videoCount < 5) {
+      summary += ` (Based on ${videoCount} video${videoCount === 1 ? '' : 's'} — add more for a clearer picture.)`
+    }
+    
+    return summary
+  } catch (error) {
+    console.error('LLM personality generation failed, using template fallback:', error)
+    return generatePersonalitySummaryTemplate(l1, l2, l3, videoCount)
+  }
+}
+
+/**
+ * Template-based fallback for personality summary generation.
+ * Used when LLM is unavailable or fails.
+ */
+function generatePersonalitySummaryTemplate(
   l1: L1QualityLayer,
   l2: L2LikenessLayer,
   l3: L3VisualLayer,
@@ -324,16 +529,20 @@ function generatePersonalitySummary(
 ): string {
   const parts: string[] = []
 
-  // Quality assessment
-  const qualityPct = Math.round((l1.avg_quality_score || 0) * 100)
-  if (qualityPct >= 80) {
-    parts.push('High-quality content creator')
-  } else if (qualityPct >= 60) {
-    parts.push('Solid content quality')
-  } else if (qualityPct >= 40) {
+  // Quality assessment (now using split L1)
+  const serviceFitPct = Math.round((l1.avg_service_fit || 0) * 100)
+  const execQualityPct = Math.round((l1.avg_execution_quality || 0) * 100)
+  
+  if (serviceFitPct >= 70 && execQualityPct >= 70) {
+    parts.push('Strong content that aligns well with service needs')
+  } else if (execQualityPct >= 70) {
+    parts.push('Well-executed content in a distinct style')
+  } else if (serviceFitPct >= 70) {
+    parts.push('Content style fits service needs, with room for polish')
+  } else if (serviceFitPct >= 40 || execQualityPct >= 40) {
     parts.push('Mixed content quality')
   } else {
-    parts.push('Emerging content quality')
+    parts.push('Emerging content identity')
   }
 
   // Energy/warmth personality
@@ -405,6 +614,24 @@ function generatePersonalitySummary(
   return summary
 }
 
+/**
+ * Main entry point for personality summary generation.
+ * Tries LLM first, falls back to template.
+ */
+async function generatePersonalitySummary(
+  l1: L1QualityLayer,
+  l2: L2LikenessLayer,
+  l3: L3VisualLayer,
+  videoCount: number,
+  profileName?: string,
+  useLLM: boolean = true
+): Promise<string> {
+  if (useLLM) {
+    return generatePersonalitySummaryLLM(l1, l2, l3, videoCount, profileName)
+  }
+  return generatePersonalitySummaryTemplate(l1, l2, l3, videoCount)
+}
+
 // -----------------------------------------------------------------------------
 // Fingerprint computation
 // -----------------------------------------------------------------------------
@@ -448,37 +675,98 @@ export async function computeFingerprint(input: FingerprintInput): Promise<Profi
   // Compute layer averages
   const allSignals = videoSignals.map((v) => v.signals)
 
+  // Compute L1b: Execution Quality (composite score)
+  const execQualityScores = allSignals.map((s) => {
+    const coherence = s.execution_coherence ?? 0.5
+    const distinct = s.distinctiveness ?? 0.5
+    const conf = s.confidence != null ? s.confidence / 10 : 0.5
+    const align = s.message_alignment ?? 0.5
+    return coherence * 0.35 + distinct * 0.35 + conf * 0.15 + align * 0.15
+  })
+
+  const avgServiceFit = average(allSignals.map((s) => s.quality_score).filter((x): x is number => x != null))
+
   const l1Quality: L1QualityLayer = {
-    avg_quality_score: average(allSignals.map((s) => s.quality_score).filter((x): x is number => x != null)),
+    // L1a: Service Fit
+    avg_service_fit: avgServiceFit,
+    // L1b: Execution Quality
+    avg_execution_quality: average(execQualityScores),
     avg_execution_coherence: average(
       allSignals.map((s) => s.execution_coherence).filter((x): x is number => x != null)
     ),
-    avg_distinctiveness: average(allSignals.map((s) => s.distinctiveness).filter((x): x is number => x != null))
+    avg_distinctiveness: average(allSignals.map((s) => s.distinctiveness).filter((x): x is number => x != null)),
+    avg_confidence: average(allSignals.map((s) => s.confidence).filter((x): x is number => x != null)) / 10 || 0,
+    avg_message_alignment: average(allSignals.map((s) => s.message_alignment).filter((x): x is number => x != null)),
+    // Legacy backwards compatibility
+    avg_quality_score: avgServiceFit
   }
 
+  // L2: Personality - collect all arrays
   const allHumorTypes = allSignals.flatMap((s) => s.humor_types)
   const allVibes = allSignals.flatMap((s) => s.vibe)
+  const allOccasions = allSignals.flatMap((s) => s.occasion)
+  const allCtaTypes = allSignals.flatMap((s) => s.cta_types)
+  const allSubtext = allSignals.flatMap((s) => s.subtext)
+  const allAudiences = allSignals.map((s) => s.apparent_audience).filter((x): x is string => x != null)
+  const allTraits = allSignals.flatMap((s) => s.traits_observed)
+  const allServiceEthos = allSignals.flatMap((s) => s.service_ethos)
+  
+  // L2: Collect categorical values for mode calculation
   const ageCodes = allSignals.map((s) => s.age_code).filter((x): x is string => x != null)
   const priceTiers = allSignals.map((s) => s.price_tier).filter((x): x is string => x != null)
   const intents = allSignals.map((s) => s.primary_intent).filter((x): x is string => x != null)
+  const humorTargets = allSignals.map((s) => s.humor_target).filter((x): x is string => x != null)
+  const meannessRisks = allSignals.map((s) => s.meanness_risk).filter((x): x is string => x != null)
+  const accessibilities = allSignals.map((s) => s.accessibility).filter((x): x is string => x != null)
+  const edginesses = allSignals.map((s) => s.edginess).filter((x): x is string => x != null)
 
   const l2Likeness: L2LikenessLayer = {
-    dominant_humor_types: topN(allHumorTypes, 3),
+    // 2a: Tone
     avg_energy: average(allSignals.map((s) => s.energy).filter((x): x is number => x != null)),
     avg_warmth: average(allSignals.map((s) => s.warmth).filter((x): x is number => x != null)),
     avg_formality: average(allSignals.map((s) => s.formality).filter((x): x is number => x != null)),
+    avg_self_seriousness: average(allSignals.map((s) => s.self_seriousness).filter((x): x is number => x != null)),
+    avg_confidence: average(allSignals.map((s) => s.confidence).filter((x): x is number => x != null)),
+    
+    // 2b: Humor Profile
+    dominant_humor_types: topN(allHumorTypes, 3),
     dominant_age_code: (mode(ageCodes) as L2LikenessLayer['dominant_age_code']) ?? 'mixed',
-    dominant_vibe: topN(allVibes, 3),
+    dominant_humor_target: mode(humorTargets),
+    dominant_meanness_risk: (mode(meannessRisks) as L2LikenessLayer['dominant_meanness_risk']) ?? null,
+    
+    // 2c: Positioning
+    dominant_accessibility: (mode(accessibilities) as L2LikenessLayer['dominant_accessibility']) ?? null,
     dominant_price_tier: (mode(priceTiers) as L2LikenessLayer['dominant_price_tier']) ?? 'mixed',
-    dominant_intent: mode(intents)
+    dominant_edginess: (mode(edginesses) as L2LikenessLayer['dominant_edginess']) ?? null,
+    dominant_vibe: topN(allVibes, 3),
+    dominant_occasion: topN(allOccasions, 3),
+    
+    // 2d: Intent & Messaging
+    dominant_intent: mode(intents),
+    dominant_cta_types: topN(allCtaTypes, 3),
+    collected_subtext: topN(allSubtext, 5),
+    collected_audiences: [...new Set(allAudiences)].slice(0, 3),
+    
+    // 2e: Character Traits
+    dominant_traits: topN(allTraits, 5),
+    dominant_service_ethos: topN(allServiceEthos, 3)
   }
+
+  // L3: Production DNA
+  const formatBooleans = allSignals.map((s) => s.has_repeatable_format).filter((x): x is boolean => x != null)
+  const formatNames = allSignals.map((s) => s.format_name).filter((x): x is string => x != null && x !== '')
 
   const l3Visual: L3VisualLayer = {
     avg_production_investment: average(
       allSignals.map((s) => s.production_investment).filter((x): x is number => x != null)
     ),
     avg_effortlessness: average(allSignals.map((s) => s.effortlessness).filter((x): x is number => x != null)),
-    avg_intentionality: average(allSignals.map((s) => s.intentionality).filter((x): x is number => x != null))
+    avg_intentionality: average(allSignals.map((s) => s.intentionality).filter((x): x is number => x != null)),
+    avg_social_permission: average(allSignals.map((s) => s.social_permission).filter((x): x is number => x != null)),
+    has_repeatable_format_pct: formatBooleans.length > 0 
+      ? formatBooleans.filter(b => b).length / formatBooleans.length 
+      : 0,
+    collected_format_names: [...new Set(formatNames)]
   }
 
   // Build video weights map
@@ -504,8 +792,15 @@ export async function computeFingerprint(input: FingerprintInput): Promise<Profi
 
   const profileId = input.profile_id ?? `profile_${Date.now()}`
 
-  // Generate personality summary from layer data
-  const personalitySummary = generatePersonalitySummary(l1Quality, l2Likeness, l3Visual, videos.length)
+  // Generate personality summary from layer data (using LLM by default)
+  const personalitySummary = await generatePersonalitySummary(
+    l1Quality, 
+    l2Likeness, 
+    l3Visual, 
+    videos.length,
+    input.profile_name,
+    true  // useLLM
+  )
 
   return {
     profile_id: profileId,

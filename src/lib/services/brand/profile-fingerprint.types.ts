@@ -2,33 +2,70 @@
  * Profile Fingerprint Types
  *
  * A profile fingerprint is a multi-layer representation of a brand's content identity.
- * Layer weights prioritize: Quality > Likeness > Visual
+ * Layer weights prioritize: Quality > Personality > Production
+ * 
+ * v2.0 - Dec 2025: Split L1 into Service Fit + Execution Quality, expanded L2 sub-dimensions
  */
 
-/** Layer 1: Quality/Virality signals */
+/** Layer 1: Quality - Split into Service Fit and Execution Quality */
 export interface L1QualityLayer {
-  avg_quality_score: number;        // 0-1, from /analyze-rate
-  avg_execution_coherence: number;  // 0-1, from Schema v1
-  avg_distinctiveness: number;      // 0-1, from Schema v1
+  // L1a: Service Fit - How useful is this style for our service?
+  avg_service_fit: number;           // 0-1, from /analyze-rate overall_score
+  
+  // L1b: Execution Quality - How well-executed, regardless of style?
+  avg_execution_quality: number;     // 0-1, computed from execution signals
+  avg_execution_coherence: number;   // 0-1, from Schema v1
+  avg_distinctiveness: number;       // 0-1, from Schema v1
+  avg_confidence: number;            // 0-1, normalized from personality.confidence_1_10
+  avg_message_alignment: number;     // 0-1, from coherence.personality_message_alignment
+  
+  // Legacy field for backwards compatibility
+  avg_quality_score: number;         // 0-1, alias for avg_service_fit
 }
 
-/** Layer 2: Likeness/Personality signals */
+/** Layer 2: Personality - Expanded with sub-dimensions */
 export interface L2LikenessLayer {
-  dominant_humor_types: string[];   // Most common humor types
-  avg_energy: number;               // 1-10
-  avg_warmth: number;               // 1-10
-  avg_formality: number;            // 1-10
+  // 2a: Tone (numeric averages, 1-10)
+  avg_energy: number;
+  avg_warmth: number;
+  avg_formality: number;
+  avg_self_seriousness: number;      // NEW: playful vs serious
+  avg_confidence: number;            // NEW: delivery confidence
+  
+  // 2b: Humor Profile
+  dominant_humor_types: string[];
   dominant_age_code: 'younger' | 'older' | 'balanced' | 'mixed';
-  dominant_vibe: string[];          // Most common vibes
+  dominant_humor_target: string | null;    // NEW: self/customer/situation/etc
+  dominant_meanness_risk: 'low' | 'medium' | 'high' | 'unknown' | null;  // NEW
+  
+  // 2c: Positioning
+  dominant_accessibility: 'everyman' | 'aspirational' | 'exclusive' | 'elite' | 'mixed' | null;  // NEW
   dominant_price_tier: 'budget' | 'mid' | 'premium' | 'luxury' | 'mixed';
-  dominant_intent: string | null;   // Most common primary_intent
+  dominant_edginess: 'safe' | 'mild' | 'moderate' | 'edgy' | 'provocative' | 'mixed' | null;  // NEW
+  dominant_vibe: string[];
+  dominant_occasion: string[];       // NEW: date night, casual, etc
+  
+  // 2d: Intent & Messaging
+  dominant_intent: string | null;
+  dominant_cta_types: string[];      // NEW: follow_for_series, visit_in_store, etc
+  collected_subtext: string[];       // NEW: underlying themes
+  collected_audiences: string[];     // NEW: apparent_audience values
+  
+  // 2e: Character Traits
+  dominant_traits: string[];         // NEW: from traits_observed
+  dominant_service_ethos: string[];  // NEW: hospitality service philosophy
 }
 
-/** Layer 3: Visual/Production signals */
+/** Layer 3: Production DNA - Expanded */
 export interface L3VisualLayer {
   avg_production_investment: number; // 1-10
   avg_effortlessness: number;        // 1-10
   avg_intentionality: number;        // 1-10
+  avg_social_permission: number;     // NEW: 1-10, shareability
+  
+  // Format consistency
+  has_repeatable_format_pct: number; // NEW: 0-1, % of videos with repeatable format
+  collected_format_names: string[];  // NEW: format identifiers found
 }
 
 /** Complete profile fingerprint */
