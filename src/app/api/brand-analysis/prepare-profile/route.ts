@@ -97,22 +97,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No video_urls provided' }, { status: 400 })
     }
 
-    // Extract video IDs for lookup
-    const videoIds = videoUrls.map(extractVideoId).filter(Boolean)
-
-    // Fetch videos from database
+    // Fetch videos from database using exact URL match (same as fingerprint service)
     const { data: videos, error: videosError } = await supabase
       .from('analyzed_videos')
       .select('id, video_url, video_id, metadata, visual_analysis, content_embedding, gcs_uri')
-      .or(
-        videoIds.map((vid) => `video_id.eq.${vid}`).join(',') +
-          ',' +
-          videoUrls.map((u) => `video_url.eq.${u}`).join(',')
-      )
+      .in('video_url', videoUrls)
 
     if (videosError) throw videosError
 
     const foundVideos = videos || []
+    
+    console.log(`[prepare-profile] Found ${foundVideos.length} videos from ${videoUrls.length} URLs`)
+    console.log(`[prepare-profile] Videos needing embedding: ${foundVideos.filter(v => !v.content_embedding).length}`)
+    console.log(`[prepare-profile] Videos with GCS URI: ${foundVideos.filter(v => v.gcs_uri).length}`)
+    
     const errors: string[] = []
     let embeddingsBackfilled = 0
     let schemaV1Analyzed = 0
@@ -249,6 +247,8 @@ export async function POST(request: NextRequest) {
       embeddings_backfilled: embeddingsBackfilled,
       schema_v1_analyzed: schemaV1Analyzed,
       videos_found: foundVideos.length,
+      videos_checked_for_embedding: videosNeedingEmbedding.length,
+      videos_checked_for_schema_v1: videosNeedingSchemaV1.length,
       videos_needing_gcs: needGcsUri.length,
       errors
     })

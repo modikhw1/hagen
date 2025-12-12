@@ -282,7 +282,15 @@ export default function BrandAnalysisClient() {
   const [matchResults, setMatchResults] = useState<any[]>([]);
   const [matchLoading, setMatchLoading] = useState(false);
   const [prepareLoading, setPrepareLoading] = useState(false);
-  const [prepareResult, setPrepareResult] = useState<{ embeddings_backfilled: number; schema_v1_analyzed: number; errors: string[] } | null>(null);
+  const [prepareResult, setPrepareResult] = useState<{ 
+    embeddings_backfilled: number; 
+    schema_v1_analyzed: number; 
+    videos_found: number;
+    videos_checked_for_embedding: number;
+    videos_checked_for_schema_v1: number;
+    videos_needing_gcs: number;
+    errors: string[] 
+  } | null>(null);
 
   const isObject = (value: unknown): value is Record<string, unknown> => {
     return typeof value === 'object' && value !== null;
@@ -500,6 +508,10 @@ export default function BrandAnalysisClient() {
       setPrepareResult({
         embeddings_backfilled: data.embeddings_backfilled || 0,
         schema_v1_analyzed: data.schema_v1_analyzed || 0,
+        videos_found: data.videos_found || 0,
+        videos_checked_for_embedding: data.videos_checked_for_embedding || 0,
+        videos_checked_for_schema_v1: data.videos_checked_for_schema_v1 || 0,
+        videos_needing_gcs: data.videos_needing_gcs || 0,
         errors: data.errors || []
       });
 
@@ -515,6 +527,10 @@ export default function BrandAnalysisClient() {
       setPrepareResult({
         embeddings_backfilled: 0,
         schema_v1_analyzed: 0,
+        videos_found: 0,
+        videos_checked_for_embedding: 0,
+        videos_checked_for_schema_v1: 0,
+        videos_needing_gcs: 0,
         errors: [err instanceof Error ? err.message : 'Unknown error']
       });
     } finally {
@@ -1037,20 +1053,47 @@ https://www.tiktok.com/@username/video/67890..."
                           
                           {/* Prepare result feedback */}
                           {prepareResult && (
-                            <div className="mt-3 p-3 bg-gray-800/50 rounded text-xs">
+                            <div className="mt-3 p-3 bg-gray-800/50 rounded text-xs space-y-1">
+                              <p className="text-gray-300 font-medium mb-2">Preparation Results:</p>
+                              <p className="text-gray-400">📹 Videos found in DB: {prepareResult.videos_found}</p>
+                              
+                              {/* Embeddings section */}
+                              <p className={prepareResult.videos_checked_for_embedding > 0 ? 'text-yellow-400' : 'text-gray-500'}>
+                                🧠 Videos needing embeddings: {prepareResult.videos_checked_for_embedding}
+                              </p>
                               {prepareResult.embeddings_backfilled > 0 && (
-                                <p className="text-green-400">✓ {prepareResult.embeddings_backfilled} embedding(s) backfilled</p>
+                                <p className="text-green-400 ml-4">✓ {prepareResult.embeddings_backfilled} embedding(s) backfilled</p>
                               )}
+                              
+                              {/* Schema v1 section */}
+                              <p className={prepareResult.videos_checked_for_schema_v1 > 0 ? 'text-yellow-400' : 'text-gray-500'}>
+                                📊 Videos eligible for Schema v1: {prepareResult.videos_checked_for_schema_v1}
+                              </p>
                               {prepareResult.schema_v1_analyzed > 0 && (
-                                <p className="text-green-400">✓ {prepareResult.schema_v1_analyzed} video(s) analyzed with Schema v1</p>
+                                <p className="text-green-400 ml-4">✓ {prepareResult.schema_v1_analyzed} video(s) analyzed</p>
                               )}
+                              
+                              {/* GCS warning */}
+                              {prepareResult.videos_needing_gcs > 0 && (
+                                <p className="text-orange-400">
+                                  ⚠ {prepareResult.videos_needing_gcs} video(s) need GCS upload first (no gcs_uri)
+                                </p>
+                              )}
+                              
+                              {/* Errors */}
                               {prepareResult.errors.length > 0 && (
-                                <div className="text-red-400 mt-1">
-                                  {prepareResult.errors.map((e, i) => <p key={i}>⚠ {e}</p>)}
+                                <div className="text-red-400 mt-2 border-t border-gray-700 pt-2">
+                                  {prepareResult.errors.map((e, i) => <p key={i}>❌ {e}</p>)}
                                 </div>
                               )}
-                              {prepareResult.embeddings_backfilled === 0 && prepareResult.schema_v1_analyzed === 0 && prepareResult.errors.length === 0 && (
-                                <p className="text-gray-400">No updates needed — videos may need GCS upload first for Schema v1.</p>
+                              
+                              {/* All good message */}
+                              {prepareResult.embeddings_backfilled === 0 && 
+                               prepareResult.schema_v1_analyzed === 0 && 
+                               prepareResult.videos_checked_for_embedding === 0 &&
+                               prepareResult.videos_checked_for_schema_v1 === 0 &&
+                               prepareResult.errors.length === 0 && (
+                                <p className="text-green-400">✓ All videos already have complete data!</p>
                               )}
                             </div>
                           )}
