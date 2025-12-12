@@ -281,6 +281,8 @@ export default function BrandAnalysisClient() {
   const [profileError, setProfileError] = useState<string | null>(null);
   const [matchResults, setMatchResults] = useState<any[]>([]);
   const [matchLoading, setMatchLoading] = useState(false);
+  const [prepareLoading, setPrepareLoading] = useState(false);
+  const [prepareResult, setPrepareResult] = useState<{ embeddings_backfilled: number; schema_v1_analyzed: number; errors: string[] } | null>(null);
 
   const isObject = (value: unknown): value is Record<string, unknown> => {
     return typeof value === 'object' && value !== null;
@@ -476,6 +478,49 @@ export default function BrandAnalysisClient() {
       setMatchLoading(false);
     }
   }, [profileFingerprint, videos]);
+
+  // Prepare profile: backfill embeddings + run Schema v1
+  const prepareProfile = useCallback(async () => {
+    if (!profileFingerprint?.urls_found?.length) return;
+
+    setPrepareLoading(true);
+    setPrepareResult(null);
+
+    try {
+      const res = await fetch('/api/brand-analysis/prepare-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          video_urls: profileFingerprint.urls_found
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || 'Preparation failed');
+
+      setPrepareResult({
+        embeddings_backfilled: data.embeddings_backfilled || 0,
+        schema_v1_analyzed: data.schema_v1_analyzed || 0,
+        errors: data.errors || []
+      });
+
+      // Auto-recompute fingerprint if anything was updated
+      if (data.embeddings_backfilled > 0 || data.schema_v1_analyzed > 0) {
+        // Small delay then re-compute
+        setTimeout(() => {
+          computeProfileFingerprint();
+        }, 500);
+      }
+    } catch (err) {
+      console.error('Prepare profile error:', err);
+      setPrepareResult({
+        embeddings_backfilled: 0,
+        schema_v1_analyzed: 0,
+        errors: [err instanceof Error ? err.message : 'Unknown error']
+      });
+    } finally {
+      setPrepareLoading(false);
+    }
+  }, [profileFingerprint, computeProfileFingerprint]);
 
 
   // Fetch rated videos from library
@@ -823,7 +868,7 @@ export default function BrandAnalysisClient() {
                   <div>
                     <h3 className="font-semibold text-lg mb-2">🎯 Profile Fingerprint Matching</h3>
                     <p className="text-sm text-gray-400">
-                      Create a fingerprint from a brand's videos, then match your library against it.
+                      Create a fingerprint from a brand&apos;s videos, then match your library against it.
                       Paste 5-10 video URLs from the target profile (one per line).
                     </p>
                   </div>
@@ -967,6 +1012,48 @@ https://www.tiktok.com/@username/video/67890..."
                       {profileFingerprint.missing_data_notes?.length > 0 && (
                         <div className="text-xs text-yellow-400/70">
                           ⚠ {profileFingerprint.missing_data_notes.join('; ')}
+                        </div>
+                      )}
+
+                      {/* Prepare Profile Button - shows when there's missing embeddings or Schema v1 */}
+                      {profileFingerprint.missing_data_notes?.some((n: string) => 
+                        n.includes('missing embeddings') || n.includes('missing Schema v1')
+                      ) && (
+                        <div className="bg-amber-900/20 border border-amber-700/50 rounded-lg p-4">
+                          <p className="text-sm text-amber-200 mb-3">
+                            <strong>⚡ Data Incomplete</strong> — Some videos are missing embeddings or Schema v1 analysis, 
+                            which reduces matching accuracy.
+                          </p>
+                          <button
+                            onClick={prepareProfile}
+                            disabled={prepareLoading}
+                            className="px-4 py-2 bg-amber-600 hover:bg-amber-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium rounded-lg text-sm"
+                          >
+                            {prepareLoading ? 'Preparing… (may take a minute)' : '🔧 Prepare Profile Data'}
+                          </button>
+                          <p className="text-xs text-gray-500 mt-2">
+                            This will backfill embeddings and run Schema v1 analysis for videos in this profile.
+                          </p>
+                          
+                          {/* Prepare result feedback */}
+                          {prepareResult && (
+                            <div className="mt-3 p-3 bg-gray-800/50 rounded text-xs">
+                              {prepareResult.embeddings_backfilled > 0 && (
+                                <p className="text-green-400">✓ {prepareResult.embeddings_backfilled} embedding(s) backfilled</p>
+                              )}
+                              {prepareResult.schema_v1_analyzed > 0 && (
+                                <p className="text-green-400">✓ {prepareResult.schema_v1_analyzed} video(s) analyzed with Schema v1</p>
+                              )}
+                              {prepareResult.errors.length > 0 && (
+                                <div className="text-red-400 mt-1">
+                                  {prepareResult.errors.map((e, i) => <p key={i}>⚠ {e}</p>)}
+                                </div>
+                              )}
+                              {prepareResult.embeddings_backfilled === 0 && prepareResult.schema_v1_analyzed === 0 && prepareResult.errors.length === 0 && (
+                                <p className="text-gray-400">No updates needed — videos may need GCS upload first for Schema v1.</p>
+                              )}
+                            </div>
+                          )}
                         </div>
                       )}
 
