@@ -1,0 +1,1482 @@
+'use client';
+
+import { useState, useEffect, useCallback, useRef } from 'react';
+
+// Types
+interface Video {
+  id: string;
+  video_url: string;
+  video_id: string;
+  platform: string;
+  gcs_uri?: string | null;
+  metadata: {
+    title?: string;
+    author?: {
+      username?: string;
+      displayName?: string;
+    } | string;
+    thumbnail_url?: string;
+  } | null;
+  visual_analysis: Record<string, unknown> | null;
+  rating: {
+    overall_score: number;
+    notes: string | null;
+    rated_at: string;
+    humor_type?: string | null;
+    dimensions?: Record<string, unknown> | null;
+    tags?: string[] | null;
+  } | null;
+}
+
+interface BrandRating {
+  id: string;
+  video_id: string;
+  personality_notes: string;
+  statement_notes: string;
+  corrections?: string;
+  ai_analysis?: unknown;
+  extracted_signals?: Record<string, unknown>;
+  created_at: string;
+}
+
+interface SimilarVideo {
+  video_id: string;
+  video_url: string;
+  personality_notes: string;
+  statement_notes: string;
+  similarity: number;
+}
+
+// Custom Slider Component
+function Slider({ 
+  value, 
+  onChange, 
+  min = 1, 
+  max = 10,
+  labels 
+}: { 
+  value: number; 
+  onChange: (v: number) => void;
+  min?: number;
+  max?: number;
+  labels?: { left: string; right: string };
+}) {
+  const percentage = ((value - min) / (max - min)) * 100;
+  
+  return (
+    <div className="space-y-2">
+      {labels && (
+        <div className="flex justify-between text-xs text-gray-500">
+          <span>{labels.left}</span>
+          <span>{labels.right}</span>
+        </div>
+      )}
+      <div className="relative">
+        <input
+          type="range"
+          min={min}
+          max={max}
+          value={value}
+          onChange={(e) => onChange(Number(e.target.value))}
+          className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider-thumb"
+          style={{
+            background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${percentage}%, #374151 ${percentage}%, #374151 100%)`
+          }}
+        />
+        <div className="flex justify-between mt-1">
+          {Array.from({ length: max - min + 1 }, (_, i) => i + min).map((n) => (
+            <span 
+              key={n} 
+              className={`text-xs ${value === n ? 'text-blue-400 font-bold' : 'text-gray-600'}`}
+            >
+              {n}
+            </span>
+          ))}
+        </div>
+      </div>
+      <div className="text-center">
+        <span className="text-2xl font-bold text-white">{value}</span>
+        <span className="text-gray-400 text-sm ml-1">/ {max}</span>
+      </div>
+    </div>
+  );
+}
+
+// Age Range Slider Component
+function AgeRangeSlider({
+  minAge,
+  maxAge,
+  onChange
+}: {
+  minAge: number;
+  maxAge: number;
+  onChange: (min: number, max: number) => void;
+}) {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [dragging, setDragging] = useState<'min' | 'max' | null>(null);
+  
+  const ageMin = 12;
+  const ageMax = 65;
+  
+  const getPercentage = (age: number) => ((age - ageMin) / (ageMax - ageMin)) * 100;
+  
+  const handleMouseDown = (handle: 'min' | 'max') => (e: React.MouseEvent) => {
+    e.preventDefault();
+    setDragging(handle);
+  };
+  
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!dragging || !trackRef.current) return;
+    
+    const rect = trackRef.current.getBoundingClientRect();
+    const percentage = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+    const age = Math.round(ageMin + (percentage / 100) * (ageMax - ageMin));
+    
+    if (dragging === 'min') {
+      onChange(Math.min(age, maxAge - 1), maxAge);
+    } else {
+      onChange(minAge, Math.max(age, minAge + 1));
+    }
+  }, [dragging, minAge, maxAge, onChange]);
+  
+  const handleMouseUp = useCallback(() => {
+    setDragging(null);
+  }, []);
+  
+  useEffect(() => {
+    if (dragging) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [dragging, handleMouseMove, handleMouseUp]);
+  
+  const ageMarkers = [12, 18, 25, 35, 45, 55, 65];
+  
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-between text-xs text-gray-500">
+        <span>Youth (12)</span>
+        <span>Senior (65)</span>
+      </div>
+      
+      <div 
+        ref={trackRef}
+        className="relative h-2 bg-gray-700 rounded-full cursor-pointer"
+      >
+        {/* Selected range */}
+        <div 
+          className="absolute h-full bg-blue-500 rounded-full"
+          style={{
+            left: `${getPercentage(minAge)}%`,
+            width: `${getPercentage(maxAge) - getPercentage(minAge)}%`
+          }}
+        />
+        
+        {/* Min handle */}
+        <div
+          className={`absolute w-5 h-5 bg-white rounded-full shadow-lg cursor-grab transform -translate-x-1/2 -translate-y-1/2 top-1/2 border-2 border-blue-500 ${dragging === 'min' ? 'cursor-grabbing scale-110' : 'hover:scale-110'} transition-transform`}
+          style={{ left: `${getPercentage(minAge)}%` }}
+          onMouseDown={handleMouseDown('min')}
+        />
+        
+        {/* Max handle */}
+        <div
+          className={`absolute w-5 h-5 bg-white rounded-full shadow-lg cursor-grab transform -translate-x-1/2 -translate-y-1/2 top-1/2 border-2 border-blue-500 ${dragging === 'max' ? 'cursor-grabbing scale-110' : 'hover:scale-110'} transition-transform`}
+          style={{ left: `${getPercentage(maxAge)}%` }}
+          onMouseDown={handleMouseDown('max')}
+        />
+      </div>
+      
+      {/* Age markers */}
+      <div className="flex justify-between">
+        {ageMarkers.map((age) => (
+          <span 
+            key={age}
+            className={`text-xs ${age >= minAge && age <= maxAge ? 'text-blue-400' : 'text-gray-600'}`}
+          >
+            {age}
+          </span>
+        ))}
+      </div>
+      
+      {/* Display selected range */}
+      <div className="text-center">
+        <span className="text-2xl font-bold text-white">{minAge} - {maxAge}</span>
+        <span className="text-gray-400 text-sm ml-2">years old</span>
+      </div>
+    </div>
+  );
+}
+
+function HelpTip({ text }: { text: string }) {
+  return (
+    <span className="relative inline-flex items-center group">
+      <span
+        className="ml-2 inline-flex items-center justify-center w-5 h-5 rounded-full border border-gray-700 bg-gray-800 text-gray-300 text-xs select-none"
+        aria-label="Help"
+      >
+        i
+      </span>
+      <span className="pointer-events-none absolute left-0 top-7 z-20 hidden w-72 rounded-lg border border-gray-700 bg-gray-900 p-3 text-xs text-gray-200 group-hover:block">
+        {text}
+      </span>
+    </span>
+  );
+}
+
+export default function BrandAnalysisClient() {
+  // Video list state
+  const [videos, setVideos] = useState<Video[]>([]);
+  const [loadingVideos, setLoadingVideos] = useState(true);
+  const [videoError, setVideoError] = useState<string | null>(null);
+  
+  // Selection state
+  const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
+  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
+  
+  // NEW: Analysis state
+  const [survivalScore, setSurvivalScore] = useState(5);
+  const [survivalNotes, setSurvivalNotes] = useState('');
+  
+  const [coolnessScore, setCoolnessScore] = useState(5);
+  const [coolnessNotes, setCoolnessNotes] = useState('');
+  
+  const [targetAgeMin, setTargetAgeMin] = useState(18);
+  const [targetAgeMax, setTargetAgeMax] = useState(35);
+  const [audienceNotes, setAudienceNotes] = useState('');
+  
+  // LEGACY: Brand rating state (still supported)
+  const [personalityNotes, setPersonalityNotes] = useState('');
+  const [statementNotes, setStatementNotes] = useState('');
+  const [corrections, setCorrections] = useState('');
+  const [existingRating, setExistingRating] = useState<BrandRating | null>(null);
+
+  // Schema v1 AI analysis state
+  const [schemaV1ModelAnalysis, setSchemaV1ModelAnalysis] = useState<unknown | null>(null);
+  const [schemaV1HumanPatch, setSchemaV1HumanPatch] = useState<Record<string, unknown> | null>(null);
+  const [schemaV1Loading, setSchemaV1Loading] = useState(false);
+  const [schemaV1Error, setSchemaV1Error] = useState<string | null>(null);
+  
+  // Similar videos
+  const [similarVideos, setSimilarVideos] = useState<SimilarVideo[]>([]);
+  const [loadingSimilar, setLoadingSimilar] = useState(false);
+  
+  // Submission state
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  
+  // Tab state
+  const [activeTab, setActiveTab] = useState<'schema' | 'signals' | 'brand'>('schema');
+
+  const isObject = (value: unknown): value is Record<string, unknown> => {
+    return typeof value === 'object' && value !== null;
+  };
+
+  const getModelObservation = (analysis: unknown): any | null => {
+    if (!isObject(analysis)) return null;
+    // Expected VideoBrandAnalysis shape: { raw_output: VideoBrandObservationV1 }
+    const raw = (analysis as any).raw_output;
+    return isObject(raw) ? raw : null;
+  };
+
+  const deepMerge = (base: any, patch: any): any => {
+    if (patch === null || patch === undefined) return base;
+    if (Array.isArray(patch)) return patch;
+    if (typeof patch !== 'object') return patch;
+    if (base === null || base === undefined) return patch;
+    if (Array.isArray(base)) return patch;
+
+    const result: Record<string, any> = { ...(base as any) };
+    for (const key of Object.keys(patch)) {
+      result[key] = deepMerge((base as any)[key], (patch as any)[key]);
+    }
+    return result;
+  };
+
+  const setDeep = (obj: any, path: string[], value: any): any => {
+    const root = isObject(obj) ? { ...(obj as any) } : {};
+    let cursor: any = root;
+
+    for (let i = 0; i < path.length - 1; i++) {
+      const key = path[i];
+      const existing = cursor[key];
+      cursor[key] = isObject(existing) ? { ...(existing as any) } : {};
+      cursor = cursor[key];
+    }
+
+    cursor[path[path.length - 1]] = value;
+    return root;
+  };
+
+  const updateSchemaPatch = (path: string[], value: any) => {
+    setSchemaV1HumanPatch((prev) => setDeep(prev, path, value));
+  };
+
+  const parseCommaList = (value: string): string[] => {
+    const parts = value
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+    return parts;
+  };
+
+  const getDeep = (obj: any, ...path: string[]) => {
+    let cur = obj;
+    for (const key of path) {
+      if (!cur || typeof cur !== 'object') return undefined;
+      cur = cur[key];
+    }
+    return cur;
+  };
+
+  const seedSchemaFromAnalyzeRate = useCallback(() => {
+    if (!selectedVideo) return;
+
+    const raw = selectedVideo.visual_analysis || {};
+    const humorType =
+      getDeep(raw, 'script', 'humor', 'humorType') ||
+      getDeep(raw, 'humor_analysis', 'primary_type') ||
+      (selectedVideo.rating as any)?.humor_type ||
+      null;
+
+    const contentFormat =
+      getDeep(raw, 'content', 'format') ||
+      getDeep(raw, 'format') ||
+      null;
+
+    const patch: Record<string, unknown> = {
+      schema_version: 1,
+      video: {
+        video_id: selectedVideo.id,
+        platform: selectedVideo.platform,
+        video_url: selectedVideo.video_url,
+        gcs_uri: selectedVideo.gcs_uri || undefined
+      },
+      signals: {
+        humor: {
+          present: humorType ? humorType !== 'none' : null,
+          humor_types: humorType ? [String(humorType)] : [],
+          target: null,
+          age_code: 'unknown',
+          meanness_risk: 'unknown'
+        },
+        execution: {
+          has_repeatable_format: null,
+          format_name_if_any: contentFormat ? String(contentFormat) : null
+        }
+      }
+    };
+
+    // Merge into existing patch (user edits win after merge)
+    setSchemaV1HumanPatch((prev) => deepMerge(patch, prev));
+  }, [selectedVideo]);
+
+  const [uploadingGcs, setUploadingGcs] = useState(false);
+  const [uploadGcsError, setUploadGcsError] = useState<string | null>(null);
+
+  const uploadSelectedVideoToGcs = useCallback(async () => {
+    if (!selectedVideo) return;
+    setUploadingGcs(true);
+    setUploadGcsError(null);
+
+    try {
+      const res = await fetch('/api/videos/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ videoId: selectedVideo.id })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data?.error || 'Failed to upload');
+      }
+
+      const gcsUri = data.gcsUri as string | undefined;
+      if (gcsUri) {
+        setSelectedVideo((prev) => (prev ? { ...prev, gcs_uri: gcsUri } : prev));
+        setVideos((prev) => prev.map((v) => (v.id === selectedVideo.id ? { ...v, gcs_uri: gcsUri } : v)));
+      }
+    } catch (err) {
+      setUploadGcsError(err instanceof Error ? err.message : 'Failed to upload');
+    } finally {
+      setUploadingGcs(false);
+    }
+  }, [selectedVideo]);
+
+
+  // Fetch rated videos from library
+  const fetchVideos = useCallback(async () => {
+    setLoadingVideos(true);
+    try {
+      const res = await fetch('/api/ratings?limit=100');
+      if (!res.ok) throw new Error('Failed to fetch videos');
+      const data = await res.json();
+      
+      const transformedVideos: Video[] = data.map((r: any) => ({
+        id: r.video?.id || r.video_id,
+        video_url: r.video?.video_url || '',
+        video_id: r.video?.video_id || '',
+        platform: r.video?.platform || 'unknown',
+        metadata: r.video?.metadata || null,
+        visual_analysis: r.video?.visual_analysis || null,
+        gcs_uri: r.video?.gcs_uri || null,
+        rating: {
+          overall_score: r.overall_score,
+          notes: r.notes,
+          rated_at: r.rated_at,
+          humor_type: r.humor_type || null,
+          dimensions: r.dimensions || null,
+          tags: r.tags || null,
+        },
+      }));
+      
+      setVideos(transformedVideos);
+      setVideoError(null);
+    } catch (err) {
+      setVideoError(err instanceof Error ? err.message : 'Failed to load videos');
+    } finally {
+      setLoadingVideos(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchVideos();
+  }, [fetchVideos]);
+
+  // Reset form
+  const resetForm = useCallback(() => {
+    setExistingRating(null);
+    setPersonalityNotes('');
+    setStatementNotes('');
+    setCorrections('');
+    setSchemaV1ModelAnalysis(null);
+    setSchemaV1HumanPatch(null);
+    setSchemaV1Error(null);
+    setSurvivalScore(5);
+    setSurvivalNotes('');
+    setCoolnessScore(5);
+    setCoolnessNotes('');
+    setTargetAgeMin(18);
+    setTargetAgeMax(35);
+    setAudienceNotes('');
+  }, []);
+
+  // Load existing rating when video is selected
+  const loadExistingRating = useCallback(async (videoId: string) => {
+    try {
+      // Use fallback to surface the latest schema_v1 batch result when there is no human/primary rating yet.
+      const res = await fetch(`/api/brand-analysis?video_id=${videoId}&fallback=true`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.rating) {
+          setExistingRating(data.rating);
+          setPersonalityNotes(data.rating.personality_notes || '');
+          setStatementNotes(data.rating.statement_notes || '');
+          setCorrections(data.rating.corrections || '');
+
+          // ai_analysis can be stored in multiple formats; keep backwards compatibility.
+          const aiAnalysis = data.rating.ai_analysis as unknown;
+          let modelAnalysis: unknown | null = null;
+          let humanPatch: Record<string, unknown> | null = null;
+
+          if (aiAnalysis) {
+            if (isObject(aiAnalysis) && (aiAnalysis as any).kind === 'schema_v1_review') {
+              modelAnalysis = (aiAnalysis as any).model_analysis ?? null;
+              humanPatch = (aiAnalysis as any).human_patch ?? null;
+            } else if (isObject(aiAnalysis) && 'raw_output' in aiAnalysis) {
+              modelAnalysis = aiAnalysis;
+            }
+          }
+
+          setSchemaV1ModelAnalysis(modelAnalysis);
+          setSchemaV1HumanPatch(humanPatch);
+          
+          // Load signal data if exists
+          if (data.rating.extracted_signals) {
+            const signals = data.rating.extracted_signals;
+            if (signals.survival_score) setSurvivalScore(signals.survival_score);
+            if (signals.survival_notes) setSurvivalNotes(signals.survival_notes);
+            if (signals.coolness_score) setCoolnessScore(signals.coolness_score);
+            if (signals.coolness_notes) setCoolnessNotes(signals.coolness_notes);
+            if (signals.target_age_min) setTargetAgeMin(signals.target_age_min);
+            if (signals.target_age_max) setTargetAgeMax(signals.target_age_max);
+            if (signals.audience_notes) setAudienceNotes(signals.audience_notes);
+          }
+        } else {
+          resetForm();
+        }
+      }
+    } catch (e) {
+      console.error('Failed to load existing rating:', e);
+    }
+  }, [resetForm]);
+
+  const runSchemaV1Analysis = useCallback(async () => {
+    if (!selectedVideo) return;
+
+    setSchemaV1Loading(true);
+    setSchemaV1Error(null);
+
+    try {
+      const res = await fetch('/api/brand-analysis/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          video_id: selectedVideo.id,
+          video_url: selectedVideo.video_url
+          ,gcs_uri: selectedVideo.gcs_uri
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data?.error || 'Failed to analyze');
+      }
+
+      setSchemaV1ModelAnalysis(data.analysis || null);
+    } catch (err) {
+      setSchemaV1Error(err instanceof Error ? err.message : 'Failed to analyze');
+    } finally {
+      setSchemaV1Loading(false);
+    }
+  }, [selectedVideo]);
+
+  // Load similar videos
+  const loadSimilarVideos = useCallback(async (videoId: string) => {
+    setLoadingSimilar(true);
+    try {
+      const res = await fetch(`/api/brand-analysis/similar?video_id=${videoId}&limit=5`);
+      if (res.ok) {
+        const data = await res.json();
+        setSimilarVideos(data.videos || []);
+      }
+    } catch (e) {
+      console.error('Failed to load similar videos:', e);
+    } finally {
+      setLoadingSimilar(false);
+    }
+  }, []);
+
+  // Handle video selection
+  const handleSelectVideo = (video: Video) => {
+    setSelectedVideoId(video.id);
+    setSelectedVideo(video);
+    setSubmitted(false);
+    setSubmitError(null);
+    setSchemaV1Error(null);
+    loadExistingRating(video.id);
+    loadSimilarVideos(video.id);
+  };
+
+  // Handle submission
+  const handleSubmit = async () => {
+    if (!selectedVideo) return;
+    
+    setSubmitting(true);
+    setSubmitError(null);
+    
+    try {
+      const res = await fetch('/api/brand-analysis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          video_id: selectedVideo.id,
+          video_url: selectedVideo.video_url,
+          personality_notes: personalityNotes,
+          statement_notes: statementNotes,
+          corrections: corrections || null,
+          ai_analysis: {
+            kind: 'schema_v1_review',
+            model_analysis: schemaV1ModelAnalysis,
+            human_patch: schemaV1HumanPatch,
+            updated_at: new Date().toISOString()
+          },
+          extracted_signals: {
+            // New signal fields
+            survival_score: survivalScore,
+            survival_notes: survivalNotes,
+            coolness_score: coolnessScore,
+            coolness_notes: coolnessNotes,
+            target_age_min: targetAgeMin,
+            target_age_max: targetAgeMax,
+            audience_notes: audienceNotes
+          }
+        })
+      });
+      
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to save');
+      }
+      
+      setSubmitted(true);
+      loadSimilarVideos(selectedVideo.id);
+      
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : 'Failed to save rating');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Get quality tier color
+  const getScoreColor = (score: number) => {
+    if (score >= 0.8) return 'text-green-400';
+    if (score >= 0.6) return 'text-blue-400';
+    if (score >= 0.4) return 'text-yellow-400';
+    return 'text-red-400';
+  };
+
+  // Safely get author name from metadata
+  const getAuthorName = (metadata: Video['metadata']): string => {
+    if (!metadata?.author) return 'Unknown';
+    if (typeof metadata.author === 'string') return metadata.author;
+    return metadata.author.displayName || metadata.author.username || 'Unknown';
+  };
+
+  const modelObservation = getModelObservation(schemaV1ModelAnalysis);
+  const effectiveObservation = deepMerge(modelObservation, schemaV1HumanPatch);
+  const effectiveSignals = effectiveObservation?.signals;
+  const effectiveEvidence: any[] = Array.isArray(effectiveObservation?.evidence) ? effectiveObservation.evidence : [];
+  const effectiveUncertainties: string[] = Array.isArray(effectiveObservation?.uncertainties)
+    ? effectiveObservation.uncertainties
+    : [];
+
+  const addEvidenceItem = () => {
+    const next = [...effectiveEvidence, { type: 'other', start_s: null, end_s: null, text: '', supports: [] }];
+    updateSchemaPatch(['evidence'], next);
+  };
+
+  const removeEvidenceItem = (index: number) => {
+    const next = effectiveEvidence.filter((_, i) => i !== index);
+    updateSchemaPatch(['evidence'], next);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-950 text-white">
+      {/* Custom slider styles */}
+      <style jsx global>{`
+        input[type="range"]::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background: white;
+          cursor: pointer;
+          border: 2px solid #3b82f6;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+        input[type="range"]::-moz-range-thumb {
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background: white;
+          cursor: pointer;
+          border: 2px solid #3b82f6;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+      `}</style>
+
+      {/* Header */}
+      <div className="border-b border-gray-800">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <h1 className="text-2xl font-bold">Brand Analysis</h1>
+          <p className="text-gray-400 text-sm mt-1">
+            Analyze survival instinct, social positioning, and target audience signals
+          </p>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          {/* Left Panel: Video List */}
+          <div className="lg:col-span-1">
+            <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+              <div className="p-4 border-b border-gray-800">
+                <h2 className="font-semibold">Rated Videos</h2>
+                <p className="text-sm text-gray-400 mt-1">
+                  {videos.length} videos available
+                </p>
+              </div>
+              
+              {loadingVideos ? (
+                <div className="p-4 text-gray-400">Loading...</div>
+              ) : videoError ? (
+                <div className="p-4 text-red-400">{videoError}</div>
+              ) : (
+                <div className="max-h-[700px] overflow-y-auto">
+                  {videos.map((video) => (
+                    <button
+                      key={video.id}
+                      onClick={() => handleSelectVideo(video)}
+                      className={`w-full p-4 text-left border-b border-gray-800 hover:bg-gray-800 transition-colors ${
+                        selectedVideoId === video.id ? 'bg-gray-800' : ''
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="w-16 h-16 bg-gray-700 rounded flex-shrink-0 flex items-center justify-center">
+                          <span className="text-2xl">🎬</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">
+                            {video.metadata?.title || video.video_id}
+                          </p>
+                          <p className="text-xs text-gray-400 mt-1">
+                            {video.platform} • {getAuthorName(video.metadata)}
+                          </p>
+                          {video.rating && (
+                            <p className={`text-xs mt-1 ${getScoreColor(video.rating.overall_score)}`}>
+                              Score: {Math.round(video.rating.overall_score * 100)}%
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Center + Right: Analysis Form */}
+          <div className="lg:col-span-2 space-y-6">
+            {!selectedVideo ? (
+              <div className="bg-gray-900 rounded-xl border border-gray-800 p-8 text-center">
+                <div className="text-6xl mb-4">👈</div>
+                <h3 className="text-lg font-medium text-gray-300">Select a Video</h3>
+                <p className="text-gray-500 mt-2">
+                  Choose a rated video from the list to analyze its brand signals
+                </p>
+              </div>
+            ) : (
+              <>
+                {/* Selected Video Info */}
+                <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-24 h-24 bg-gray-700 rounded flex-shrink-0 flex items-center justify-center">
+                      <span className="text-4xl">🎬</span>
+                    </div>
+                    <div className="flex-1">
+                      <h2 className="text-lg font-semibold">
+                        {selectedVideo.metadata?.title || selectedVideo.video_id}
+                      </h2>
+                      <p className="text-sm text-gray-400 mt-1">
+                        {selectedVideo.platform} • {getAuthorName(selectedVideo.metadata)}
+                      </p>
+                      <a
+                        href={selectedVideo.video_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-400 hover:text-blue-300 text-sm mt-2 inline-block"
+                      >
+                        Open Video ↗
+                      </a>
+
+                      <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+                        <span
+                          className={`px-2 py-1 rounded border ${
+                            selectedVideo.gcs_uri
+                              ? 'border-green-800 bg-green-900/20 text-green-300'
+                              : 'border-gray-700 bg-gray-800/40 text-gray-400'
+                          }`}
+                        >
+                          {selectedVideo.gcs_uri ? 'GCS ready' : 'No GCS URI in record'}
+                        </span>
+
+                        {!selectedVideo.gcs_uri && (
+                          <button
+                            onClick={uploadSelectedVideoToGcs}
+                            disabled={uploadingGcs}
+                            className="px-2 py-1 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:cursor-not-allowed text-white rounded"
+                          >
+                            {uploadingGcs ? 'Uploading…' : 'Upload to GCS'}
+                          </button>
+                        )}
+                      </div>
+
+                      {uploadGcsError && (
+                        <p className="text-xs text-red-300 mt-2">{uploadGcsError}</p>
+                      )}
+
+                      {existingRating && (
+                        <p className="text-xs text-green-400 mt-2">
+                          ✓ Previously rated on {new Date(existingRating.created_at).toLocaleDateString()}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tab Navigation */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setActiveTab('schema')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                      activeTab === 'schema'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                    }`}
+                  >
+                    🧩 Schema v1 (Primary)
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('signals')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                      activeTab === 'signals' 
+                        ? 'bg-blue-600 text-white' 
+                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                    }`}
+                  >
+                    📊 Legacy Signals
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('brand')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                      activeTab === 'brand' 
+                        ? 'bg-blue-600 text-white' 
+                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                    }`}
+                  >
+                    🎭 Legacy Notes
+                  </button>
+                </div>
+
+                {activeTab === 'schema' ? (
+                  <>
+                    {/* Schema v1 Instructions */}
+                    <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 space-y-3">
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <h2 className="text-lg font-semibold">Schema v1 Review</h2>
+                          <p className="text-sm text-gray-400 mt-1">
+                            Your job is to correct the model into an evidence-backed, comparable record.
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={seedSchemaFromAnalyzeRate}
+                            className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition-colors"
+                          >
+                            Seed from /analyze-rate
+                          </button>
+                          <button
+                            onClick={runSchemaV1Analysis}
+                            disabled={schemaV1Loading}
+                            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                          >
+                            {schemaV1Loading ? 'Running...' : 'Run AI (Schema v1)'}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="text-sm text-gray-300 space-y-1">
+                        <p>What’s expected of you (keep it lightweight):</p>
+                        <ul className="text-sm text-gray-400 list-disc pl-5 space-y-1">
+                          <li>Fix the <span className="text-gray-200">big obvious</span> fields first (business_type, vibe, humor type, format).</li>
+                          <li>If you can’t justify a value, set it to <span className="text-gray-200">null</span> and add a short uncertainty note.</li>
+                          <li>Evidence is optional. If it feels tedious, skip it or add 1–2 “anchor” items with no timestamps (start/end blank).</li>
+                        </ul>
+                      </div>
+
+                      {schemaV1Error && (
+                        <div className="p-3 bg-red-900/30 border border-red-800 rounded-lg text-red-300 text-sm">
+                          {schemaV1Error}
+                        </div>
+                      )}
+
+                      {!schemaV1ModelAnalysis ? (
+                        <p className="text-sm text-gray-500">Run AI to generate a starting point, then correct it.</p>
+                      ) : null}
+                    </div>
+
+                    {/* Core fields: hospitality + humor + execution */}
+                    <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 space-y-6">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-lg font-semibold">Key Fields</h3>
+                        <HelpTip text="These are the highest-impact fields for comparing hospitality brands. Don’t overthink it—pick the closest option, or set it to null if you can’t tell." />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <label className="block text-sm font-medium text-gray-300">
+                            Hospitality: business_type
+                            <HelpTip text="What kind of place is this? Cafe = coffee/tea focus, Restaurant = meals, Bar = alcohol/nightlife focus, Hotel = lodging. If it’s unclear, leave it blank." />
+                          </label>
+                          <select
+                            value={effectiveSignals?.hospitality?.business_type ?? ''}
+                            onChange={(e) => updateSchemaPatch(['signals', 'hospitality', 'business_type'], e.target.value ? e.target.value : null)}
+                            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            disabled={!schemaV1ModelAnalysis}
+                          >
+                            <option value="">(unset / null)</option>
+                            <option value="restaurant">restaurant</option>
+                            <option value="cafe">cafe</option>
+                            <option value="bar">bar</option>
+                            <option value="hotel">hotel</option>
+                            <option value="other">other</option>
+                          </select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="block text-sm font-medium text-gray-300">
+                            Hospitality: price_tier
+                            <HelpTip text="Your best guess of how expensive it seems (based on vibe, presentation, language, setting). If you can’t tell from the video, set it to null." />
+                          </label>
+                          <select
+                            value={effectiveSignals?.hospitality?.price_tier ?? ''}
+                            onChange={(e) => updateSchemaPatch(['signals', 'hospitality', 'price_tier'], e.target.value ? e.target.value : null)}
+                            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            disabled={!schemaV1ModelAnalysis}
+                          >
+                            <option value="">(unset / null)</option>
+                            <option value="budget">budget</option>
+                            <option value="mid">mid</option>
+                            <option value="premium">premium</option>
+                            <option value="luxury">luxury</option>
+                            <option value="unknown">unknown</option>
+                          </select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="block text-sm font-medium text-gray-300">
+                            Humor: present
+                            <HelpTip text="Is the goal to be funny? If it’s mostly informational or aesthetic, set false. If unclear, null." />
+                          </label>
+                          <select
+                            value={effectiveSignals?.humor?.present === null || effectiveSignals?.humor?.present === undefined ? '' : String(effectiveSignals?.humor?.present)}
+                            onChange={(e) => {
+                              const v = e.target.value;
+                              updateSchemaPatch(['signals', 'humor', 'present'], v === '' ? null : v === 'true');
+                            }}
+                            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            disabled={!schemaV1ModelAnalysis}
+                          >
+                            <option value="">(unset / null)</option>
+                            <option value="true">true</option>
+                            <option value="false">false</option>
+                          </select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="block text-sm font-medium text-gray-300">
+                            Execution: has_repeatable_format
+                            <HelpTip text="Could they post this same template again and again (like a series)? If it’s a one-off, set false. If you’re not sure, null." />
+                          </label>
+                          <select
+                            value={effectiveSignals?.execution?.has_repeatable_format === null || effectiveSignals?.execution?.has_repeatable_format === undefined ? '' : String(effectiveSignals?.execution?.has_repeatable_format)}
+                            onChange={(e) => {
+                              const v = e.target.value;
+                              updateSchemaPatch(['signals', 'execution', 'has_repeatable_format'], v === '' ? null : v === 'true');
+                            }}
+                            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            disabled={!schemaV1ModelAnalysis}
+                          >
+                            <option value="">(unset / null)</option>
+                            <option value="true">true</option>
+                            <option value="false">false</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <label className="block text-sm font-medium text-gray-300">
+                            Hospitality: vibe (comma-separated)
+                            <HelpTip text="Simple adjectives for the atmosphere (cozy, premium, playful, busy, romantic). This is subjective—pick what most viewers would feel." />
+                          </label>
+                          <input
+                            value={(effectiveSignals?.hospitality?.vibe || []).join(', ')}
+                            onChange={(e) => updateSchemaPatch(['signals', 'hospitality', 'vibe'], parseCommaList(e.target.value))}
+                            placeholder="cozy, friendly, premium"
+                            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            disabled={!schemaV1ModelAnalysis}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="block text-sm font-medium text-gray-300">
+                            Humor: humor_types (comma-separated)
+                            <HelpTip text="What kind of comedy is it? Examples: skit, observational, parody, deadpan, contrast. If you don’t know, leave it empty." />
+                          </label>
+                          <input
+                            value={(effectiveSignals?.humor?.humor_types || []).join(', ')}
+                            onChange={(e) => updateSchemaPatch(['signals', 'humor', 'humor_types'], parseCommaList(e.target.value))}
+                            placeholder="sketch, observational"
+                            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            disabled={!schemaV1ModelAnalysis}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <label className="block text-sm font-medium text-gray-300">
+                            Execution: format_name_if_any
+                            <HelpTip text="A short name for the template (e.g., “POV customer”, “what we say vs what we mean”). If none, leave blank." />
+                          </label>
+                          <input
+                            value={effectiveSignals?.execution?.format_name_if_any ?? ''}
+                            onChange={(e) => updateSchemaPatch(['signals', 'execution', 'format_name_if_any'], e.target.value ? e.target.value : null)}
+                            placeholder="POV: customer order skit"
+                            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            disabled={!schemaV1ModelAnalysis}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="block text-sm font-medium text-gray-300">
+                            Hospitality: occasion (comma-separated)
+                            <HelpTip text="What situation is this place for? (date night, quick coffee, family dinner, study/work). If it’s not shown, leave it blank." />
+                          </label>
+                          <input
+                            value={(effectiveSignals?.hospitality?.occasion || []).join(', ')}
+                            onChange={(e) => updateSchemaPatch(['signals', 'hospitality', 'occasion'], parseCommaList(e.target.value))}
+                            placeholder="quick coffee, study"
+                            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            disabled={!schemaV1ModelAnalysis}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Evidence */}
+                    <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-lg font-semibold">Evidence</h3>
+                          <HelpTip text="Evidence is optional. Think of it like ‘receipts’ for your most important claims. You can leave timestamps blank if you’re just anchoring an overall impression." />
+                        </div>
+                        <button
+                          onClick={addEvidenceItem}
+                          disabled={!schemaV1ModelAnalysis}
+                          className="px-3 py-2 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                        >
+                          + Add evidence
+                        </button>
+                      </div>
+
+                      {!schemaV1ModelAnalysis ? (
+                        <p className="text-sm text-gray-500">Run AI first to edit evidence.</p>
+                      ) : effectiveEvidence.length === 0 ? (
+                        <p className="text-sm text-gray-500">No evidence yet. Add 1–2 items for the main claims.</p>
+                      ) : (
+                        <div className="space-y-3">
+                          {effectiveEvidence.map((ev, idx) => (
+                            <div key={idx} className="p-3 bg-gray-800/40 border border-gray-700 rounded-lg space-y-2">
+                              <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-gray-200">Evidence #{idx + 1}</p>
+                                <button
+                                  onClick={() => removeEvidenceItem(idx)}
+                                  className="text-xs text-gray-400 hover:text-red-300"
+                                >
+                                  Remove
+                                </button>
+                              </div>
+
+                              <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
+                                <select
+                                  value={ev.type || 'other'}
+                                  onChange={(e) => {
+                                    const next = [...effectiveEvidence];
+                                    next[idx] = { ...(next[idx] || {}), type: e.target.value };
+                                    updateSchemaPatch(['evidence'], next);
+                                  }}
+                                  className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                >
+                                  <option value="quote">quote</option>
+                                  <option value="ocr">ocr</option>
+                                  <option value="visual">visual</option>
+                                  <option value="audio">audio</option>
+                                  <option value="caption">caption</option>
+                                  <option value="thumbnail">thumbnail</option>
+                                  <option value="bio">bio</option>
+                                  <option value="other">other</option>
+                                </select>
+                                <input
+                                  value={ev.start_s ?? ''}
+                                  onChange={(e) => {
+                                    const next = [...effectiveEvidence];
+                                    const v = e.target.value;
+                                    next[idx] = { ...(next[idx] || {}), start_s: v === '' ? null : Number(v) };
+                                    updateSchemaPatch(['evidence'], next);
+                                  }}
+                                  placeholder="start_s"
+                                  className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                                <input
+                                  value={ev.end_s ?? ''}
+                                  onChange={(e) => {
+                                    const next = [...effectiveEvidence];
+                                    const v = e.target.value;
+                                    next[idx] = { ...(next[idx] || {}), end_s: v === '' ? null : Number(v) };
+                                    updateSchemaPatch(['evidence'], next);
+                                  }}
+                                  placeholder="end_s"
+                                  className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                                <input
+                                  value={(ev.supports || []).join(', ')}
+                                  onChange={(e) => {
+                                    const next = [...effectiveEvidence];
+                                    next[idx] = { ...(next[idx] || {}), supports: parseCommaList(e.target.value) };
+                                    updateSchemaPatch(['evidence'], next);
+                                  }}
+                                  placeholder="supports (comma paths)"
+                                  className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                              </div>
+
+                              <textarea
+                                value={ev.text || ''}
+                                onChange={(e) => {
+                                  const next = [...effectiveEvidence];
+                                  next[idx] = { ...(next[idx] || {}), text: e.target.value };
+                                  updateSchemaPatch(['evidence'], next);
+                                }}
+                                placeholder="What was said / shown?"
+                                className="w-full h-20 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Uncertainties */}
+                    <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-lg font-semibold">Uncertainties</h3>
+                        <HelpTip text="This is where you say ‘I can’t actually tell from the video.’ It’s not a failure—it prevents fake precision and keeps the dataset honest." />
+                      </div>
+                      <p className="text-sm text-gray-500">Use this to keep the framework honest when things are subjective or unobservable.</p>
+                      <textarea
+                        value={effectiveUncertainties.join('\n')}
+                        onChange={(e) => updateSchemaPatch(['uncertainties'], e.target.value.split('\n').map((s) => s.trim()).filter(Boolean))}
+                        placeholder="One per line..."
+                        className="w-full h-24 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
+                        disabled={!schemaV1ModelAnalysis}
+                      />
+                    </div>
+
+                    {/* JSON snapshots */}
+                    <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 space-y-3">
+                      <h3 className="text-lg font-semibold">JSON Snapshot</h3>
+                      {!schemaV1ModelAnalysis ? (
+                        <p className="text-sm text-gray-500">No analysis yet.</p>
+                      ) : (
+                        <pre className="text-xs bg-gray-950 border border-gray-800 rounded-lg p-3 overflow-x-auto max-h-96 overflow-y-auto whitespace-pre-wrap">
+                          {JSON.stringify(
+                            {
+                              kind: 'schema_v1_review',
+                              model_analysis: schemaV1ModelAnalysis,
+                              human_patch: schemaV1HumanPatch
+                            },
+                            null,
+                            2
+                          )}
+                        </pre>
+                      )}
+                    </div>
+                  </>
+                ) : activeTab === 'signals' ? (
+                  <>
+                    {/* Section 1: Survival Instinct */}
+                    <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <span className="text-2xl">🎯</span>
+                        <div>
+                          <h3 className="font-semibold text-lg">Survival Instinct</h3>
+                          <p className="text-sm text-gray-400">
+                            Business mentality: Abundance vs. Scarcity mindset
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-gray-800/50 rounded-lg p-4 mb-4">
+                        <Slider
+                          value={survivalScore}
+                          onChange={setSurvivalScore}
+                          min={1}
+                          max={10}
+                          labels={{ 
+                            left: '😌 Low Survival (Abundance)', 
+                            right: '🔥 High Survival (Scarcity)' 
+                          }}
+                        />
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4 mb-4 text-xs">
+                        <div className="bg-gray-800/30 rounded-lg p-3">
+                          <p className="text-gray-400 font-medium mb-2">Low Survival Signals:</p>
+                          <ul className="text-gray-500 space-y-1">
+                            <li>• Security buffer / inherited position</li>
+                            <li>• Diffused accountability</li>
+                            <li>• &quot;What feels right?&quot; mentality</li>
+                            <li>• Inconsistent posting</li>
+                            <li>• Status game over results</li>
+                          </ul>
+                        </div>
+                        <div className="bg-gray-800/30 rounded-lg p-3">
+                          <p className="text-gray-400 font-medium mb-2">High Survival Signals:</p>
+                          <ul className="text-gray-500 space-y-1">
+                            <li>• Resource scarcity encoding</li>
+                            <li>• Outcome obsession</li>
+                            <li>• &quot;What converts?&quot; mentality</li>
+                            <li>• Ruthless prioritization</li>
+                            <li>• Metrics-driven decisions</li>
+                          </ul>
+                        </div>
+                      </div>
+                      
+                      <textarea
+                        value={survivalNotes}
+                        onChange={(e) => setSurvivalNotes(e.target.value)}
+                        placeholder="Notes: Video quality, cohesiveness, mindful structure, 'upwards' set posture..."
+                        className="w-full h-24 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
+                      />
+                    </div>
+
+                    {/* Section 2: Social Centerfold (Coolness) */}
+                    <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <span className="text-2xl">😎</span>
+                        <div>
+                          <h3 className="font-semibold text-lg">Social Centerfold (Coolness)</h3>
+                          <p className="text-sm text-gray-400">
+                            Social arena positioning: Frame control and outcome independence
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-gray-800/50 rounded-lg p-4 mb-4">
+                        <Slider
+                          value={coolnessScore}
+                          onChange={setCoolnessScore}
+                          min={1}
+                          max={10}
+                          labels={{ 
+                            left: '👤 Uncool (Following)', 
+                            right: '🌟 Cool (Leading)' 
+                          }}
+                        />
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4 mb-4 text-xs">
+                        <div className="bg-gray-800/30 rounded-lg p-3">
+                          <p className="text-gray-400 font-medium mb-2">&quot;Loser&quot; (Uncool) Signals:</p>
+                          <ul className="text-gray-500 space-y-1">
+                            <li>• Following rather than leading</li>
+                            <li>• Social timidness/risk aversion</li>
+                            <li>• Neutral dominance symbols</li>
+                            <li>• Family-oriented / safety priority</li>
+                            <li>• Silent effort that may not work</li>
+                          </ul>
+                        </div>
+                        <div className="bg-gray-800/30 rounded-lg p-3">
+                          <p className="text-gray-400 font-medium mb-2">&quot;Winner&quot; (Cool) Signals:</p>
+                          <ul className="text-gray-500 space-y-1">
+                            <li>• Frame control - sets parameters</li>
+                            <li>• Outcome independence</li>
+                            <li>• Effortless presentation</li>
+                            <li>• Energy generation</li>
+                            <li>• Reframes the game itself</li>
+                          </ul>
+                        </div>
+                      </div>
+                      
+                      <textarea
+                        value={coolnessNotes}
+                        onChange={(e) => setCoolnessNotes(e.target.value)}
+                        placeholder="Notes: Frame dynamics, status signals, energy, social positioning observed..."
+                        className="w-full h-24 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
+                      />
+                    </div>
+
+                    {/* Section 3: Target Audience */}
+                    <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <span className="text-2xl">👥</span>
+                        <div>
+                          <h3 className="font-semibold text-lg">Target Audience</h3>
+                          <p className="text-sm text-gray-400">
+                            Age demographic range this content appeals to
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-gray-800/50 rounded-lg p-4 mb-4">
+                        <AgeRangeSlider
+                          minAge={targetAgeMin}
+                          maxAge={targetAgeMax}
+                          onChange={(min, max) => {
+                            setTargetAgeMin(min);
+                            setTargetAgeMax(max);
+                          }}
+                        />
+                      </div>
+                      
+                      <div className="grid grid-cols-4 gap-2 mb-4 text-xs">
+                        <div className="bg-gray-800/30 rounded-lg p-2 text-center">
+                          <p className="text-gray-400 font-medium">12-17</p>
+                          <p className="text-gray-500">Teen</p>
+                        </div>
+                        <div className="bg-gray-800/30 rounded-lg p-2 text-center">
+                          <p className="text-gray-400 font-medium">18-24</p>
+                          <p className="text-gray-500">Young Adult</p>
+                        </div>
+                        <div className="bg-gray-800/30 rounded-lg p-2 text-center">
+                          <p className="text-gray-400 font-medium">25-44</p>
+                          <p className="text-gray-500">Adult</p>
+                        </div>
+                        <div className="bg-gray-800/30 rounded-lg p-2 text-center">
+                          <p className="text-gray-400 font-medium">45-65</p>
+                          <p className="text-gray-500">Mature</p>
+                        </div>
+                      </div>
+                      
+                      <textarea
+                        value={audienceNotes}
+                        onChange={(e) => setAudienceNotes(e.target.value)}
+                        placeholder="Notes: Why this target audience? Humor type, references, cultural markers, language style..."
+                        className="w-full h-24 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {/* Brand Identity Tab (Original) */}
+                    <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 space-y-6">
+                      <h2 className="text-lg font-semibold">Brand Identity</h2>
+                      
+                      {/* Personality Notes */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          Person / Personality
+                          <span className="text-gray-500 font-normal ml-2">
+                            (Who is this brand if it were a person?)
+                          </span>
+                        </label>
+                        <textarea
+                          value={personalityNotes}
+                          onChange={(e) => setPersonalityNotes(e.target.value)}
+                          placeholder="Describe the brand as a person: age, gender energy, life stage, social class, priorities, values, character traits..."
+                          className="w-full h-32 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                        />
+                      </div>
+
+                      {/* Statement Notes */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          Statement / Message
+                          <span className="text-gray-500 font-normal ml-2">
+                            (What is the brand saying? What&apos;s the subtext?)
+                          </span>
+                        </label>
+                        <textarea
+                          value={statementNotes}
+                          onChange={(e) => setStatementNotes(e.target.value)}
+                          placeholder="What is being communicated between the lines? Mission? Target audience? Self-seriousness? Opinion stance? Humor style?..."
+                          className="w-full h-32 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                        />
+                      </div>
+
+                      {/* Corrections */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          Notes / Corrections
+                          <span className="text-gray-500 font-normal ml-2">(Optional)</span>
+                        </label>
+                        <textarea
+                          value={corrections}
+                          onChange={(e) => setCorrections(e.target.value)}
+                          placeholder="Any additional observations..."
+                          className="w-full h-20 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* Submit */}
+                <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
+                  {submitError && (
+                    <div className="mb-4 p-3 bg-red-900/30 border border-red-800 rounded-lg text-red-300 text-sm">
+                      {submitError}
+                    </div>
+                  )}
+                  
+                  {submitted ? (
+                    <div className="p-4 bg-green-900/30 border border-green-800 rounded-lg">
+                      <p className="text-green-300 font-medium">✓ Analysis saved!</p>
+                      <p className="text-gray-400 text-sm mt-1">
+                        This data will be used for RAG and model training.
+                      </p>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={handleSubmit}
+                      disabled={submitting}
+                      className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+                    >
+                      {submitting ? 'Saving...' : existingRating ? 'Update Analysis' : 'Save Analysis'}
+                    </button>
+                  )}
+                </div>
+
+                {/* Similar Videos */}
+                <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
+                  <h3 className="font-semibold mb-4">
+                    Similar Videos
+                    <span className="text-gray-400 font-normal ml-2 text-sm">(RAG context)</span>
+                  </h3>
+                  
+                  {loadingSimilar ? (
+                    <div className="text-gray-400">Loading...</div>
+                  ) : similarVideos.length === 0 ? (
+                    <div className="text-gray-500 text-sm">
+                      No similar videos found yet. Rate more videos to build context.
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {similarVideos.map((sv) => (
+                        <div
+                          key={sv.video_id}
+                          className="p-3 bg-gray-800/50 rounded-lg border border-gray-700"
+                        >
+                          <div className="flex items-start justify-between mb-2">
+                            <a
+                              href={sv.video_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-400 hover:text-blue-300 text-sm"
+                            >
+                              View Video ↗
+                            </a>
+                            <span className="text-xs text-gray-400">
+                              {Math.round(sv.similarity * 100)}% similar
+                            </span>
+                          </div>
+                          {sv.personality_notes && (
+                            <p className="text-xs text-gray-400 line-clamp-2">
+                              {sv.personality_notes}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

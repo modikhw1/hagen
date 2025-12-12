@@ -28,6 +28,8 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const videoId = searchParams.get('video_id')
+    const requestedRaterId = searchParams.get('rater_id') || 'primary'
+    const fallback = searchParams.get('fallback') === 'true'
     
     if (!videoId) {
       return NextResponse.json(
@@ -50,11 +52,41 @@ export async function GET(request: NextRequest) {
         )
       `)
       .eq('video_id', videoId)
-      .eq('rater_id', 'primary')
+      .eq('rater_id', requestedRaterId)
       .single()
     
-    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows
+    if (error && error.code !== 'PGRST116') {
       throw error
+    }
+
+    // Optional fallback: if no human/primary rating exists, return the latest AI/system (schema_v1) rating.
+    // This is what allows the UI to display batch results without requiring a manual save.
+    if (!data && fallback && requestedRaterId === 'primary') {
+      const { data: fallbackData, error: fallbackError } = await supabase
+        .from('video_brand_ratings')
+        .select(`
+          *,
+          video:analyzed_videos(
+            id,
+            video_url,
+            video_id,
+            platform,
+            metadata,
+            visual_analysis
+          )
+        `)
+        .eq('video_id', videoId)
+        .eq('rater_id', 'schema_v1')
+        .single()
+
+      if (fallbackError && fallbackError.code !== 'PGRST116') {
+        throw fallbackError
+      }
+
+      return NextResponse.json({
+        success: true,
+        rating: fallbackData || null
+      })
     }
     
     return NextResponse.json({

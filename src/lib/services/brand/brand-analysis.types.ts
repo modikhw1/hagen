@@ -124,6 +124,100 @@ export interface VideoBrandSignals {
      */
     tensions?: string[]
   }
+
+  /**
+   * Execution + observables that show up consistently in human notes.
+   * These are intentionally "observable" (what the viewer can see), not internal motives.
+   */
+  execution_signals?: {
+    /**
+     * How planned/scripted does this feel? (1-10)
+     */
+    intentionality?: number
+
+    /**
+     * How much production investment is implied? (1-10)
+     */
+    production_investment?: number
+
+    /**
+     * Does it feel native/effortless vs forced? (1-10)
+     */
+    effortlessness?: number
+
+    /**
+     * Observable social permission / risk allowance (1-10)
+     * Closely related to "frame control" and willingness to take social risk.
+     */
+    social_permission?: number
+
+    /**
+     * Does the video imply a repeatable/serial format?
+     */
+    has_repeatable_format?: boolean
+
+    /**
+     * If it looks like a named series/format, what is it?
+     */
+    format_name?: string
+  }
+
+  /**
+   * Hospitality-specific, service business context (restaurants/cafés/bars/hotels).
+   * Keep this lightweight and composable.
+   */
+  hospitality_signals?: {
+    business_type?: 'restaurant' | 'cafe' | 'bar' | 'hotel' | 'other'
+
+    /**
+     * Vibe / atmosphere cues (e.g., cozy, luxury, party, minimalist)
+     */
+    vibe?: string[]
+
+    /**
+     * When is this place for? (e.g., quick coffee, date night, work/study)
+     */
+    occasion?: string[]
+
+    price_tier?: 'budget' | 'mid' | 'premium' | 'luxury' | 'unknown'
+
+    /**
+     * What does the brand emphasize about service? (fast, friendly, premium)
+     */
+    service_ethos?: string[]
+
+    /**
+     * Signature items/offers that show up repeatedly
+     */
+    signature_items_or_offers?: string[]
+
+    /**
+     * Local neighborhood / city markers
+     */
+    locality_markers?: string[]
+
+    tourist_orientation?: 'locals' | 'tourists' | 'mixed' | 'unknown'
+  }
+
+  /**
+   * Humor mix (separate from quality).
+   * Used primarily for matching and feasibility filtering.
+   */
+  humor_mix?: {
+    present?: boolean
+    humor_types?: string[]
+    target?: 'self' | 'customer' | 'employee' | 'industry' | 'competitor' | 'situation' | 'product' | 'none' | 'unknown'
+    age_code?: 'younger' | 'older' | 'balanced' | 'unknown'
+    meanness_risk?: 'low' | 'medium' | 'high' | 'unknown'
+  }
+
+  /**
+   * Conversion signals (without requiring ad-like behavior).
+   */
+  conversion_signals?: {
+    cta_types?: Array<'follow_for_series' | 'comment_prompt' | 'visit_in_store' | 'book_now' | 'order_online' | 'link_in_bio' | 'dm_us' | 'other'>
+    visit_intent_strength?: number // 0-1
+  }
 }
 
 /**
@@ -273,6 +367,42 @@ export interface CreatorBrandProfile {
     common_themes: string[]
     recurring_subtext: string[]
     audience_relationship: string
+  }
+
+  /**
+   * Optional: profile-level assets summary (bio, thumbnails, etc.)
+   * Useful for "profile analysis" beyond videos.
+   */
+  profile_assets?: {
+    bio?: string
+    profile_image_description?: string
+    thumbnail_style_notes?: string
+    pinned_video_ids?: string[]
+    links?: string[]
+  }
+
+  /**
+   * Optional: how complete/intentional the brand system appears.
+   * All values 0-1.
+   */
+  scorecard?: {
+    positioning_clarity?: number
+    promise_consistency?: number
+    visual_identity_consistency?: number
+    message_coherence?: number
+    distinctiveness?: number
+    trust_signals?: number
+    conversion_intent?: number
+    overall_brand_completeness?: number
+  }
+
+  /**
+   * Optional: inferred content system for recommendation (pillars + formats).
+   */
+  content_system?: {
+    pillars?: { name: string; weight: number }[]
+    signature_formats?: string[]
+    voice_rules_inferred?: string[]
   }
   
   created_at: string
