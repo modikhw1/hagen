@@ -700,7 +700,7 @@ export default function RatePage() {
                             ? 'bg-green-100 text-green-700' 
                             : 'bg-gray-100 text-gray-600'
                         }`}>
-                          {prediction.modelUsed === 'tuned' ? '✨ Fine-tuned' : 'Base model'}
+                          {prediction.modelUsed === 'tuned' ? 'Fine-tuned' : 'Base model'}
                         </span>
                       )}
                     </div>

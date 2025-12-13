@@ -53,12 +53,12 @@ export function VideoInterpretationCard({
   const { analysis, platform, url, isAnalyzing, error } = interpretation
 
   // Get platform icon
-  const platformIcon = {
-    tiktok: '📱',
-    youtube: '▶️',
-    instagram: '📸',
-    unknown: '🎬'
-  }[platform] || '🎬'
+  const platformLabel = {
+    tiktok: 'TikTok',
+    youtube: 'YouTube',
+    instagram: 'Instagram',
+    unknown: 'Video'
+  }[platform] || 'Video'
 
   // Get platform color
   const platformColor = {
@@ -118,7 +118,7 @@ export function VideoInterpretationCard({
     return (
       <div className={`bg-gradient-to-r ${platformColor} border rounded-lg p-3 animate-pulse`}>
         <div className="flex items-center gap-3">
-          <span className="text-xl">{platformIcon}</span>
+          <span className="text-xl">{platformLabel}</span>
           <div className="flex-1">
             <div className="flex items-center gap-2">
               <LoadingSpinner size="sm" />
@@ -159,7 +159,7 @@ export function VideoInterpretationCard({
         className={`bg-gradient-to-r ${platformColor} border rounded-lg p-2 w-full text-left hover:opacity-90 transition-opacity`}
       >
         <div className="flex items-center gap-2">
-          <span>{platformIcon}</span>
+          <span>{platformLabel}</span>
           <span className="text-sm text-gray-300 flex-1 truncate">
             {analysis.tone} • {analysis.style}
             {analysis.humorType && ` • ${analysis.humorType}`}
@@ -176,7 +176,7 @@ export function VideoInterpretationCard({
       {/* Header */}
       <div className="flex items-center justify-between p-3 border-b border-gray-700/50">
         <div className="flex items-center gap-3">
-          <span className="text-xl">{platformIcon}</span>
+          <span className="text-xl">{platformLabel}</span>
           <div>
             <div className="text-sm font-medium text-white">
               Gemini Interpretation
@@ -311,7 +311,7 @@ export function VideoInterpretationCard({
         {isEditing && (
           <div>
             <label className="text-xs text-gray-500 block mb-1">
-              📝 Correction Note (helps train Gemini)
+              Correction Note (helps train Gemini)
             </label>
             <textarea
               value={correctionNote}
@@ -358,7 +358,7 @@ export function VideoInterpretationCard({
                   onClick={handleStartEditing}
                   title="Correct this interpretation - changes go back to Gemini training data"
                 >
-                  ✏️ Correct Gemini
+                  Correct Gemini
                 </Button>
               )}
             </div>

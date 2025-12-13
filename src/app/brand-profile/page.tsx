@@ -54,13 +54,13 @@ interface VideoMatch {
 }
 
 const PHASE_LABELS: Record<string, string> = {
-  introduction: '👋 Getting to Know You',
-  business_goals: '🎯 Business Goals',
-  social_goals: '📱 Social Media Goals',
-  tone_discovery: '🎨 Finding Your Voice',
-  audience: '👥 Your Audience',
-  references: '✨ Inspiration',
-  synthesis: '📋 Profile Summary'
+  introduction: 'Getting to Know You',
+  business_goals: 'Business Goals',
+  social_goals: 'Social Media Goals',
+  tone_discovery: 'Finding Your Voice',
+  audience: 'Your Audience',
+  references: 'Inspiration',
+  synthesis: 'Profile Summary'
 }
 
 export default function BrandProfilePage() {
@@ -287,7 +287,7 @@ export default function BrandProfilePage() {
       setMessages(prev => [...prev, {
         id: generateMessageId(),
         role: 'assistant',
-        content: `✨ I've created your brand profile! Here's what I learned about ${conversationInfo.brandName}:\n\n${data.synthesis.narrative_summary}`
+        content: `I've created your brand profile! Here's what I learned about ${conversationInfo.brandName}:\n\n${data.synthesis.narrative_summary}`
       }])
 
       setConversationInfo(prev => prev ? {
@@ -394,7 +394,7 @@ export default function BrandProfilePage() {
         throw new Error(error.error || 'Failed to save correction')
       }
 
-      console.log('✅ Correction saved to Gemini training data')
+      console.log('Correction saved to Gemini training data')
     } catch (error) {
       console.error('Correction error:', error)
       throw error
@@ -494,7 +494,7 @@ export default function BrandProfilePage() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">
-            🎨 Brand Discovery
+            Brand Discovery
           </h1>
           <p className="text-gray-400">
             Let&apos;s understand your brand&apos;s unique voice and find content that fits
@@ -642,7 +642,7 @@ export default function BrandProfilePage() {
                       <div className="bg-gray-800 rounded-lg p-3 mt-1 border border-yellow-600/30">
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-xs text-yellow-400">
-                            {msg.role === 'assistant' ? '🤖 Claude Feedback' : '📝 Training Note'}
+                            {msg.role === 'assistant' ? 'Claude Feedback' : 'Training Note'}
                           </span>
                           <div className="flex gap-2">
                             <button
@@ -677,7 +677,7 @@ export default function BrandProfilePage() {
                         />
                         {msg.role === 'assistant' && (
                           <p className="text-xs text-gray-500 mt-2">
-                            💡 This feedback trains Claude&apos;s conversation style. For video interpretation corrections, use the &quot;Correct Gemini&quot; button on the video card above.
+                            Tip: This feedback trains Claude&apos;s conversation style. For video interpretation corrections, use the &quot;Correct Gemini&quot; button on the video card above.
                           </p>
                         )}
                       </div>
@@ -692,7 +692,7 @@ export default function BrandProfilePage() {
                           }`}
                           title={msg.trainingNote ? 'Edit note' : 'Add training note'}
                         >
-                          {msg.trainingNote ? '📝' : '+'}
+                          {msg.trainingNote ? 'Note' : '+'}
                         </button>
                         {msg.trainingNote && (
                           <div 
@@ -780,7 +780,7 @@ export default function BrandProfilePage() {
                   onClick={handleSynthesize}
                   disabled={isLoading}
                 >
-                  ✨ Generate Profile
+                  Generate Profile
                 </Button>
               )}
             </div>
@@ -792,18 +792,18 @@ export default function BrandProfilePage() {
           <div className="space-y-6">
             {/* Tone Profile */}
             <Card>
-              <h3 className="text-lg font-semibold text-white mb-4">🎨 Tone Profile</h3>
+              <h3 className="text-lg font-semibold text-white mb-4">Tone Profile</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {synthesis.tone.primary && (
                   <div className="text-center">
-                    <div className="text-2xl mb-1">🎯</div>
+                    <div className="text-2xl mb-1">●</div>
                     <div className="text-sm text-gray-400">Primary</div>
                     <div className="text-white font-medium capitalize">{synthesis.tone.primary}</div>
                   </div>
                 )}
                 {synthesis.tone.energy_level && (
                   <div className="text-center">
-                    <div className="text-2xl mb-1">⚡</div>
+                    <div className="text-2xl mb-1">◆</div>
                     <div className="text-sm text-gray-400">Energy</div>
                     <div className="text-white font-medium">{synthesis.tone.energy_level}/10</div>
                   </div>
@@ -833,7 +833,7 @@ export default function BrandProfilePage() {
 
             {/* Key Insights */}
             <Card>
-              <h3 className="text-lg font-semibold text-white mb-4">💡 Key Insights</h3>
+              <h3 className="text-lg font-semibold text-white mb-4">Key Insights</h3>
               <ul className="space-y-2">
                 {synthesis.key_insights?.map((insight, idx) => (
                   <li key={idx} className="flex items-start gap-2 text-gray-300">
@@ -846,7 +846,7 @@ export default function BrandProfilePage() {
 
             {/* Content Recommendations */}
             <Card>
-              <h3 className="text-lg font-semibold text-white mb-4">📹 Content Recommendations</h3>
+              <h3 className="text-lg font-semibold text-white mb-4">Content Recommendations</h3>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <h4 className="text-sm font-medium text-gray-400 mb-2">Formats that would work</h4>
@@ -874,7 +874,7 @@ export default function BrandProfilePage() {
             {/* Find Matching Videos */}
             <Card>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-white">🎬 Videos That Match Your Brand</h3>
+                <h3 className="text-lg font-semibold text-white">Videos That Match Your Brand</h3>
                 <Button
                   onClick={handleFindMatches}
                   disabled={isFindingMatches}

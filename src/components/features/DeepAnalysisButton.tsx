@@ -55,7 +55,7 @@ export function DeepAnalysisButton({ videoId, onComplete }: DeepAnalysisButtonPr
       }
 
       const result = await response.json();
-      setProgress('✅ Analysis complete!');
+      setProgress('Analysis complete!');
       
       if (onComplete) {
         onComplete(result.analysis);
@@ -80,7 +80,7 @@ export function DeepAnalysisButton({ videoId, onComplete }: DeepAnalysisButtonPr
     return (
       <Card className="p-4 bg-yellow-50 border-yellow-200">
         <div className="flex items-start gap-3">
-          <span className="text-2xl">⚙️</span>
+          <span className="text-2xl">...</span>
           <div className="flex-1">
             <h3 className="font-semibold text-yellow-900 mb-1">
               Deep Analysis Not Configured

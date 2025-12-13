@@ -195,7 +195,7 @@ export function VoiceInput({
           className="absolute left-0 right-12 -bottom-7 text-xs text-red-600 bg-red-50 px-2 py-1 rounded hover:bg-red-100 text-left truncate"
           title="Click to dismiss"
         >
-          ⚠️ {error}
+          ! {error}
         </button>
       )}
     </div>

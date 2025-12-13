@@ -613,7 +613,7 @@ export default function LibraryPage() {
                         </span>
                       ) : state?.status === 'error' ? (
                         <span className="text-sm text-red-600" title={state.error}>
-                          ❌ Error
+                          Error
                         </span>
                       ) : isAnalyzed ? (
                         <span className="inline-flex items-center gap-1 text-sm text-green-600">

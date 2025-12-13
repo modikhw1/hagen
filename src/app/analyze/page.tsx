@@ -87,7 +87,7 @@ export default function AnalyzePage() {
         <div className="space-y-6">
           {result.alreadyExists && (
             <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-700">
-              ℹ️ This video was already analyzed. Showing existing data.
+              Info: This video was already analyzed. Showing existing data.
             </div>
           )}
 

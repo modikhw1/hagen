@@ -5,10 +5,11 @@ import { usePathname } from 'next/navigation';
 
 const navItems = [
   { href: '/analyze-rate', label: 'Analyze + Rate' },
-  { href: '/rate', label: 'Quick Rate' },
-  { href: '/library', label: 'Library' },
-  { href: '/discern', label: 'Discern' },
+  { href: '/brand-analysis', label: 'Brand Analysis' },
   { href: '/brand-profile', label: 'Brand Profile' },
+  { href: '/library', label: 'Library' },
+  { href: '/rate', label: 'Quick Rate' },
+  { href: '/discern', label: 'Discern' },
 ];
 
 export function Navigation() {

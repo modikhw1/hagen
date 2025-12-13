@@ -271,7 +271,7 @@ export default function BrandAnalysisClient() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   
   // Tab state
-  const [activeTab, setActiveTab] = useState<'schema' | 'signals' | 'brand' | 'profile'>('schema');
+  const [activeTab, setActiveTab] = useState<'profile' | 'schema' | 'signals' | 'brand'>('profile');
 
   // Profile fingerprint state
   const [profileVideoUrls, setProfileVideoUrls] = useState('');
@@ -852,7 +852,7 @@ export default function BrandAnalysisClient() {
                     >
                       <div className="flex items-start gap-3">
                         <div className="w-16 h-16 bg-gray-700 rounded flex-shrink-0 flex items-center justify-center">
-                          <span className="text-2xl">🎬</span>
+                          <span className="text-2xl">▶</span>
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium truncate">
@@ -882,7 +882,7 @@ export default function BrandAnalysisClient() {
                 {/* Profile Matching - Standalone (no video selected) */}
                 <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 space-y-4">
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">🎯 Profile Fingerprint Matching</h3>
+                    <h3 className="font-semibold text-lg mb-2">Profile Fingerprint Matching</h3>
                     <p className="text-sm text-gray-400">
                       Create a fingerprint from a brand&apos;s videos, then match your library against it.
                       Paste 5-10 video URLs from the target profile (one per line).
@@ -915,7 +915,7 @@ https://www.tiktok.com/@username/video/67890..."
                       className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm font-mono"
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      ⚠️ Videos must already be in the system (analyzed via /analyze-rate first)
+                      Warning: Videos must already be in the system (analyzed via /analyze-rate first)
                     </p>
                   </div>
 
@@ -1011,7 +1011,7 @@ https://www.tiktok.com/@username/video/67890..."
                       {profileFingerprint.urls_not_found?.length > 0 && (
                         <div className="bg-red-900/20 border border-red-800/50 rounded-lg p-3">
                           <p className="text-xs text-red-300 font-medium mb-2">
-                            ❌ {profileFingerprint.urls_not_found.length} URL(s) not found in database:
+                            Error: {profileFingerprint.urls_not_found.length} URL(s) not found in database:
                           </p>
                           <ul className="text-xs text-red-400/80 space-y-1 font-mono">
                             {profileFingerprint.urls_not_found.map((url: string, i: number) => (
@@ -1027,7 +1027,7 @@ https://www.tiktok.com/@username/video/67890..."
                       {/* Other warnings */}
                       {profileFingerprint.missing_data_notes?.length > 0 && (
                         <div className="text-xs text-yellow-400/70">
-                          ⚠ {profileFingerprint.missing_data_notes.join('; ')}
+                          Warning: {profileFingerprint.missing_data_notes.join('; ')}
                         </div>
                       )}
 
@@ -1037,7 +1037,7 @@ https://www.tiktok.com/@username/video/67890..."
                       ) && (
                         <div className="bg-amber-900/20 border border-amber-700/50 rounded-lg p-4">
                           <p className="text-sm text-amber-200 mb-3">
-                            <strong>⚡ Data Incomplete</strong> — Some videos are missing embeddings or Schema v1 analysis, 
+                            <strong>Data Incomplete</strong> — Some videos are missing embeddings or Schema v1 analysis, 
                             which reduces matching accuracy.
                           </p>
                           <button
@@ -1055,7 +1055,7 @@ https://www.tiktok.com/@username/video/67890..."
                           {prepareResult && (
                             <div className="mt-3 p-3 bg-gray-800/50 rounded text-xs space-y-1">
                               <p className="text-gray-300 font-medium mb-2">Preparation Results:</p>
-                              <p className="text-gray-400">📹 Videos found in DB: {prepareResult.videos_found}</p>
+                              <p className="text-gray-400">Videos found in DB: {prepareResult.videos_found}</p>
                               
                               {/* Embeddings section */}
                               <p className={prepareResult.videos_checked_for_embedding > 0 ? 'text-yellow-400' : 'text-gray-500'}>
@@ -1067,7 +1067,7 @@ https://www.tiktok.com/@username/video/67890..."
                               
                               {/* Schema v1 section */}
                               <p className={prepareResult.videos_checked_for_schema_v1 > 0 ? 'text-yellow-400' : 'text-gray-500'}>
-                                📊 Videos eligible for Schema v1: {prepareResult.videos_checked_for_schema_v1}
+                                Videos eligible for Schema v1: {prepareResult.videos_checked_for_schema_v1}
                               </p>
                               {prepareResult.schema_v1_analyzed > 0 && (
                                 <p className="text-green-400 ml-4">✓ {prepareResult.schema_v1_analyzed} video(s) analyzed</p>
@@ -1076,14 +1076,14 @@ https://www.tiktok.com/@username/video/67890..."
                               {/* GCS warning */}
                               {prepareResult.videos_needing_gcs > 0 && (
                                 <p className="text-orange-400">
-                                  ⚠ {prepareResult.videos_needing_gcs} video(s) need GCS upload first (no gcs_uri)
+                                  Warning: {prepareResult.videos_needing_gcs} video(s) need GCS upload first (no gcs_uri)
                                 </p>
                               )}
                               
                               {/* Errors */}
                               {prepareResult.errors.length > 0 && (
                                 <div className="text-red-400 mt-2 border-t border-gray-700 pt-2">
-                                  {prepareResult.errors.map((e, i) => <p key={i}>❌ {e}</p>)}
+                                  {prepareResult.errors.map((e, i) => <p key={i}>Error: {e}</p>)}
                                 </div>
                               )}
                               
@@ -1210,7 +1210,7 @@ https://www.tiktok.com/@username/video/67890..."
                 <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
                   <div className="flex items-start gap-4">
                     <div className="w-24 h-24 bg-gray-700 rounded flex-shrink-0 flex items-center justify-center">
-                      <span className="text-4xl">🎬</span>
+                      <span className="text-4xl">▶</span>
                     </div>
                     <div className="flex-1">
                       <h2 className="text-lg font-semibold">
@@ -1266,6 +1266,16 @@ https://www.tiktok.com/@username/video/67890..."
                 {/* Tab Navigation */}
                 <div className="flex gap-2 flex-wrap">
                   <button
+                    onClick={() => setActiveTab('profile')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                      activeTab === 'profile'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                    }`}
+                  >
+                    Fingerprint Matching
+                  </button>
+                  <button
                     onClick={() => setActiveTab('schema')}
                     className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                       activeTab === 'schema'
@@ -1273,7 +1283,7 @@ https://www.tiktok.com/@username/video/67890..."
                         : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                     }`}
                   >
-                    🧩 Schema v1 (Primary)
+                    Schema v1 (Primary)
                   </button>
                   <button
                     onClick={() => setActiveTab('signals')}
@@ -1283,7 +1293,7 @@ https://www.tiktok.com/@username/video/67890..."
                         : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                     }`}
                   >
-                    📊 Legacy Signals
+                    Legacy Signals
                   </button>
                   <button
                     onClick={() => setActiveTab('brand')}
@@ -1293,11 +1303,25 @@ https://www.tiktok.com/@username/video/67890..."
                         : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                     }`}
                   >
-                    🎭 Legacy Notes
+                    Legacy Notes
                   </button>
                 </div>
 
-                {activeTab === 'schema' ? (
+                {activeTab === 'profile' ? (
+                  <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
+                    <h2 className="text-lg font-semibold mb-4">Profile Fingerprint Matching</h2>
+                    <p className="text-gray-400 text-sm mb-4">
+                      This feature is available in the main section above when no video is selected.
+                      Deselect any video to access fingerprint matching.
+                    </p>
+                    <button
+                      onClick={() => setSelectedVideoId(null)}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg"
+                    >
+                      Go to Fingerprint Matching
+                    </button>
+                  </div>
+                ) : activeTab === 'schema' ? (
                   <>
                     {/* Schema v1 Instructions */}
                     <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 space-y-3">
@@ -1639,7 +1663,7 @@ https://www.tiktok.com/@username/video/67890..."
                     {/* Section 1: Survival Instinct */}
                     <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
                       <div className="flex items-center gap-3 mb-4">
-                        <span className="text-2xl">🎯</span>
+                        <span className="text-2xl">●</span>
                         <div>
                           <h3 className="font-semibold text-lg">Survival Instinct</h3>
                           <p className="text-sm text-gray-400">
@@ -1656,7 +1680,7 @@ https://www.tiktok.com/@username/video/67890..."
                           max={10}
                           labels={{ 
                             left: '😌 Low Survival (Abundance)', 
-                            right: '🔥 High Survival (Scarcity)' 
+                            right: 'High Survival (Scarcity)' 
                           }}
                         />
                       </div>

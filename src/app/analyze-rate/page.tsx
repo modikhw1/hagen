@@ -126,8 +126,8 @@ export default function AnalyzeRatePage() {
         const fullRes = await fetch(`/api/videos/analyze?id=${videoId}`);
         if (fullRes.ok) {
           const fullData = await fullRes.json();
-          console.log('📊 Full video data:', fullData);
-          console.log('📊 visual_analysis:', fullData.visual_analysis);
+          console.log('Full video data:', fullData);
+          console.log('visual_analysis:', fullData.visual_analysis);
           
           const ragContext = await fetchSimilarVideos(videoId);
           
@@ -137,14 +137,14 @@ export default function AnalyzeRatePage() {
             analysis: fullData.visual_analysis,
             rag_context: ragContext
           };
-          console.log('📊 Setting result:', analysisResult);
+          console.log('Setting result:', analysisResult);
           
           setResult(analysisResult);
           setStatus('');
           setLoading(false);  // Ensure loading is reset
           return;
         } else {
-          console.error('❌ Failed to fetch full video data:', await fullRes.text());
+          console.error('Failed to fetch full video data:', await fullRes.text());
         }
       }
 

@@ -208,7 +208,7 @@ export default function DiscernPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">
-            🔍 Video Discernment
+            Video Discernment
           </h1>
           <p className="text-gray-400">
             Analyze videos through conversation. I learn what you value.
