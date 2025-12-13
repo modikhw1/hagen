@@ -1263,66 +1263,24 @@ https://www.tiktok.com/@username/video/67890..."
                   </div>
                 </div>
 
-                {/* Tab Navigation */}
-                <div className="flex gap-2 flex-wrap">
+                {/* Back to Fingerprint Matching Button */}
+                <div className="flex items-center gap-3">
                   <button
-                    onClick={() => setActiveTab('profile')}
-                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                      activeTab === 'profile'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                    }`}
+                    onClick={() => setSelectedVideoId(null)}
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors"
                   >
-                    Fingerprint Matching
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Back to Fingerprint Matching
                   </button>
-                  <button
-                    onClick={() => setActiveTab('schema')}
-                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                      activeTab === 'schema'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                    }`}
-                  >
-                    Schema v1 (Primary)
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('signals')}
-                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                      activeTab === 'signals' 
-                        ? 'bg-blue-600 text-white' 
-                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                    }`}
-                  >
-                    Legacy Signals
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('brand')}
-                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                      activeTab === 'brand' 
-                        ? 'bg-blue-600 text-white' 
-                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                    }`}
-                  >
-                    Legacy Notes
-                  </button>
+                  <div className="flex-1 text-sm text-gray-400">
+                    Schema v1 Review for this video
+                  </div>
                 </div>
 
-                {activeTab === 'profile' ? (
-                  <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
-                    <h2 className="text-lg font-semibold mb-4">Profile Fingerprint Matching</h2>
-                    <p className="text-gray-400 text-sm mb-4">
-                      This feature is available in the main section above when no video is selected.
-                      Deselect any video to access fingerprint matching.
-                    </p>
-                    <button
-                      onClick={() => setSelectedVideoId(null)}
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg"
-                    >
-                      Go to Fingerprint Matching
-                    </button>
-                  </div>
-                ) : activeTab === 'schema' ? (
-                  <>
+                {/* Schema v1 Content - Direct view without tabs */}
+                <>
                     {/* Schema v1 Instructions */}
                     <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 space-y-3">
                       <div className="flex items-start justify-between gap-4">
@@ -1658,225 +1616,6 @@ https://www.tiktok.com/@username/video/67890..."
                       )}
                     </div>
                   </>
-                ) : activeTab === 'signals' ? (
-                  <>
-                    {/* Section 1: Survival Instinct */}
-                    <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
-                      <div className="flex items-center gap-3 mb-4">
-                        <span className="text-2xl">●</span>
-                        <div>
-                          <h3 className="font-semibold text-lg">Survival Instinct</h3>
-                          <p className="text-sm text-gray-400">
-                            Business mentality: Abundance vs. Scarcity mindset
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="bg-gray-800/50 rounded-lg p-4 mb-4">
-                        <Slider
-                          value={survivalScore}
-                          onChange={setSurvivalScore}
-                          min={1}
-                          max={10}
-                          labels={{ 
-                            left: '😌 Low Survival (Abundance)', 
-                            right: 'High Survival (Scarcity)' 
-                          }}
-                        />
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-4 mb-4 text-xs">
-                        <div className="bg-gray-800/30 rounded-lg p-3">
-                          <p className="text-gray-400 font-medium mb-2">Low Survival Signals:</p>
-                          <ul className="text-gray-500 space-y-1">
-                            <li>• Security buffer / inherited position</li>
-                            <li>• Diffused accountability</li>
-                            <li>• &quot;What feels right?&quot; mentality</li>
-                            <li>• Inconsistent posting</li>
-                            <li>• Status game over results</li>
-                          </ul>
-                        </div>
-                        <div className="bg-gray-800/30 rounded-lg p-3">
-                          <p className="text-gray-400 font-medium mb-2">High Survival Signals:</p>
-                          <ul className="text-gray-500 space-y-1">
-                            <li>• Resource scarcity encoding</li>
-                            <li>• Outcome obsession</li>
-                            <li>• &quot;What converts?&quot; mentality</li>
-                            <li>• Ruthless prioritization</li>
-                            <li>• Metrics-driven decisions</li>
-                          </ul>
-                        </div>
-                      </div>
-                      
-                      <textarea
-                        value={survivalNotes}
-                        onChange={(e) => setSurvivalNotes(e.target.value)}
-                        placeholder="Notes: Video quality, cohesiveness, mindful structure, 'upwards' set posture..."
-                        className="w-full h-24 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
-                      />
-                    </div>
-
-                    {/* Section 2: Social Centerfold (Coolness) */}
-                    <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
-                      <div className="flex items-center gap-3 mb-4">
-                        <span className="text-2xl">😎</span>
-                        <div>
-                          <h3 className="font-semibold text-lg">Social Centerfold (Coolness)</h3>
-                          <p className="text-sm text-gray-400">
-                            Social arena positioning: Frame control and outcome independence
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="bg-gray-800/50 rounded-lg p-4 mb-4">
-                        <Slider
-                          value={coolnessScore}
-                          onChange={setCoolnessScore}
-                          min={1}
-                          max={10}
-                          labels={{ 
-                            left: '👤 Uncool (Following)', 
-                            right: '🌟 Cool (Leading)' 
-                          }}
-                        />
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-4 mb-4 text-xs">
-                        <div className="bg-gray-800/30 rounded-lg p-3">
-                          <p className="text-gray-400 font-medium mb-2">&quot;Loser&quot; (Uncool) Signals:</p>
-                          <ul className="text-gray-500 space-y-1">
-                            <li>• Following rather than leading</li>
-                            <li>• Social timidness/risk aversion</li>
-                            <li>• Neutral dominance symbols</li>
-                            <li>• Family-oriented / safety priority</li>
-                            <li>• Silent effort that may not work</li>
-                          </ul>
-                        </div>
-                        <div className="bg-gray-800/30 rounded-lg p-3">
-                          <p className="text-gray-400 font-medium mb-2">&quot;Winner&quot; (Cool) Signals:</p>
-                          <ul className="text-gray-500 space-y-1">
-                            <li>• Frame control - sets parameters</li>
-                            <li>• Outcome independence</li>
-                            <li>• Effortless presentation</li>
-                            <li>• Energy generation</li>
-                            <li>• Reframes the game itself</li>
-                          </ul>
-                        </div>
-                      </div>
-                      
-                      <textarea
-                        value={coolnessNotes}
-                        onChange={(e) => setCoolnessNotes(e.target.value)}
-                        placeholder="Notes: Frame dynamics, status signals, energy, social positioning observed..."
-                        className="w-full h-24 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
-                      />
-                    </div>
-
-                    {/* Section 3: Target Audience */}
-                    <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
-                      <div className="flex items-center gap-3 mb-4">
-                        <span className="text-2xl">👥</span>
-                        <div>
-                          <h3 className="font-semibold text-lg">Target Audience</h3>
-                          <p className="text-sm text-gray-400">
-                            Age demographic range this content appeals to
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="bg-gray-800/50 rounded-lg p-4 mb-4">
-                        <AgeRangeSlider
-                          minAge={targetAgeMin}
-                          maxAge={targetAgeMax}
-                          onChange={(min, max) => {
-                            setTargetAgeMin(min);
-                            setTargetAgeMax(max);
-                          }}
-                        />
-                      </div>
-                      
-                      <div className="grid grid-cols-4 gap-2 mb-4 text-xs">
-                        <div className="bg-gray-800/30 rounded-lg p-2 text-center">
-                          <p className="text-gray-400 font-medium">12-17</p>
-                          <p className="text-gray-500">Teen</p>
-                        </div>
-                        <div className="bg-gray-800/30 rounded-lg p-2 text-center">
-                          <p className="text-gray-400 font-medium">18-24</p>
-                          <p className="text-gray-500">Young Adult</p>
-                        </div>
-                        <div className="bg-gray-800/30 rounded-lg p-2 text-center">
-                          <p className="text-gray-400 font-medium">25-44</p>
-                          <p className="text-gray-500">Adult</p>
-                        </div>
-                        <div className="bg-gray-800/30 rounded-lg p-2 text-center">
-                          <p className="text-gray-400 font-medium">45-65</p>
-                          <p className="text-gray-500">Mature</p>
-                        </div>
-                      </div>
-                      
-                      <textarea
-                        value={audienceNotes}
-                        onChange={(e) => setAudienceNotes(e.target.value)}
-                        placeholder="Notes: Why this target audience? Humor type, references, cultural markers, language style..."
-                        className="w-full h-24 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
-                      />
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    {/* Brand Identity Tab (Original) */}
-                    <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 space-y-6">
-                      <h2 className="text-lg font-semibold">Brand Identity</h2>
-                      
-                      {/* Personality Notes */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                          Person / Personality
-                          <span className="text-gray-500 font-normal ml-2">
-                            (Who is this brand if it were a person?)
-                          </span>
-                        </label>
-                        <textarea
-                          value={personalityNotes}
-                          onChange={(e) => setPersonalityNotes(e.target.value)}
-                          placeholder="Describe the brand as a person: age, gender energy, life stage, social class, priorities, values, character traits..."
-                          className="w-full h-32 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                        />
-                      </div>
-
-                      {/* Statement Notes */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                          Statement / Message
-                          <span className="text-gray-500 font-normal ml-2">
-                            (What is the brand saying? What&apos;s the subtext?)
-                          </span>
-                        </label>
-                        <textarea
-                          value={statementNotes}
-                          onChange={(e) => setStatementNotes(e.target.value)}
-                          placeholder="What is being communicated between the lines? Mission? Target audience? Self-seriousness? Opinion stance? Humor style?..."
-                          className="w-full h-32 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                        />
-                      </div>
-
-                      {/* Corrections */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                          Notes / Corrections
-                          <span className="text-gray-500 font-normal ml-2">(Optional)</span>
-                        </label>
-                        <textarea
-                          value={corrections}
-                          onChange={(e) => setCorrections(e.target.value)}
-                          placeholder="Any additional observations..."
-                          className="w-full h-20 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                        />
-                      </div>
-                    </div>
-                  </>
-                )}
-
                 {/* Submit */}
                 <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
                   {submitError && (
