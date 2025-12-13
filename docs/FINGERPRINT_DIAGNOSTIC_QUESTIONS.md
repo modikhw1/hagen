@@ -246,12 +246,26 @@ Not all hospitality brands use humor. Is the system biased toward funny content?
 
 → Your response:
 
+For the intended channel, TikTok, a big part of our target audience uses humor. In fact, the service is built towards brands that want just that, and it is positioned as such. The reason is that high quality entertaining clips, with a comedic effect, has a unique way of penetrating the noise.
+
+The system may need to take other types of content into account. The analyze-rate is strictly a humor type/rating tool, which doesn't mesh well with profiles that have a mix of humor, meme, informative & visually engaging posts. This mix of content may still be relevant to understand, since it can give some insight into how the brand thinks. It's not common to have a fairly big and professional brand page with only humor. At the same time, the service is meant to give concepts that can be used when needed. In it's current form, the service doesn't promise or market a complete social media mix.
+
 ---
 
 ### Q2.5: `age_code` (younger/older/balanced) is a proxy for audience.
 Is this the right signal? What about urban/suburban, income level, cultural background?
 
 → Your response:
+
+This metric is mainly about what type of humor/themes will be relevant for what audience. The concepts I have graded as being excellent has an engaging premise/theme/style for people between 15-45. Absurdism tend to do well here.
+
+Within the younger audience, many teens enjoy simple and to the point meme formats, often with a POV text overlay establishing the premise, and having support of a TikTok "sound" as well as a short clip with simple acting. These are simple to replicate, have a quick and easy payoff, and usually uses attractive people in them. These tend to be very quick and 'vapid', making them not the most memorable or in extension - not creating room to relate a (positive) feeling towards the profile.
+
+Themes that seem somewhat popular with younger people, but not only teens, is work drama/gossip, relationships/mating, power structures at work etc.
+
+What seems to work for most is sketches that seem somewhat effortless (not too much planning for the script for example), but with a humorous twist that mixes between meanness, a simple misunderstanding, someone tricking someone else etc. Simple human dynamics played out in a service environment, that is still "safe" but with some dynamics that are more mature or contain some dramatic element.
+
+Cultural background and income is normally matched through user viewing numbers, meaning that any focus for a brand would attract those viewers. This data is likely not relevant to track.
 
 ---
 
@@ -260,12 +274,20 @@ How well is the AI detecting this? A fancy restaurant trying to seem approachabl
 
 → Your response:
 
+It would be the language, themes and clothing/grooming/backdrop. I'm not sure about this variable in general, but in general, I would say that any content that is aimed to do well on TikTok will always be accessible, or trying to be.
+
 ---
 
 ### Q2.7: `edginess` might be the most subjective signal.
 "Safe" vs "provocative"—these judgments vary by culture, generation, context. How do we calibrate?
 
 → Your response:
+
+I think this signal shouldn't be viewed as very subjective. I'm sure if there is some analysis done online, there should be a vast array of data sources describing what type of themes may or may not be deemed as safe for a brand with certain expectations.
+
+There are notes within the /analyze-rate data collection that speak on what type of videos may not work. But in general, hateful or explicitly sexual themes may not work well. Flirting but in a restrained way can sometimes work. And sometimes relationship dynamics are being alluded to, instead of actually shown as a real dynamic.
+
+When a concept is centered around work environment dynamic, some themes may not be good if not shown to be clearly absurdist or ironic. If the team is shown to be incapable, hateful, non-serviceminded, unrespectful - these are generally not good. It also depends on the type of brand and it's size, assuming that bigger brands or companies need to be restrained while smaller profiles may take bigger risks.
 
 ---
 
@@ -274,6 +296,8 @@ The AI generates these, but they're not standardized. Should we have a controlle
 
 → Your response:
 
+These are ok. I have no problem with this, but if traits/tags are added, perhaps there should be a deeper system in place. This is something that can be iterated.
+
 ---
 
 ### Q2.9: How do we handle brand evolution?
@@ -281,12 +305,16 @@ A brand's personality can shift. Are we fingerprinting "current state" or "core 
 
 → Your response:
 
+I think brand personality should be calculated at the time of the fingerprint creation. If the user wants to append data, he/she can interact with the profile analysis tool once again.
+
 ---
 
 ### Q2.10: What's the relationship between personality and performance?
 If a brand is warm but their warm content underperforms vs. their edgy content—which defines them?
 
 → Your response:
+
+I don't think this is an important off-case. One is assuming that the profile using this service will find it easy to go one way or the other, wishing or asking the brand profile to track changes in intention, which perhaps adds another dimenson to the fingerprint (desire vs current).
 
 ---
 
