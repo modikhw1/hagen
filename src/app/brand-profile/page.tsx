@@ -51,6 +51,20 @@ interface VideoMatch {
   similarity: number
   quality_tier?: string
   brand_tone_notes?: string
+  // v1.1 fingerprint matching fields
+  passed_filters?: boolean
+  filter_results?: {
+    passed: boolean
+    failed_filters: string[]
+    warnings: string[]
+  }
+  score_breakdown?: {
+    audience_alignment: number
+    tone_match: number
+    format_appropriateness: number
+    aspiration_alignment: number
+  }
+  explanation?: string
 }
 
 const PHASE_LABELS: Record<string, string> = {
@@ -82,6 +96,30 @@ export default function BrandProfilePage() {
   const [showMasterNotes, setShowMasterNotes] = useState(false)
   const [isSavingNotes, setIsSavingNotes] = useState(false)
   const [notesSaved, setNotesSaved] = useState(false)
+  
+  // NEW v1.1: Fingerprint constraint states
+  const [operationalConstraints, setOperationalConstraints] = useState<{
+    team_size: string
+    time_per_video: string
+    equipment: string[]
+  }>({
+    team_size: 'solo',
+    time_per_video: 'under_1hr',
+    equipment: ['smartphone']
+  })
+  
+  const [environmentAvailability, setEnvironmentAvailability] = useState<{
+    settings: string[]
+    can_feature_customers: boolean | null
+    space: string
+  }>({
+    settings: [],
+    can_feature_customers: null,
+    space: 'moderate'
+  })
+  
+  const [ambitionLevel, setAmbitionLevel] = useState<string>('level_up')
+  
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -319,7 +357,13 @@ export default function BrandProfilePage() {
         body: JSON.stringify({
           limit: 10,
           threshold: 0.5,
-          regenerateEmbedding: true
+          regenerateEmbedding: true,
+          // NEW v1.1: Pass fingerprint constraints
+          fingerprint: {
+            operational_constraints: operationalConstraints,
+            environment_availability: environmentAvailability,
+            ambition_level: ambitionLevel
+          }
         })
       })
 
@@ -871,6 +915,230 @@ export default function BrandProfilePage() {
               </div>
             </Card>
 
+            {/* NEW v1.1: Operational Constraints */}
+            <Card>
+              <h3 className="text-lg font-semibold text-white mb-4">What Can You Realistically Produce?</h3>
+              <p className="text-sm text-gray-400 mb-4">Help us match you with content you can actually recreate.</p>
+              
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Team Size */}
+                <div>
+                  <label className="text-sm font-medium text-gray-300 block mb-2">Team Size Available</label>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { value: 'solo', label: 'Just Me' },
+                      { value: 'duo', label: '2 People' },
+                      { value: 'small_team', label: '3-5 People' },
+                      { value: 'large_team', label: '5+ People' }
+                    ].map(opt => (
+                      <button
+                        key={opt.value}
+                        onClick={() => setOperationalConstraints(prev => ({ ...prev, team_size: opt.value }))}
+                        className={`px-3 py-1.5 text-sm rounded-lg transition-all ${
+                          operationalConstraints.team_size === opt.value
+                            ? 'bg-purple-600 text-white'
+                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Time Per Video */}
+                <div>
+                  <label className="text-sm font-medium text-gray-300 block mb-2">Time You Can Spend Per Video</label>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { value: 'under_1hr', label: 'Under 1hr' },
+                      { value: '1_4hrs', label: '1-4 Hours' },
+                      { value: 'half_day', label: 'Half Day' },
+                      { value: 'full_day', label: 'Full Day' }
+                    ].map(opt => (
+                      <button
+                        key={opt.value}
+                        onClick={() => setOperationalConstraints(prev => ({ ...prev, time_per_video: opt.value }))}
+                        className={`px-3 py-1.5 text-sm rounded-lg transition-all ${
+                          operationalConstraints.time_per_video === opt.value
+                            ? 'bg-purple-600 text-white'
+                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Equipment */}
+                <div className="md:col-span-2">
+                  <label className="text-sm font-medium text-gray-300 block mb-2">Equipment Available</label>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { value: 'smartphone', label: 'Smartphone' },
+                      { value: 'tripod', label: 'Tripod' },
+                      { value: 'ring_light', label: 'Ring Light' },
+                      { value: 'microphone', label: 'Microphone' },
+                      { value: 'camera', label: 'Camera' },
+                      { value: 'editing_software', label: 'Editing Software' }
+                    ].map(opt => (
+                      <button
+                        key={opt.value}
+                        onClick={() => {
+                          setOperationalConstraints(prev => ({
+                            ...prev,
+                            equipment: prev.equipment.includes(opt.value)
+                              ? prev.equipment.filter(e => e !== opt.value)
+                              : [...prev.equipment, opt.value]
+                          }))
+                        }}
+                        className={`px-3 py-1.5 text-sm rounded-lg transition-all ${
+                          operationalConstraints.equipment.includes(opt.value)
+                            ? 'bg-purple-600 text-white'
+                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            {/* NEW v1.1: Environment Availability */}
+            <Card>
+              <h3 className="text-lg font-semibold text-white mb-4">Where Can You Film?</h3>
+              <p className="text-sm text-gray-400 mb-4">Select all the spaces you have access to for content creation.</p>
+              
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Available Settings */}
+                <div className="md:col-span-2">
+                  <label className="text-sm font-medium text-gray-300 block mb-2">Available Locations</label>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { value: 'kitchen', label: 'Kitchen' },
+                      { value: 'dining_room', label: 'Dining Room' },
+                      { value: 'bar', label: 'Bar Area' },
+                      { value: 'storefront', label: 'Storefront' },
+                      { value: 'outdoor', label: 'Outdoor Patio' },
+                      { value: 'offsite', label: 'Off-site Locations' }
+                    ].map(opt => (
+                      <button
+                        key={opt.value}
+                        onClick={() => {
+                          setEnvironmentAvailability(prev => ({
+                            ...prev,
+                            settings: prev.settings.includes(opt.value)
+                              ? prev.settings.filter(s => s !== opt.value)
+                              : [...prev.settings, opt.value]
+                          }))
+                        }}
+                        className={`px-3 py-1.5 text-sm rounded-lg transition-all ${
+                          environmentAvailability.settings.includes(opt.value)
+                            ? 'bg-green-600 text-white'
+                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Can Feature Customers */}
+                <div>
+                  <label className="text-sm font-medium text-gray-300 block mb-2">Can You Feature Customers?</label>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setEnvironmentAvailability(prev => ({ ...prev, can_feature_customers: true }))}
+                      className={`px-4 py-2 text-sm rounded-lg transition-all ${
+                        environmentAvailability.can_feature_customers === true
+                          ? 'bg-green-600 text-white'
+                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                      }`}
+                    >
+                      Yes
+                    </button>
+                    <button
+                      onClick={() => setEnvironmentAvailability(prev => ({ ...prev, can_feature_customers: false }))}
+                      className={`px-4 py-2 text-sm rounded-lg transition-all ${
+                        environmentAvailability.can_feature_customers === false
+                          ? 'bg-red-600 text-white'
+                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                      }`}
+                    >
+                      No
+                    </button>
+                  </div>
+                </div>
+
+                {/* Space Available */}
+                <div>
+                  <label className="text-sm font-medium text-gray-300 block mb-2">Space Available</label>
+                  <div className="flex gap-2">
+                    {[
+                      { value: 'minimal', label: 'Tight' },
+                      { value: 'moderate', label: 'Moderate' },
+                      { value: 'spacious', label: 'Spacious' }
+                    ].map(opt => (
+                      <button
+                        key={opt.value}
+                        onClick={() => setEnvironmentAvailability(prev => ({ ...prev, space: opt.value }))}
+                        className={`px-3 py-1.5 text-sm rounded-lg transition-all ${
+                          environmentAvailability.space === opt.value
+                            ? 'bg-green-600 text-white'
+                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            {/* NEW v1.1: Aspiration Level */}
+            <Card>
+              <h3 className="text-lg font-semibold text-white mb-4">Content Quality Goals</h3>
+              <p className="text-sm text-gray-400 mb-4">What kind of content are you looking for?</p>
+              
+              <div className="space-y-4">
+                {[
+                  { 
+                    value: 'match_current', 
+                    label: 'Match My Current Level', 
+                    description: 'Show me content similar to what I already make'
+                  },
+                  { 
+                    value: 'level_up', 
+                    label: 'Help Me Level Up', 
+                    description: 'Show me content slightly better than what I make now'
+                  },
+                  { 
+                    value: 'aspirational', 
+                    label: 'Show Me Aspirational Examples', 
+                    description: 'Show me high-quality content for inspiration'
+                  }
+                ].map(opt => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setAmbitionLevel(opt.value)}
+                    className={`w-full text-left p-4 rounded-lg transition-all ${
+                      ambitionLevel === opt.value
+                        ? 'bg-purple-600/30 border-2 border-purple-500'
+                        : 'bg-gray-800 border-2 border-gray-700 hover:border-gray-600'
+                    }`}
+                  >
+                    <div className="font-medium text-white">{opt.label}</div>
+                    <div className="text-sm text-gray-400">{opt.description}</div>
+                  </button>
+                ))}
+              </div>
+            </Card>
+
             {/* Find Matching Videos */}
             <Card>
               <div className="flex items-center justify-between mb-4">
@@ -894,36 +1162,87 @@ export default function BrandProfilePage() {
               </div>
 
               {matchedVideos.length > 0 ? (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {matchedVideos.map((video, idx) => (
                     <div 
                       key={video.id}
-                      className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg"
+                      className="p-4 bg-gray-800/50 rounded-lg"
                     >
-                      <div className="flex items-center gap-3">
-                        <span className="text-gray-500 text-sm">#{idx + 1}</span>
-                        <div>
-                          <div className="text-white font-medium">
-                            {video.title || 'Untitled Video'}
-                          </div>
-                          <div className="text-sm text-gray-400">
-                            {video.platform} • {video.quality_tier || 'Unrated'}
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-3">
+                          <span className="text-gray-500 text-sm font-bold">#{idx + 1}</span>
+                          <div>
+                            <div className="text-white font-medium">
+                              {video.title || 'Untitled Video'}
+                            </div>
+                            <div className="text-sm text-gray-400">
+                              {video.platform} • {video.quality_tier || 'Unrated'}
+                            </div>
                           </div>
                         </div>
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg font-bold text-purple-400">
+                            {Math.round(video.similarity * 100)}%
+                          </span>
+                          <a
+                            href={video.video_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-400 hover:text-blue-300 text-sm"
+                          >
+                            View →
+                          </a>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <span className="text-sm text-purple-400">
-                          {Math.round(video.similarity * 100)}% match
-                        </span>
-                        <a
-                          href={video.video_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-400 hover:text-blue-300 text-sm"
-                        >
-                          View →
-                        </a>
-                      </div>
+                      
+                      {/* v1.1: Score breakdown visualization */}
+                      {video.score_breakdown && (
+                        <div className="mt-3 grid grid-cols-4 gap-2 text-xs">
+                          <div className="flex flex-col items-center">
+                            <div className="w-full bg-gray-700 rounded-full h-1.5 mb-1">
+                              <div 
+                                className="bg-purple-500 h-1.5 rounded-full" 
+                                style={{ width: `${video.score_breakdown.audience_alignment * 100}%` }}
+                              />
+                            </div>
+                            <span className="text-gray-400">Audience</span>
+                          </div>
+                          <div className="flex flex-col items-center">
+                            <div className="w-full bg-gray-700 rounded-full h-1.5 mb-1">
+                              <div 
+                                className="bg-green-500 h-1.5 rounded-full" 
+                                style={{ width: `${video.score_breakdown.tone_match * 100}%` }}
+                              />
+                            </div>
+                            <span className="text-gray-400">Tone</span>
+                          </div>
+                          <div className="flex flex-col items-center">
+                            <div className="w-full bg-gray-700 rounded-full h-1.5 mb-1">
+                              <div 
+                                className="bg-blue-500 h-1.5 rounded-full" 
+                                style={{ width: `${video.score_breakdown.format_appropriateness * 100}%` }}
+                              />
+                            </div>
+                            <span className="text-gray-400">Format</span>
+                          </div>
+                          <div className="flex flex-col items-center">
+                            <div className="w-full bg-gray-700 rounded-full h-1.5 mb-1">
+                              <div 
+                                className="bg-yellow-500 h-1.5 rounded-full" 
+                                style={{ width: `${video.score_breakdown.aspiration_alignment * 100}%` }}
+                              />
+                            </div>
+                            <span className="text-gray-400">Aspiration</span>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* v1.1: Match explanation */}
+                      {video.explanation && (
+                        <p className="mt-3 text-sm text-gray-400 italic">
+                          {video.explanation}
+                        </p>
+                      )}
                     </div>
                   ))}
                 </div>

@@ -7,6 +7,77 @@ import { z } from 'zod'
 const Score0to1 = z.number().min(0).max(1)
 const OneToTen = z.number().min(1).max(10)
 
+// =============================================================================
+// New v1.1 Sub-Schemas: Replicability, Risk, Environment, Audience
+// =============================================================================
+
+/** Replicability: How easily can a brand recreate this content? */
+export const ReplicabilitySchema = z
+  .object({
+    actor_count: z.enum(['solo', 'duo', 'small_team', 'large_team']).nullable().optional(),
+    setup_complexity: z.enum(['phone_only', 'basic_tripod', 'lighting_setup', 'full_studio']).nullable().optional(),
+    skill_required: z.enum(['anyone', 'basic_editing', 'intermediate', 'professional']).nullable().optional(),
+    environment_dependency: z.enum(['anywhere', 'specific_indoor', 'specific_outdoor', 'venue_required']).nullable().optional(),
+    equipment_needed: z.array(z.string()).optional(),
+    estimated_time: z.enum(['under_1hr', '1_4hrs', 'half_day', 'full_day']).nullable().optional()
+  })
+  .strict()
+
+/** Risk Level: How brand-safe or edgy is the content? */
+export const RiskLevelSchema = z
+  .object({
+    content_edge: z.enum(['brand_safe', 'mildly_edgy', 'edgy', 'provocative']).nullable().optional(),
+    humor_risk: z.enum(['safe_humor', 'playful', 'sarcastic', 'dark_humor']).nullable().optional(),
+    trend_reliance: z.enum(['evergreen', 'light_trends', 'trend_dependent']).nullable().optional(),
+    controversy_potential: z.enum(['none', 'low', 'moderate', 'high']).nullable().optional()
+  })
+  .strict()
+
+/** Environment Requirements: What physical setting is needed? */
+export const EnvironmentRequirementsSchema = z
+  .object({
+    setting_type: z.enum(['indoor', 'outdoor', 'kitchen', 'bar', 'storefront', 'dining_room', 'mixed']).nullable().optional(),
+    space_requirements: z.enum(['minimal', 'moderate', 'spacious']).nullable().optional(),
+    lighting_conditions: z.enum(['natural', 'artificial', 'low_light', 'flexible']).nullable().optional(),
+    noise_tolerance: z.enum(['quiet_needed', 'moderate_ok', 'noisy_ok']).nullable().optional(),
+    customer_visibility: z.enum(['no_customers', 'background', 'featured']).nullable().optional()
+  })
+  .strict()
+
+/** Expanded Target Audience: Who is this content for? */
+export const TargetAudienceSchema = z
+  .object({
+    // Demographics
+    age_range: z
+      .object({
+        primary: z.enum(['gen_z', 'millennial', 'gen_x', 'boomer', 'broad']).nullable().optional(),
+        secondary: z.enum(['gen_z', 'millennial', 'gen_x', 'boomer', 'none']).nullable().optional()
+      })
+      .strict()
+      .optional(),
+    income_level: z.enum(['budget', 'mid_range', 'upscale', 'luxury', 'broad']).nullable().optional(),
+    
+    // Psychographics
+    lifestyle_tags: z.array(z.enum([
+      'foodies', 'families', 'date_night', 'business', 'tourists',
+      'locals', 'health_conscious', 'indulgent', 'social_media_active',
+      'adventurous', 'comfort_seeking', 'trend_followers'
+    ])).optional(),
+    
+    // Occasion targeting
+    primary_occasion: z.enum([
+      'quick_meal', 'casual_dining', 'special_occasion',
+      'takeout', 'delivery', 'bar_drinks', 'coffee_cafe', 'brunch'
+    ]).nullable().optional(),
+    
+    // Cultural positioning
+    vibe_alignment: z.enum([
+      'trendy', 'classic', 'family_friendly', 'upscale_casual',
+      'dive_authentic', 'instagram_worthy', 'neighborhood_gem', 'hidden_gem'
+    ]).nullable().optional()
+  })
+  .strict()
+
 export const VideoBrandEvidenceV1Schema = z
   .object({
     type: z.enum(['quote', 'ocr', 'visual', 'audio', 'caption', 'thumbnail', 'bio', 'other']),
@@ -84,6 +155,12 @@ export const VideoBrandObservationV1Schema = z
           .strict()
           .optional(),
 
+        /** NEW v1.1: Replicability assessment */
+        replicability: ReplicabilitySchema.optional(),
+
+        /** NEW v1.1: Risk level assessment */
+        risk_level: RiskLevelSchema.optional(),
+
         hospitality: z
           .object({
             business_type: z.enum(['restaurant', 'cafe', 'bar', 'hotel', 'other']).nullable().optional(),
@@ -97,6 +174,12 @@ export const VideoBrandObservationV1Schema = z
           })
           .strict()
           .optional(),
+
+        /** NEW v1.1: Environment requirements for content recreation */
+        environment_requirements: EnvironmentRequirementsSchema.optional(),
+
+        /** NEW v1.1: Expanded target audience signals */
+        target_audience: TargetAudienceSchema.optional(),
 
         humor: z
           .object({

@@ -82,6 +82,13 @@ export default function AnalyzeRatePage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   
+  // NEW v1.1: Structured replicability state
+  const [actorCount, setActorCount] = useState<string | null>(null);
+  const [setupComplexity, setSetupComplexity] = useState<string | null>(null);
+  const [skillRequired, setSkillRequired] = useState<string | null>(null);
+  const [settingType, setSettingType] = useState<string | null>(null);
+  const [equipmentNeeded, setEquipmentNeeded] = useState<string[]>([]);
+  
   // Analysis notes/corrections state
   const [analysisNotes, setAnalysisNotes] = useState('');
   const [editingAnalysis, setEditingAnalysis] = useState(false);
@@ -213,7 +220,15 @@ export default function AnalyzeRatePage() {
           brand_tone_notes: brandToneNotes,
           analysis_notes: analysisNotes,
           gemini_analysis: result.analysis,
-          similar_videos: result.rag_context?.references || []
+          similar_videos: result.rag_context?.references || [],
+          // NEW v1.1: Structured replicability data
+          structured_replicability: {
+            actor_count: actorCount,
+            setup_complexity: setupComplexity,
+            skill_required: skillRequired,
+            setting_type: settingType,
+            equipment_needed: equipmentNeeded
+          }
         })
       });
 
@@ -241,6 +256,12 @@ export default function AnalyzeRatePage() {
     setEditingAnalysis(false);
     setSubmitted(false);
     setError(null);
+    // Reset structured replicability fields
+    setActorCount(null);
+    setSetupComplexity(null);
+    setSkillRequired(null);
+    setSettingType(null);
+    setEquipmentNeeded([]);
   };
 
   // Gemini returns 0-10 scores, normalize to 0-100%
@@ -398,7 +419,7 @@ export default function AnalyzeRatePage() {
               {editingAnalysis && (
                 <div className="mt-4 pt-4 border-t border-gray-700">
                   <label className="block text-sm text-gray-400 mb-2">
-                    Correct Gemini's Analysis
+                    Correct Gemini&apos;s Analysis
                     <span className="text-gray-500 ml-2">(corrections will be saved for model learning)</span>
                   </label>
                   <textarea
@@ -486,16 +507,98 @@ export default function AnalyzeRatePage() {
                   />
                 </div>
 
-                {/* Replicability */}
+                {/* Replicability - Structured Inputs */}
                 <div className="mb-4">
                   <label className="block text-sm text-gray-400 mb-2">
-                    Replicability Notes
+                    Replicability Assessment
                   </label>
+                  
+                  {/* Actor Count */}
+                  <div className="mb-3">
+                    <span className="text-xs text-gray-500 block mb-1">How many people appear?</span>
+                    <div className="flex flex-wrap gap-2">
+                      {(['solo', 'duo', 'small_team', 'large_team'] as const).map((option) => (
+                        <button
+                          key={option}
+                          onClick={() => setActorCount(option)}
+                          className={`px-3 py-1 text-sm rounded-lg transition-all ${
+                            actorCount === option
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                          }`}
+                        >
+                          {option === 'solo' ? '1 Person' : option === 'duo' ? '2 People' : option === 'small_team' ? '3-5' : '5+'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Setup Complexity */}
+                  <div className="mb-3">
+                    <span className="text-xs text-gray-500 block mb-1">Equipment needed?</span>
+                    <div className="flex flex-wrap gap-2">
+                      {(['phone_only', 'basic_tripod', 'lighting_setup', 'full_studio'] as const).map((option) => (
+                        <button
+                          key={option}
+                          onClick={() => setSetupComplexity(option)}
+                          className={`px-3 py-1 text-sm rounded-lg transition-all ${
+                            setupComplexity === option
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                          }`}
+                        >
+                          {option === 'phone_only' ? 'Phone Only' : option === 'basic_tripod' ? 'Tripod' : option === 'lighting_setup' ? 'Lighting' : 'Studio'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Skill Required */}
+                  <div className="mb-3">
+                    <span className="text-xs text-gray-500 block mb-1">Skill level to recreate?</span>
+                    <div className="flex flex-wrap gap-2">
+                      {(['anyone', 'basic_editing', 'intermediate', 'professional'] as const).map((option) => (
+                        <button
+                          key={option}
+                          onClick={() => setSkillRequired(option)}
+                          className={`px-3 py-1 text-sm rounded-lg transition-all ${
+                            skillRequired === option
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                          }`}
+                        >
+                          {option === 'anyone' ? 'Anyone' : option === 'basic_editing' ? 'Basic' : option === 'intermediate' ? 'Intermediate' : 'Pro'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Setting Type */}
+                  <div className="mb-3">
+                    <span className="text-xs text-gray-500 block mb-1">Environment required?</span>
+                    <div className="flex flex-wrap gap-2">
+                      {(['kitchen', 'dining_room', 'bar', 'storefront', 'outdoor', 'mixed'] as const).map((option) => (
+                        <button
+                          key={option}
+                          onClick={() => setSettingType(option)}
+                          className={`px-3 py-1 text-sm rounded-lg transition-all ${
+                            settingType === option
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                          }`}
+                        >
+                          {option.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Additional notes */}
                   <textarea
                     value={replicabilityNotes}
                     onChange={(e) => setReplicabilityNotes(e.target.value)}
-                    placeholder="Solo performer? Props needed? Editing complexity? Location requirements?"
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                    placeholder="Any additional notes on replicability..."
+                    className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
                     rows={2}
                   />
                 </div>

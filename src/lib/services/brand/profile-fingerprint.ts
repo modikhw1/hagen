@@ -211,6 +211,33 @@ interface VideoSignals {
   social_permission: number | null
   has_repeatable_format: boolean
   format_name: string | null
+  // NEW v1.1: Replicability signals
+  actor_count: string | null
+  setup_complexity: string | null
+  skill_required: string | null
+  environment_dependency: string | null
+  equipment_needed: string[]
+  estimated_time: string | null
+  // NEW v1.1: Risk level signals
+  content_edge: string | null
+  humor_risk: string | null
+  trend_reliance: string | null
+  controversy_potential: string | null
+  // NEW v1.1: Environment requirements
+  setting_type: string | null
+  space_requirements: string | null
+  lighting_conditions: string | null
+  noise_tolerance: string | null
+  customer_visibility: string | null
+  // NEW v1.1: Expanded target audience
+  audience_age_primary: string | null
+  audience_age_secondary: string | null
+  audience_income_level: string | null
+  audience_lifestyle_tags: string[]
+  audience_primary_occasion: string | null
+  audience_vibe_alignment: string | null
+  // NEW v1.1: Humor presence flag
+  humor_present: boolean
 }
 
 function extractSignals(
@@ -248,7 +275,34 @@ function extractSignals(
     intentionality: null,
     social_permission: null,
     has_repeatable_format: false,
-    format_name: null
+    format_name: null,
+    // NEW v1.1: Replicability
+    actor_count: null,
+    setup_complexity: null,
+    skill_required: null,
+    environment_dependency: null,
+    equipment_needed: [],
+    estimated_time: null,
+    // NEW v1.1: Risk level
+    content_edge: null,
+    humor_risk: null,
+    trend_reliance: null,
+    controversy_potential: null,
+    // NEW v1.1: Environment
+    setting_type: null,
+    space_requirements: null,
+    lighting_conditions: null,
+    noise_tolerance: null,
+    customer_visibility: null,
+    // NEW v1.1: Target audience
+    audience_age_primary: null,
+    audience_age_secondary: null,
+    audience_income_level: null,
+    audience_lifestyle_tags: [],
+    audience_primary_occasion: null,
+    audience_vibe_alignment: null,
+    // NEW v1.1: Humor presence
+    humor_present: false
   }
 
   // From video_ratings (quality)
@@ -339,6 +393,54 @@ function extractSignals(
       const coh = (s.coherence || s.coherence_signals) as Record<string, unknown> | undefined
       if (coh) {
         signals.message_alignment = (coh.personality_message_alignment_0_1 as number) ?? (coh.message_alignment as number) ?? null
+      }
+
+      // NEW v1.1: Replicability signals
+      const rep = s.replicability as Record<string, unknown> | undefined
+      if (rep) {
+        signals.actor_count = (rep.actor_count as string) ?? null
+        signals.setup_complexity = (rep.setup_complexity as string) ?? null
+        signals.skill_required = (rep.skill_required as string) ?? null
+        signals.environment_dependency = (rep.environment_dependency as string) ?? null
+        signals.equipment_needed = (rep.equipment_needed as string[]) ?? []
+        signals.estimated_time = (rep.estimated_time as string) ?? null
+      }
+
+      // NEW v1.1: Risk level signals
+      const risk = s.risk_level as Record<string, unknown> | undefined
+      if (risk) {
+        signals.content_edge = (risk.content_edge as string) ?? null
+        signals.humor_risk = (risk.humor_risk as string) ?? null
+        signals.trend_reliance = (risk.trend_reliance as string) ?? null
+        signals.controversy_potential = (risk.controversy_potential as string) ?? null
+      }
+
+      // NEW v1.1: Environment requirements
+      const env = s.environment_requirements as Record<string, unknown> | undefined
+      if (env) {
+        signals.setting_type = (env.setting_type as string) ?? null
+        signals.space_requirements = (env.space_requirements as string) ?? null
+        signals.lighting_conditions = (env.lighting_conditions as string) ?? null
+        signals.noise_tolerance = (env.noise_tolerance as string) ?? null
+        signals.customer_visibility = (env.customer_visibility as string) ?? null
+      }
+
+      // NEW v1.1: Expanded target audience
+      const aud = s.target_audience as Record<string, unknown> | undefined
+      if (aud) {
+        const ageRange = aud.age_range as Record<string, unknown> | undefined
+        signals.audience_age_primary = (ageRange?.primary as string) ?? null
+        signals.audience_age_secondary = (ageRange?.secondary as string) ?? null
+        signals.audience_income_level = (aud.income_level as string) ?? null
+        signals.audience_lifestyle_tags = (aud.lifestyle_tags as string[]) ?? []
+        signals.audience_primary_occasion = (aud.primary_occasion as string) ?? null
+        signals.audience_vibe_alignment = (aud.vibe_alignment as string) ?? null
+      }
+
+      // NEW v1.1: Humor presence (from humor section)
+      const humor = (s.humor || s.humor_mix) as Record<string, unknown> | undefined
+      if (humor) {
+        signals.humor_present = (humor.present as boolean) ?? false
       }
     }
   }
@@ -747,5 +849,435 @@ export async function computeMatch(
     furthest_video_id: furthestVideoId,
     furthest_similarity: Math.round(furthestSimilarity * 100) / 100,
     explanation: explanationParts.join(', ')
+  }
+}
+
+// =============================================================================
+// NEW v1.1: Conversion Functions - VideoSignals → VideoFingerprint
+// =============================================================================
+
+import type {
+  VideoFingerprint,
+  BrandFingerprint,
+  ReplicabilityScore,
+  RiskLevel,
+  EnvironmentRequirements,
+  AudienceSignals,
+  ToneProfile,
+  ContentFormat,
+  TargetAudienceDefinition,
+  OperationalConstraints,
+  EnvironmentAvailability,
+  TonePreferences,
+  RiskTolerance,
+  AmbitionLevel
+} from './profile-fingerprint.types'
+
+/**
+ * Compute replicability feasibility score (0-1) from categorical signals
+ */
+function computeReplicabilityScore(signals: VideoSignals): number {
+  let score = 1.0
+  
+  // Actor count penalty
+  const actorPenalty: Record<string, number> = {
+    'solo': 0, 'duo': 0.1, 'small_team': 0.25, 'large_team': 0.4
+  }
+  if (signals.actor_count) score -= actorPenalty[signals.actor_count] || 0
+  
+  // Setup complexity penalty
+  const setupPenalty: Record<string, number> = {
+    'phone_only': 0, 'basic_tripod': 0.1, 'lighting_setup': 0.2, 'full_studio': 0.35
+  }
+  if (signals.setup_complexity) score -= setupPenalty[signals.setup_complexity] || 0
+  
+  // Skill penalty
+  const skillPenalty: Record<string, number> = {
+    'anyone': 0, 'basic_editing': 0.1, 'intermediate': 0.2, 'professional': 0.35
+  }
+  if (signals.skill_required) score -= skillPenalty[signals.skill_required] || 0
+  
+  return Math.max(0, Math.min(1, score))
+}
+
+/**
+ * Compute risk level score (0-1, higher = riskier) from categorical signals
+ */
+function computeRiskScore(signals: VideoSignals): number {
+  let score = 0
+  
+  const edgeScore: Record<string, number> = {
+    'brand_safe': 0, 'mildly_edgy': 0.25, 'edgy': 0.5, 'provocative': 0.8
+  }
+  if (signals.content_edge) score += edgeScore[signals.content_edge] || 0
+  
+  const humorRiskScore: Record<string, number> = {
+    'safe_humor': 0, 'playful': 0.1, 'sarcastic': 0.3, 'dark_humor': 0.5
+  }
+  if (signals.humor_risk) score += humorRiskScore[signals.humor_risk] || 0
+  
+  const controversyScore: Record<string, number> = {
+    'none': 0, 'low': 0.1, 'moderate': 0.3, 'high': 0.5
+  }
+  if (signals.controversy_potential) score += controversyScore[signals.controversy_potential] || 0
+  
+  return Math.min(1, score / 1.8) // Normalize
+}
+
+/**
+ * Convert VideoSignals to VideoFingerprint
+ */
+export function signalsToVideoFingerprint(
+  videoId: string,
+  signals: VideoSignals,
+  embedding: number[],
+  videoUrl?: string
+): VideoFingerprint {
+  return {
+    video_id: videoId,
+    video_url: videoUrl,
+    computed_at: new Date().toISOString(),
+    
+    format: {
+      primary_intent: signals.primary_intent,
+      has_repeatable_format: signals.has_repeatable_format,
+      format_name: signals.format_name,
+      cta_types: signals.cta_types
+    },
+    
+    replicability: {
+      actor_count: signals.actor_count as ReplicabilityScore['actor_count'],
+      setup_complexity: signals.setup_complexity as ReplicabilityScore['setup_complexity'],
+      skill_required: signals.skill_required as ReplicabilityScore['skill_required'],
+      environment_dependency: signals.environment_dependency as ReplicabilityScore['environment_dependency'],
+      equipment_needed: signals.equipment_needed,
+      estimated_time: signals.estimated_time as ReplicabilityScore['estimated_time'],
+      feasibility_score: computeReplicabilityScore(signals)
+    },
+    
+    audience_signals: {
+      age_primary: signals.audience_age_primary as AudienceSignals['age_primary'],
+      age_secondary: signals.audience_age_secondary as AudienceSignals['age_secondary'],
+      income_level: signals.audience_income_level as AudienceSignals['income_level'],
+      lifestyle_tags: signals.audience_lifestyle_tags,
+      primary_occasion: signals.audience_primary_occasion,
+      vibe_alignment: signals.audience_vibe_alignment
+    },
+    
+    tone_profile: {
+      energy: signals.energy,
+      warmth: signals.warmth,
+      formality: signals.formality,
+      self_seriousness: signals.self_seriousness,
+      humor_present: signals.humor_present,
+      humor_types: signals.humor_types,
+      humor_target: signals.humor_target,
+      meanness_risk: signals.meanness_risk
+    },
+    
+    environment_requirements: {
+      setting_type: signals.setting_type as EnvironmentRequirements['setting_type'],
+      space_requirements: signals.space_requirements as EnvironmentRequirements['space_requirements'],
+      lighting_conditions: signals.lighting_conditions as EnvironmentRequirements['lighting_conditions'],
+      noise_tolerance: signals.noise_tolerance as EnvironmentRequirements['noise_tolerance'],
+      customer_visibility: signals.customer_visibility as EnvironmentRequirements['customer_visibility']
+    },
+    
+    risk_level: {
+      content_edge: signals.content_edge as RiskLevel['content_edge'],
+      humor_risk: signals.humor_risk as RiskLevel['humor_risk'],
+      trend_reliance: signals.trend_reliance as RiskLevel['trend_reliance'],
+      controversy_potential: signals.controversy_potential as RiskLevel['controversy_potential'],
+      overall_risk_score: computeRiskScore(signals)
+    },
+    
+    quality_baseline: {
+      execution_quality: signals.execution_coherence ?? 0.5,
+      production_investment: signals.production_investment ?? 5,
+      distinctiveness: signals.distinctiveness ?? 0.5
+    },
+    
+    embedding,
+    confidence: signals.confidence ?? 0.5
+  }
+}
+
+// =============================================================================
+// NEW v1.1: BrandFingerprint Computation from Brand Profile Data
+// =============================================================================
+
+/**
+ * Brand synthesis data structure (from /brand-profile conversation)
+ */
+interface BrandSynthesisData {
+  brand_id: string
+  brand_name: string
+  narrative_summary?: string
+  characteristics?: Record<string, unknown>
+  tone?: Record<string, unknown>
+  current_state?: Record<string, unknown>
+  goals?: Record<string, unknown>
+  target_audience?: Record<string, unknown>
+  content_recommendations?: {
+    formats_likely_to_fit?: string[]
+    formats_to_avoid?: string[]
+    topics_to_explore?: string[]
+    production_level?: string
+  }
+  // NEW v1.1 fields (optional - collected from enhanced UI)
+  operational_constraints?: Partial<OperationalConstraints>
+  environment_availability?: Partial<EnvironmentAvailability>
+  tone_preferences?: Partial<TonePreferences>
+  risk_tolerance?: Partial<RiskTolerance>
+  ambition_level?: Partial<AmbitionLevel>
+}
+
+/**
+ * Infer target audience from synthesis data
+ */
+function inferTargetAudience(synthesis: BrandSynthesisData): TargetAudienceDefinition {
+  const ta = synthesis.target_audience || {}
+  
+  return {
+    age_primary: (ta.age_primary as TargetAudienceDefinition['age_primary']) || 'broad',
+    age_secondary: ta.age_secondary as TargetAudienceDefinition['age_secondary'],
+    income_level: (ta.income_level as TargetAudienceDefinition['income_level']) || 'mid_range',
+    lifestyle_tags: (ta.lifestyle_tags as string[]) || [],
+    primary_occasion: (ta.primary_occasion as string) || 'casual_dining',
+    vibe: (ta.vibe as string) || 'classic'
+  }
+}
+
+/**
+ * Infer operational constraints from synthesis data
+ */
+function inferOperationalConstraints(synthesis: BrandSynthesisData): OperationalConstraints {
+  const oc = synthesis.operational_constraints || {}
+  const productionLevel = synthesis.content_recommendations?.production_level
+  
+  // Infer from production_level recommendation
+  let defaultTeam: OperationalConstraints['team_size_available'] = 'solo'
+  let defaultSkill: OperationalConstraints['skill_level'] = 'basic_editing'
+  
+  if (productionLevel === 'professional') {
+    defaultTeam = 'small_team'
+    defaultSkill = 'professional'
+  } else if (productionLevel === 'polished') {
+    defaultTeam = 'duo'
+    defaultSkill = 'intermediate'
+  }
+  
+  return {
+    team_size_available: oc.team_size_available || defaultTeam,
+    equipment_available: oc.equipment_available || ['smartphone'],
+    time_per_video: oc.time_per_video || '1_4hrs',
+    skill_level: oc.skill_level || defaultSkill
+  }
+}
+
+/**
+ * Infer environment availability from synthesis data
+ */
+function inferEnvironmentAvailability(synthesis: BrandSynthesisData): EnvironmentAvailability {
+  const ea = synthesis.environment_availability || {}
+  const characteristics = synthesis.characteristics || {}
+  
+  // Try to infer from business type or characteristics
+  const businessType = characteristics.business_type as string | undefined
+  let defaultSettings: EnvironmentAvailability['available_settings'] = ['kitchen', 'dining_room']
+  
+  if (businessType === 'bar') {
+    defaultSettings = ['bar']
+  } else if (businessType === 'cafe') {
+    defaultSettings = ['storefront', 'dining_room']
+  }
+  
+  return {
+    available_settings: ea.available_settings || defaultSettings,
+    space_available: ea.space_available || 'moderate',
+    lighting_situation: ea.lighting_situation || 'mixed',
+    noise_level: ea.noise_level || 'moderate',
+    can_feature_customers: ea.can_feature_customers ?? true
+  }
+}
+
+/**
+ * Infer tone preferences from synthesis data
+ */
+function inferTonePreferences(synthesis: BrandSynthesisData): TonePreferences {
+  const tp = synthesis.tone_preferences || {}
+  const tone = synthesis.tone || {}
+  
+  // Try to infer from existing tone data
+  let humorLevel: TonePreferences['humor_level'] = 'moderate'
+  if (tone.humor === 'heavy' || tone.humor_level === 'high') humorLevel = 'heavy'
+  else if (tone.humor === 'light' || tone.humor_level === 'low') humorLevel = 'light'
+  else if (tone.humor === 'none') humorLevel = 'none'
+  
+  let energyPref: TonePreferences['energy_preference'] = 'moderate'
+  if (tone.energy === 'high' || (tone.energy as number) > 7) energyPref = 'high'
+  else if (tone.energy === 'low' || (tone.energy as number) < 4) energyPref = 'calm'
+  
+  return {
+    humor_level: tp.humor_level || humorLevel,
+    energy_preference: tp.energy_preference || energyPref,
+    formality_preference: tp.formality_preference || 'casual',
+    warmth_preference: tp.warmth_preference || 'warm'
+  }
+}
+
+/**
+ * Infer risk tolerance from synthesis data
+ */
+function inferRiskTolerance(synthesis: BrandSynthesisData): RiskTolerance {
+  const rt = synthesis.risk_tolerance || {}
+  
+  return {
+    max_content_edge: rt.max_content_edge || 'mildly_edgy',
+    humor_risk_ok: rt.humor_risk_ok || 'playful',
+    trend_following: rt.trend_following || 'light_trends'
+  }
+}
+
+/**
+ * Infer ambition level from synthesis data
+ */
+function inferAmbitionLevel(synthesis: BrandSynthesisData): AmbitionLevel {
+  const al = synthesis.ambition_level || {}
+  const currentState = synthesis.current_state || {}
+  const goals = synthesis.goals || {}
+  
+  // Try to infer current quality from existing content assessment
+  let currentQuality: AmbitionLevel['current_quality'] = 'medium'
+  if (currentState.quality === 'high' || currentState.production_quality === 'professional') {
+    currentQuality = 'high'
+  } else if (currentState.quality === 'low' || currentState.production_quality === 'basic') {
+    currentQuality = 'low'
+  }
+  
+  // Infer aspiration from goals
+  let aspiration: AmbitionLevel['aspiration'] = 'level_up'
+  if (goals.improve_quality || goals.professionalize) {
+    aspiration = 'level_up'
+  } else if (goals.maintain) {
+    aspiration = 'match_current'
+  }
+  
+  return {
+    current_quality: al.current_quality || currentQuality,
+    aspiration: al.aspiration || aspiration,
+    production_target: al.production_target || 'basic'
+  }
+}
+
+/**
+ * Compute BrandFingerprint from brand synthesis data
+ */
+export function computeBrandFingerprint(
+  synthesis: BrandSynthesisData,
+  contentEmbedding?: number[]
+): BrandFingerprint {
+  return {
+    brand_id: synthesis.brand_id,
+    brand_name: synthesis.brand_name,
+    computed_at: new Date().toISOString(),
+    
+    target_audience: inferTargetAudience(synthesis),
+    operational_constraints: inferOperationalConstraints(synthesis),
+    environment_availability: inferEnvironmentAvailability(synthesis),
+    tone_preferences: inferTonePreferences(synthesis),
+    risk_tolerance: inferRiskTolerance(synthesis),
+    ambition_level: inferAmbitionLevel(synthesis),
+    
+    content_embedding: contentEmbedding,
+    narrative_summary: synthesis.narrative_summary,
+    confidence: synthesis.narrative_summary ? 0.7 : 0.5
+  }
+}
+
+/**
+ * Convert a ProfileFingerprint's aggregated signals to representative VideoFingerprint
+ * Useful for comparing profile-level data to individual videos
+ */
+export function profileToVideoFingerprint(
+  profile: ProfileFingerprint
+): VideoFingerprint {
+  const l1 = profile.layers.l1_quality
+  const l2 = profile.layers.l2_likeness
+  const l3 = profile.layers.l3_visual
+  
+  return {
+    video_id: `profile_${profile.profile_id}`,
+    computed_at: profile.computed_at,
+    
+    format: {
+      primary_intent: l2.dominant_intent,
+      has_repeatable_format: l3.has_repeatable_format_pct > 0.5,
+      format_name: l3.collected_format_names[0] || null,
+      cta_types: l2.dominant_cta_types
+    },
+    
+    replicability: {
+      actor_count: null, // Not aggregated at profile level yet
+      setup_complexity: null,
+      skill_required: null,
+      environment_dependency: null,
+      equipment_needed: [],
+      estimated_time: null,
+      feasibility_score: 0.5 // Default
+    },
+    
+    audience_signals: {
+      age_primary: null,
+      age_secondary: null,
+      income_level: l2.dominant_price_tier === 'budget' ? 'budget' 
+                   : l2.dominant_price_tier === 'luxury' ? 'luxury'
+                   : l2.dominant_price_tier === 'premium' ? 'upscale'
+                   : 'mid_range',
+      lifestyle_tags: [],
+      primary_occasion: l2.dominant_occasion[0] || null,
+      vibe_alignment: l2.dominant_vibe[0] || null
+    },
+    
+    tone_profile: {
+      energy: l2.avg_energy,
+      warmth: l2.avg_warmth,
+      formality: l2.avg_formality,
+      self_seriousness: l2.avg_self_seriousness,
+      humor_present: l2.dominant_humor_types.length > 0,
+      humor_types: l2.dominant_humor_types,
+      humor_target: l2.dominant_humor_target,
+      meanness_risk: l2.dominant_meanness_risk
+    },
+    
+    environment_requirements: {
+      setting_type: null,
+      space_requirements: null,
+      lighting_conditions: null,
+      noise_tolerance: null,
+      customer_visibility: null
+    },
+    
+    risk_level: {
+      content_edge: l2.dominant_edginess === 'safe' ? 'brand_safe'
+                   : l2.dominant_edginess === 'mild' ? 'mildly_edgy'
+                   : l2.dominant_edginess === 'edgy' ? 'edgy'
+                   : 'brand_safe',
+      humor_risk: l2.dominant_meanness_risk === 'low' ? 'safe_humor'
+                 : l2.dominant_meanness_risk === 'medium' ? 'playful'
+                 : 'sarcastic',
+      trend_reliance: 'light_trends',
+      controversy_potential: 'low',
+      overall_risk_score: 0.2
+    },
+    
+    quality_baseline: {
+      execution_quality: l1.avg_execution_quality,
+      production_investment: l3.avg_production_investment,
+      distinctiveness: l1.avg_distinctiveness
+    },
+    
+    embedding: profile.embedding,
+    confidence: profile.confidence
   }
 }

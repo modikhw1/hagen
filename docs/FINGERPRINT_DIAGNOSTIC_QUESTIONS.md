@@ -327,12 +327,18 @@ Many TikToks share similar iPhone-shot, natural-light, talking-head formats. Doe
 
 → Your response:
 
+The layer would mainly show how the perception would be for any user. A small brand, going for good production is seen to be striving or putting emphasis on good perception, although that is not a guarantee that better "value" is perceived. A restaurant with a nice backdrop, or a known brand, would do well to have good production in order to not be perceived as lazy. This is why bigger brands, who take external help, will normally have a more cohesive and good looking flow and robust production across the content.
+
+In the context of the service, the production would represent the relative attunement for business purposes. Many brands use iPhone camera, especially for brands that play into the main Tiktok "Sound" trends - simple structures that rely on music clips that are dubbed. L3 should for this reason not be used as a "ranker", saying that good production is always better, or worse production is always worse. But in general, I would say that bad audio, bad (sloppy) editing, non-symmetrical or otherwise unplanned shots, unfocused lighting is generally associated with a "let's just wing it" attitude. The smaller brands that aim for something better, despite not putting too much emphasis on excellent video quality or overall editing, are generally fine on a platform like TikTok.
+
 ---
 
 ### Q3.2: "Effortlessness" is a style choice, not a quality measure.
 High-effort content made to look effortless is different from actually-low-effort content. Can the AI distinguish?
 
 → Your response:
+
+I think the metric for high effort/low effort is very strange and speculative. Low skill/low effort cannot be distinguished unless trained on a lot of data. Some type of combination of business follower size (+ amount of content posted), and maybe some analysis of the business size/revenue based on video information, would give some indication in a company is "dabbling" in content or actually tries to understand and follow TikTok content creation norms/expectations.
 
 ---
 
@@ -341,12 +347,20 @@ Is format consistency a positive signal (brand recognition) or a negative one (b
 
 → Your response:
 
+This metric is also not useful, at least how I understand the phrasing. The replicability I have mentionen earlier has to do with how much setup, or expected skill is needed to pull the concept off.
+
+Repeatable format doesn't mean anything. Any format can be repeated, if it isn't very focused in an inside joke or something that works for the profile. A metric describing "range" isn't bad or good, perhaps it's more of a categorization where the profile 'tends' to lean one way or the other. Especially when more subjective ratings, or an updated /analyze-rate function, have placed one type of content ahead of another, one could say that the profile "tends to go for simple, family friendly concepts", or profile "seems to follow the short form, Gen Z friendly sketch types" or a profile "tends to go for skits with absurdism, that try to be clever with visual humour".
+
+
+
 ---
 
 ### Q3.4: `social_permission` (how shareable is this content).
 What makes content shareable vs. private? Is this about topic or presentation?
 
 → Your response:
+
+This metric could have to do with safeness, or getting a very resonant feeling of "wow, this is so clever/absurd/chocking that I need to share with my friend". I think in general, sharing is usually done when there is a chock factor, or a "red pill" idea or concept shared. Between friends (Girl friends or guy friends), this is what I've noticed garners sharing. When it comes to food or sharing food tips, it will come down to nicely presented visuals, or that the food seems attractive.
 
 ---
 
@@ -355,6 +369,14 @@ TikTok vs Instagram vs YouTube styles differ. Is a "good TikTok" approach applic
 
 → Your response:
 
+You are right that they may not be. TikTok has another audience and overall tone, playing more on entertainment that is accessible for teenagers, rather than Instagram that attracts young adults. Instagram has more to do with overall informative, well produced content, while TikTok does more personalized or playful/entertaining content.
+
+How this is taken into account may be a goal for a later date. The current model is focused on
+
+-Service businesses (may open up for other types of businesses, but not accounted for in any way)
+-TikTok (may open up for Instagram/Youtube, but not accounted for in any way)
+-Humor as the main service provided (vetted viral concepts catered to specific profiles)
+
 ---
 
 ### Q3.6: Audio is minimally captured (music/voice tone).
@@ -362,12 +384,23 @@ For hospitality content, does audio matter? Background music, ASMR food sounds, 
 
 → Your response:
 
+In general, audio can be established to frame the type of content being produced. I have mentioned a few times how content relying on "TikTok sounds" - meaning trending theme sounds that are played in the video, may signal a piece of content that may not be the most useful for the platform.
+
+-Trend sounds are usually matched with a text overlay holding the premise. While not bad, it sometimes is related to short, punchy and high impact concepts rather than a bit more creative, longer, script/editing based concepts.
+-It's more trend reliant, meaning that it loses relevance after a few weeks/months.
+
+The content you mention may not be bad to take into consideration, especially for the profile brand fingerprint. The idea is to get a sense of the profiles overall input, meaning that it would be unwise to use the same models to analyze profiles that we use for the service in question. The models within the service focus on humour, while many target audience profiles may combine humour with other types of videos.
+
+Extending our system to recognize and allow other types of content may be good, but seems like it would extend the logic of our system for something that isn't the most important right now. Later, this would give a more accurate view.
+
 ---
 
 ### Q3.7: We don't capture visual branding (colors, logos, graphics).
 Some brands have strong visual identity. Others are just raw footage. Should we track this?
 
 → Your response:
+
+I think thumbnails and overall production/editing skill/output should be used for this. A strong visual identity, or at least a steadyness, could be used to hold some weight in figuring out a brands effectiveness or ambition. This is good to store somehow in our profile fingerprint.
 
 ---
 
@@ -380,12 +413,20 @@ If brand has 50% "witty" humor and 50% "wholesome"—we report both as dominant.
 
 → Your response:
 
+It's just different expressions of their voice. If I have a brand catering towards teenagers, the content will take different forms but reasonably be what the target appreciated. Witty humour and wholesomeness doesn't work as oppositions, it's possible to be witty and wholesome. Other's are dry and edgy. Ultimately, inconsistency would be to try any type of clip, with any type of voice, without any focus or reason. This would be the same as a person not having defined preferences in their words or actions.
+
+Generally, one would have to assume that a brand has some type of intentionality if they are seeking to improve it using the service, and in the service, the brand profile blueprint system to get a mirror showing themselves.
+
 ---
 
 ### Q4.2: Mode selection for categories can be fragile.
 With 10 videos and 4 "entertain", 3 "inform", 3 "inspire" intents—we pick "entertain." But is 40% really "dominant"?
 
 → Your response:
+
+This type of question is too narrow. The overall input that is provided may contain the assumption that it represents the overall mix. With some smart understanding assumed, where 3 videos cannot reasonably represent everything 100%, but 15 may. If the model automatically takes the 15 most recent videos, this can also be assumed to be representative, but maybe not as representative as if a user actually pasted in 15 clips that they assert represent their brand personality/output.
+
+Within the service, for our current models, we are assuming that the brand have an intention of filling up their content with humour concepts that positively add to their mix, where they decide how often or how much they want to upload. If the brand has four videos for entertainment, and six for other things, this is the users perogative. The brand can be described to have a mix but the discussion is how it related to what we offer. Meaning that the analysis, while good to actually capture neutrally what the profile does, will still make the discussion about their identity relating to humor.
 
 ---
 
@@ -394,12 +435,16 @@ Should exceptional outliers be weighted higher, or does this bias the fingerprin
 
 → Your response:
 
+The overall understanding would be that the lower quality videos would show more clear signals of the baseline, where good production or clever ideas are what happens when the user is focused. The only thing one can do is to track the overall. For the service's purpose, this would just give an idea of how to position recommendations that feels good (either mid-range good or high-range good in relation to their middle) when using the service. In describing the brand to the user, one could lean towards positive descriptions or at least "striving" descriptions, where the good is the baseline and the less good is mentioned less.
+
 ---
 
 ### Q4.4: The embedding centroid is a single 1536-dim vector.
 This compresses all semantic nuance into one point. Two very different videos could average to a centroid that resembles neither. Is this a problem?
 
 → Your response:
+
+I'm open to suggestions.
 
 ---
 
@@ -408,12 +453,20 @@ Having 100% of videos rated doesn't mean ratings are accurate. How should we dif
 
 → Your response:
 
+Some variables in play are subjective. If I view a profile, I would like the model to
+
+-Describe the profile and the business behind it. The business would only show glimpses that can be alluded to, where the content also contains signals that feed into underlying assumptions. Just as a person can have an overall energy, many things are read between the lines. If the model works as wished, the data input will be able to form a cohesive idea of the brand, their ambition, their current working processes, the personality of the content resonsible party, the comedic skill, the social media skill etc. All of this creates a profile.
+
+If the data collection makes this type of declaration inaccurate, I would signal a lack of depth or a perspective that looks unhelpful values.
+
 ---
 
 ### Q4.6: How many videos are actually needed?
 Documentation says 5-10. But some brands are consistent (3 might suffice), others are varied (might need 20). How do we know?
 
 → Your response:
+
+If one finds a way of analyzing the cohesiveness of the content, meaning everything from production, thumbnails, content themes and more, then this may be a good way of discerning 'when' understanding has been established. Three videos may very well be outliers, which would skew the learning. But if those three were analyzed, and also compared to the thumbnail quality or similar views as previous 5, then that could contain meaning.
 
 ---
 
@@ -426,12 +479,24 @@ Do these reflect importance correctly? Why is L3 so low if production style matt
 
 → Your response:
 
+This entire balance would have to be destroyed and reinterpreted to get at the main cluster or heart of the matter. The purpose of this question document is to get an understanding of how the moving parts relate to each others, and which edge-cases make a different structure relevant.
+
+Fingerprints aim to match content and describe profiles. It is meant to create reliability in recommendations to keep refunds down. The balance also takes into account the fact that production quality, in input videos, will not be so important since the videos are meant to be replicated.
+
+One would have to integrate reasonings to why certain aspects of layers matter, but also put it in a context prioritizing usefulness.
+
+L3 production value doesn't strictly matter for video-recommendation analysis, when later presented for a service user. It is somewhat important if a big, social media-investing brand purchases a concept that has low production quality. The example video - "this is the video to replicate", would give a feeling of being beneath them, even if the core concept is strong in itself.
+
+For brand-profile fingerprinting, production value 'is' important in grading the businesses' relative investment into social media production, describing the self perception and their strivingness. High strivingness means that the business aims to be competing - showing strong traits and wanting to impress. This is relevant information for recommendation as well.
+
 ---
 
 ### Q5.2: L1 match penalizes quality differences.
 If a 0.9-quality brand matches against a 0.7-quality candidate, they're penalized. But maybe the style matches perfectly?
 
 → Your response:
+
+This is why my understanding of L1 may be incomplete. I have mentioned previously what differentiates the gradiations. For what it's worth, I have no issue with revamping the grading system for /analyze-rate.
 
 ---
 
@@ -440,12 +505,16 @@ Non-humorous brands get a 0 here, hurting their match scores. Is this fair?
 
 → Your response:
 
+The videos analyzed in order to match with users will have the same assumption as ground. It is meant to be a humorous video that can fit well with the profile type. If a brand does not intend on using humor/entertainment, the service is not for them.
+
 ---
 
 ### Q5.4: Embedding similarity is cosine on the centroid.
 This treats all 1536 dimensions equally. Some might be noise. Should we reduce dimensionality or weight dimensions?
 
 → Your response:
+
+I'm open to suggestions.
 
 ---
 
@@ -454,12 +523,24 @@ Currently 0.85 is "good." But is 0.70 still valuable? At what point is a match m
 
 → Your response:
 
+Some of these values, if reliable, may be used to weight many concepts and rank them on their relative use towards a brand profile. A 0.7 can be purchased, but may not be recommended before a 0.85.
+
 ---
 
 ### Q5.6: Should we match fingerprint-to-fingerprint, or fingerprint-to-video?
 A brand fingerprint compared to a single video is asymmetric. How should we handle this?
 
 → Your response:
+
+It is true. Thinking about it, one could even analyze the entire profile of the video content uploaded, instead of relying only on variables found in the video. This sounds operation-heavy, but could be a way to get even more accuracy.
+
+My understanding is that a video may have a so called fingerprint. Unless I'm mistaken, there is possibility to match
+
+- Video to video
+- Video to profile
+- Profile to profile
+
+But I'm open to suggestions.
 
 ---
 
@@ -472,12 +553,24 @@ How many of your 4 test brands' videos have been manually rated? Is the system f
 
 → Your response:
 
+These videos have been rated with a legacy rating system that takes 5 + 1 subjective rating variables as well as notes that describe how useful they are for the service at hand. Some of these videos are also rated with a system developed later, with four gradations (excellent, good, mediocre, bad), as well as three note fields that focus the usefulness analysis even more. They have been manually rated.
+
+The data-model for each video is still available for modification. It seems to work, but it 'is' blind since it is the first step, and not iterated many times.
+
 ---
 
 ### Q6.2: Schema v1 requires GCS upload for video analysis.
 Is every video being analyzed, or are some missing? How reliable is the AI analysis without corrections?
 
 → Your response:
+
+/analyze-rate and Schema v1 both analyze and use GCS upload. If they are using the same core video upload, I'm not sure. Perhaps one can control this and make efficient.
+
+Saying corrections, I'm assuming that:
+
+-Overall analysis will improve with new schema iterations
+-Overall analysis of separate videos/profiles will be overridden if re-analyzed
+-Overall strength of analysis will improve with amount of datapoints, both profiles and videos.
 
 ---
 
@@ -486,6 +579,8 @@ The system has a `human_patch` mechanism but it seems unused. Is the AI output b
 
 → Your response:
 
+I'm not sure what this mechanism entails. But I have mentioned once or twice that human input, in the form of notes, may be a useful way of shaping the model in this stage.
+
 ---
 
 ### Q6.4: There's no feedback loop on matches.
@@ -493,12 +588,18 @@ We can't currently record "this match was good/bad" to tune the system. How crit
 
 → Your response:
 
+This can be implemented, but the core analysis function needs to be good before a broader data collection or comparison view becomes crucial. Bad/good, or a slider for a spann, with notes possible, would give a lot of information that can be used to tune the algorithm we are attempting to form.
+
 ---
 
 ### Q6.5: Embeddings are generated by OpenAI's model.
 These aren't hospitality-specific. A "cozy café" might be similar to "cozy living room" in embedding space. Is this a problem?
 
 → Your response:
+
+When it comes to OpenAI embeddings, I am completely fine with leaving that structure and revamping  the embedding system in another system. I think anything that aligns with our goals is good. I don't mind OpenAI embeddings.
+
+Focused suggestions here is invited.
 
 ---
 
@@ -509,17 +610,27 @@ For your 4 test brands (Cassa Kitchen, Kiele Kassidy, Steve's Poke, Bram's Burge
 ### Q7.1: What should the ideal fingerprint capture for each?
 In 2-3 sentences, describe what makes each brand distinctive. This is your ground truth.
 
+#Note - "I'll give a different answer, that doesn't answer directly what makes each distinctive"
+
 **Cassa Kitchen**: 
 → Your response:
+
+Cassa's kitchen seems to be a chain-type establishment, that utilize teenager staff to play out friendly and generally amusing themes. The target audience seems to be somewhat broad, and the themes play on somewhat loaded emotional themes relating to work-place environments. The concepts are short and simple, following trends but not relying to much on meme-formats. Not very "edgy".
 
 **Kiele Kassidy**: 
 → Your response:
 
+This looks like a personal brand set in a restaurant. The main character is a server in a restaurant, that uses simple trend-relying themes/sounds to play out a scenario, often presented in text on the screen. The humor feels effortless, as if the character finds inspiration on the app and records her favorites. Overall a bit edgier, which is on brand for a young creator that plays on social dynamics/workplace dynamics to engage a target audience that is assumed to be young women. Many inside jokes or assumptions that the audience gets, or finds interest in, scenarios in the workplace.
+
 **Steve's Poke**: 
 → Your response:
 
+A sketch heavy profile that seems to package the restaurant as a friendly and family-oriented poké shop. The content relies on fun sketches, featuring kids, teenagers and the main characters. Steve, the owner, plays a loving but simple man (like Homer Simpson), and the sketches seem to just make light jokes about how humans relate to food, life, friends etc. Some pun-based sketches, some wholesome and family-friendly sketches etc. Overall unfocused production. It seems to be produced by the team itself.
+
 **Bram's Burgers**: 
 → Your response:
+
+Seems like a young team running a newly started burger franschise. The tone is professional but inviting, with darker color schemes and focus on rapid and flashy editing. The sketches are not absurdist exactly, which works in relation to the theme it conveys - coolness, youth, attitude but inviting at the same time. 
 
 ---
 
@@ -535,12 +646,24 @@ Draw the expected similarity matrix:
 
 → Your response:
 
+All are distinctive. Most like would be Cassa and Steves, who have a family oriented profile that relies on humorous/entertaining/absurdist themes. They both have similar production value.
+
+Kiele's humor is more Gen Z focused, aiming to relate and resonate with youth that generally like impactful and dramatic themes, but presented in a nonchalant way. It isn't exactly family-oriented, more the dynamics of a young adult in a worldly setting, expecting a lot from the character. The content doesn't either build relation to the brand, rather its a personal brand set in a restaurant setting.
+
+Bram's creates a tone where the restaurant is treated like a friendly local burger spot with a cool packaging. The humour is about friendly confrontation, having people respect each other while showing their attitude and willingness to signal groundedness and ability.
+
 ---
 
 ### Q7.3: What would a "false positive" look like for each brand?
 What kind of content would the system incorrectly flag as a match?
 
 → Your response:
+
+Types of humor. In general, the humor that have simple conversational disagreements or expected twists and turns are generally less advanced in their setup. This would be humor that could be more broadly accessible, but not assume too much from the viewer (like a blockbuster movie - available to many but not saying anything). Another step would be humor with absurdist or "unreal" feelings, that expects more from the viewer but may also have a satisfying payoff. Another step would be creative, clever scripts, with an implied punchline or otherwise satisfying twists.
+
+Just as a person can be "simple", not wanting too much flavor or spice in their every day life, the same can be said about humor. It's useful to assume here that TikTok invites all kinds of people, but that the culture is centered around 15-25 year old having a want for dumb, creative or unexpected content.
+
+This answer may not be clear for the question posed.
 
 ---
 
@@ -549,12 +672,16 @@ What content fits the brand perfectly but the system might miss?
 
 → Your response:
 
+I can't find a helpful response.
+
 ---
 
 ### Q7.5: If you had to pick ONE signal that best differentiates these 4 brands, what would it be?
 (This helps prioritize what the system must get right)
 
 → Your response:
+
+The target audience/overall directedness of themes/voice. They differ in who they are targeting, and form their message to be relatable. Steve's - families and people who want simple enjoyment, Cassa's - adults and likely families, Kiele - Likely young people who seek entertainment and emotional stimulation, Brams - People who enjoy social environents that combine food and friend group hangouts.
 
 ---
 
