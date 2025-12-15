@@ -46,9 +46,18 @@ interface BrandRatingRecord {
     model_analysis?: {
       signals?: Record<string, unknown>
       scores?: Record<string, unknown>
+      raw_output?: {
+        signals?: Record<string, unknown>
+        scores?: Record<string, unknown>
+      }
     }
   } | null
   extracted_signals: Record<string, unknown> | null
+  // NEW v1.1: Direct JSONB columns from analyze-rate-v1
+  replicability_signals: Record<string, unknown> | null
+  risk_level_signals: Record<string, unknown> | null
+  environment_signals: Record<string, unknown> | null
+  audience_signals: Record<string, unknown> | null
 }
 
 /**
@@ -101,17 +110,22 @@ async function fetchRatings(videoIds: string[]): Promise<Map<string, RatingRecor
 
 /**
  * Fetch brand ratings (Schema v1) for a set of video IDs.
+ * Fetches from BOTH rater_id='schema_v1' (old flow) and rater_id='primary' (new analyze-rate-v1 flow)
  */
 async function fetchBrandRatings(videoIds: string[]): Promise<Map<string, BrandRatingRecord>> {
   const { data, error } = await supabase
     .from('video_brand_ratings')
-    .select('video_id, ai_analysis, extracted_signals')
+    .select('video_id, ai_analysis, extracted_signals, replicability_signals, risk_level_signals, environment_signals, audience_signals, rater_id')
     .in('video_id', videoIds)
 
   if (error) throw error
 
+  // Prefer 'primary' (analyze-rate-v1) over 'schema_v1' (old flow) if both exist
   const map = new Map<string, BrandRatingRecord>()
   for (const r of data || []) {
+    const existing = map.get(r.video_id)
+    // If we already have a 'primary' record, skip 'schema_v1'
+    if (existing && r.rater_id === 'schema_v1') continue
     map.set(r.video_id, r as BrandRatingRecord)
   }
   return map
@@ -445,6 +459,68 @@ function extractSignals(
     }
   }
 
+  // -------------------------------------------------------------------------
+  // NEW: Also extract from direct JSONB columns (from analyze-rate-v1 flow)
+  // These take precedence if they exist (more recent data)
+  // -------------------------------------------------------------------------
+  
+  // Replicability signals from JSONB column
+  if (brandRating?.replicability_signals) {
+    const rep = brandRating.replicability_signals as Record<string, unknown>
+    signals.actor_count = (rep.actor_count as string) ?? signals.actor_count
+    signals.setup_complexity = (rep.setup_complexity as string) ?? signals.setup_complexity
+    signals.skill_required = (rep.skill_required as string) ?? signals.skill_required
+    signals.environment_dependency = (rep.environment_dependency as string) ?? signals.environment_dependency
+    signals.equipment_needed = (rep.equipment_needed as string[]) ?? signals.equipment_needed
+    signals.estimated_time = (rep.estimated_time as string) ?? signals.estimated_time
+  }
+
+  // Risk level signals from JSONB column
+  if (brandRating?.risk_level_signals) {
+    const risk = brandRating.risk_level_signals as Record<string, unknown>
+    signals.content_edge = (risk.content_edge as string) ?? signals.content_edge
+    signals.humor_risk = (risk.humor_risk as string) ?? signals.humor_risk
+    signals.trend_reliance = (risk.trend_reliance as string) ?? signals.trend_reliance
+    signals.controversy_potential = (risk.controversy_potential as string) ?? signals.controversy_potential
+  }
+
+  // Environment signals from JSONB column
+  if (brandRating?.environment_signals) {
+    const env = brandRating.environment_signals as Record<string, unknown>
+    signals.setting_type = (env.setting_type as string) ?? signals.setting_type
+    signals.space_requirements = (env.space_requirements as string) ?? signals.space_requirements
+    signals.lighting_conditions = (env.lighting_conditions as string) ?? signals.lighting_conditions
+    signals.noise_tolerance = (env.noise_tolerance as string) ?? signals.noise_tolerance
+    signals.customer_visibility = (env.customer_visibility as string) ?? signals.customer_visibility
+  }
+
+  // Audience signals from JSONB column
+  if (brandRating?.audience_signals) {
+    const aud = brandRating.audience_signals as Record<string, unknown>
+    const ageRange = aud.age_range as Record<string, unknown> | string[] | undefined
+    
+    // Handle both object format {primary, secondary} and array format ['gen_z', 'millennial']
+    if (Array.isArray(ageRange) && ageRange.length > 0) {
+      signals.audience_age_primary = ageRange[0] ?? signals.audience_age_primary
+      signals.audience_age_secondary = ageRange[1] ?? signals.audience_age_secondary
+    } else if (ageRange && typeof ageRange === 'object') {
+      signals.audience_age_primary = ((ageRange as Record<string, unknown>).primary as string) ?? signals.audience_age_primary
+      signals.audience_age_secondary = ((ageRange as Record<string, unknown>).secondary as string) ?? signals.audience_age_secondary
+    }
+    
+    signals.audience_income_level = (aud.income_level as string) ?? signals.audience_income_level
+    signals.audience_lifestyle_tags = (aud.lifestyle_tags as string[]) ?? signals.audience_lifestyle_tags
+    signals.audience_primary_occasion = (aud.primary_occasion as string) ?? signals.audience_primary_occasion
+    
+    // Handle both single value and array for vibe_alignment
+    const vibeAlign = aud.vibe_alignment
+    if (Array.isArray(vibeAlign) && vibeAlign.length > 0) {
+      signals.audience_vibe_alignment = vibeAlign[0] ?? signals.audience_vibe_alignment
+    } else if (typeof vibeAlign === 'string') {
+      signals.audience_vibe_alignment = vibeAlign ?? signals.audience_vibe_alignment
+    }
+  }
+
   return signals
 }
 
@@ -675,16 +751,29 @@ export async function computeFingerprint(input: FingerprintInput): Promise<Profi
   const hasEmbedding = videosWithEmbeddings.length / videos.length
   const hasQuality =
     allSignals.filter((s) => s.quality_score != null).length / allSignals.length
+  // Consider having brand signals if EITHER execution_coherence (from ai_analysis) OR v1.1 signals exist
   const hasBrandSignals =
-    allSignals.filter((s) => s.execution_coherence != null).length / allSignals.length
+    allSignals.filter((s) => 
+      s.execution_coherence != null || 
+      s.actor_count != null || 
+      s.content_edge != null ||
+      s.audience_age_primary != null
+    ).length / allSignals.length
   const confidence = (hasEmbedding + hasQuality + hasBrandSignals) / 3
 
   const missingDataNotes: string[] = []
   if (urlsNotFound.length > 0) missingDataNotes.push(`${urlsNotFound.length} URLs not found in database`)
   if (hasEmbedding < 1) missingDataNotes.push(`${videos.length - videosWithEmbeddings.length} videos missing embeddings`)
   if (hasQuality < 1) missingDataNotes.push(`${allSignals.filter((s) => s.quality_score == null).length} videos missing quality scores`)
-  if (hasBrandSignals < 1)
-    missingDataNotes.push(`${allSignals.filter((s) => s.execution_coherence == null).length} videos missing Schema v1 analysis`)
+  // Updated: Check for ANY v1.1 signals, not just execution_coherence
+  const videosWithoutSignals = allSignals.filter((s) => 
+    s.execution_coherence == null && 
+    s.actor_count == null && 
+    s.content_edge == null &&
+    s.audience_age_primary == null
+  )
+  if (videosWithoutSignals.length > 0)
+    missingDataNotes.push(`${videosWithoutSignals.length} videos missing brand signals (rate via /analyze-rate-v1)`)
 
   const profileId = input.profile_id ?? `profile_${Date.now()}`
 

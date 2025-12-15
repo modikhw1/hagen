@@ -15,6 +15,7 @@
  * 4. Integration with existing humor analysis for cross-reference
  */
 
+import { GoogleGenerativeAI } from '@google/generative-ai'
 import type { VideoBrandAnalysis, VideoBrandSignals } from './brand-analysis.types'
 import { createVertexTuningService } from '../vertex'
 import { parseVideoBrandObservationV1, type VideoBrandObservationV1 } from './schema-v1'
@@ -40,18 +41,16 @@ export class BrandAnalyzer {
    * Check if analyzer is configured
    */
   isConfigured(): boolean {
-    // Brand analysis prefers Vertex for GCS URI support.
-    // We consider it configured if we can call Vertex.
-    return !!this.vertexProjectId
+    // Brand analysis can use either Vertex (GCS URI) or Gemini API (File API URI)
+    return !!this.vertexProjectId || !!this.apiKey
   }
   
   /**
    * Analyze a video for brand signals
    * 
-   * Currently returns placeholder - will be implemented when:
-   * 1. We have enough training data from human ratings
-   * 2. We've identified the key signals to extract
-   * 3. We've developed the prompt through iteration
+   * Supports two modes:
+   * 1. Vertex AI with GCS URI (gs://...) - preferred for training
+   * 2. Gemini API with File API URI (https://...) - fallback for analysis
    */
   async analyze(input: {
     videoUrl?: string
@@ -61,9 +60,24 @@ export class BrandAnalyzer {
   }): Promise<VideoBrandAnalysis> {
     const analyzedAt = new Date().toISOString()
 
-    // If we can't run Vertex (or we don't have a GCS URI), return a strict placeholder
-    // that already matches the Schema v1 shape.
-    if (!this.isConfigured() || !input.gcsUri) {
+    // Determine which API to use based on available URIs
+    const hasGcsUri = !!input.gcsUri
+    const hasGeminiFileUri = !!input.geminiFileUri
+    const canUseVertex = !!this.vertexProjectId && hasGcsUri
+    const canUseGeminiApi = !!this.apiKey && hasGeminiFileUri
+
+    console.log('🔍 BrandAnalyzer.analyze() called:', {
+      hasGcsUri,
+      hasGeminiFileUri,
+      canUseVertex,
+      canUseGeminiApi,
+      hasApiKey: !!this.apiKey,
+      hasVertexProjectId: !!this.vertexProjectId
+    })
+
+    // If we can't run any API, return a strict placeholder
+    if (!canUseVertex && !canUseGeminiApi) {
+      console.log('⚠️ BrandAnalyzer: No valid URI available, returning placeholder')
       const placeholderObservation = this.createPlaceholderObservation(input)
       return {
         model: this.model,
@@ -80,15 +94,38 @@ export class BrandAnalyzer {
     }
 
     const prompt = this.buildPrompt()
-    const vertex = createVertexTuningService()
+    let raw: any
 
-    // Vertex helper currently returns a generic JSON-ish object; we validate strictly.
-    const raw = await vertex.analyzeVideoWithGemini(input.gcsUri, prompt)
+    if (canUseVertex) {
+      // Prefer Vertex AI with GCS URI
+      console.log('🔷 BrandAnalyzer: Using Vertex AI with GCS URI')
+      const vertex = createVertexTuningService()
+      raw = await vertex.analyzeVideoWithGemini(input.gcsUri!, prompt)
+    } else {
+      // Fall back to Gemini API with File API URI
+      console.log('🔶 BrandAnalyzer: Using Gemini API with File API URI')
+      raw = await this.analyzeWithGeminiApi(input.geminiFileUri!, prompt)
+    }
 
     // The helper returns {overall, dimensions, reasoning} when it can't parse JSON.
     // Prefer its JSON parse when available; otherwise attempt to parse reasoning.
     const candidate = this.coerceVertexOutput(raw)
+    console.log('🔍 BrandAnalyzer raw output coerced:', {
+      rawType: typeof raw,
+      candidateType: typeof candidate,
+      hasSchemaVersion: !!(candidate as any)?.schema_version,
+      hasSignals: !!(candidate as any)?.signals,
+      signalKeys: (candidate as any)?.signals ? Object.keys((candidate as any).signals) : []
+    })
+    
     const observation = parseVideoBrandObservationV1(candidate)
+    console.log('🔍 BrandAnalyzer parsed observation:', {
+      hasSignals: !!observation.signals,
+      replicability: observation.signals?.replicability,
+      environment: observation.signals?.environment_requirements,
+      risk: observation.signals?.risk_level,
+      audience: observation.signals?.target_audience
+    })
 
     return {
       model: this.model,
@@ -101,6 +138,53 @@ export class BrandAnalyzer {
         personality: observation.confidence?.overall_0_1 ?? 0.6,
         statement: observation.confidence?.overall_0_1 ?? 0.6
       }
+    }
+  }
+
+  /**
+   * Analyze video using Gemini API (for Gemini File API URIs)
+   */
+  private async analyzeWithGeminiApi(fileUri: string, prompt: string): Promise<any> {
+    if (!this.apiKey) {
+      throw new Error('GEMINI_API_KEY not configured')
+    }
+
+    console.log('🔶 BrandAnalyzer calling Gemini API with fileUri:', fileUri.substring(0, 80))
+    
+    const genAI = new GoogleGenerativeAI(this.apiKey)
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' })
+
+    try {
+      const result = await model.generateContent([
+        {
+          fileData: {
+            mimeType: 'video/mp4',
+            fileUri: fileUri
+          }
+        },
+        { text: prompt }
+      ])
+
+      const response = result.response
+      const text = response.text()
+      console.log('🔶 Gemini API response length:', text.length, 'chars')
+      console.log('🔶 Response preview:', text.substring(0, 500))
+
+      // Try to parse as JSON
+      try {
+        // Remove markdown code fences if present
+        const cleaned = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim()
+        const parsed = JSON.parse(cleaned)
+        console.log('✅ Successfully parsed Gemini response as JSON')
+        return parsed
+      } catch (parseError) {
+        console.warn('⚠️ Could not parse as JSON, returning as reasoning:', parseError)
+        // Return as reasoning for coerceVertexOutput to handle
+        return { reasoning: text }
+      }
+    } catch (error) {
+      console.error('❌ Gemini API analysis failed:', error)
+      throw error
     }
   }
   

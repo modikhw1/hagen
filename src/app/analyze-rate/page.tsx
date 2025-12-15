@@ -302,10 +302,26 @@ export default function AnalyzeRatePage() {
       {/* Header */}
       <div className="border-b border-gray-800">
         <div className="max-w-4xl mx-auto px-6 py-4">
-          <h1 className="text-2xl font-bold">Analyze + Rate</h1>
-          <p className="text-gray-400 text-sm mt-1">
-            Analyze video, then rate with your interpretation
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold flex items-center gap-2">
+                Analyze + Rate
+                <span className="text-xs font-normal px-2 py-0.5 bg-gray-600 rounded-full">Legacy</span>
+              </h1>
+              <p className="text-gray-400 text-sm mt-1">
+                Analyze video, then rate with your interpretation
+              </p>
+            </div>
+            <a 
+              href="/analyze-rate-v1" 
+              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2"
+            >
+              <span>Use Enhanced v1.1</span>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </a>
+          </div>
         </div>
       </div>
 

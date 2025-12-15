@@ -126,14 +126,21 @@ export async function POST(request: NextRequest) {
 
     const ratingsMap = new Map(ratings?.map((r) => [r.video_id, r]) || [])
 
-    // Fetch existing Schema v1 ratings
+    // Fetch existing Schema v1 ratings (old flow: rater_id='schema_v1')
     const { data: brandRatings } = await supabase
       .from('video_brand_ratings')
-      .select('video_id')
+      .select('video_id, rater_id, replicability_signals, audience_signals')
       .in('video_id', dbVideoIds)
-      .eq('rater_id', 'schema_v1')
 
-    const hasSchemaV1 = new Set(brandRatings?.map((r) => r.video_id) || [])
+    // A video has brand signals if it has EITHER:
+    // 1. rater_id='schema_v1' entry (old flow)
+    // 2. rater_id='primary' entry WITH v1.1 JSONB columns filled (new analyze-rate-v1 flow)
+    const hasSchemaV1 = new Set(
+      brandRatings?.filter((r) => 
+        r.rater_id === 'schema_v1' || 
+        (r.rater_id === 'primary' && (r.replicability_signals || r.audience_signals))
+      ).map((r) => r.video_id) || []
+    )
 
     // ---------------------------------------------------------------------
     // Step 1: Backfill embeddings for videos missing them

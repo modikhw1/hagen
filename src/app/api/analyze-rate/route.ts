@@ -20,9 +20,14 @@ export async function POST(request: NextRequest) {
       notes,
       replicability_notes,
       brand_tone_notes,
-      analysis_notes,  // User's corrections/notes on the Gemini analysis
+      analysis_notes,
       gemini_analysis,
-      similar_videos
+      similar_videos,
+      // v1.1: Complete structured signals
+      structured_replicability,
+      risk_level_signals,
+      environment_signals,
+      target_audience_signals
     } = body;
 
     if (!video_url || !quality_tier) {
@@ -151,7 +156,54 @@ export async function POST(request: NextRequest) {
       analysis_notes ? `Analysis Notes: ${analysis_notes}` : null
     ].filter(Boolean).join('\n\n');
 
-    // Step 6: Upsert into video_ratings (update if already rated, insert if new)
+    // Step 6: Upsert into video_brand_ratings (the main table for v1.1 signals)
+    // This table has the JSONB columns for fingerprint signals
+    const brandRatingData = {
+      video_id: videoId,
+      rater_id: 'primary', // Default rater for general video ratings
+      personality_notes: combinedNotes, // Store combined notes in personality_notes field
+      // v1.1 JSONB signal columns
+      replicability_signals: structured_replicability ? {
+        actor_count: structured_replicability.actor_count,
+        setup_complexity: structured_replicability.setup_complexity,
+        skill_required: structured_replicability.skill_required,
+        environment_dependency: structured_replicability.environment_dependency || null,
+        equipment_needed: structured_replicability.equipment_needed || [],
+        estimated_time: structured_replicability.estimated_time
+      } : null,
+      risk_level_signals: risk_level_signals ? {
+        content_edge: risk_level_signals.content_edge,
+        humor_risk: risk_level_signals.humor_risk,
+        trend_reliance: risk_level_signals.trend_reliance,
+        controversy_potential: risk_level_signals.controversy_potential
+      } : null,
+      environment_signals: environment_signals ? {
+        setting_type: environment_signals.setting_type,
+        space_requirements: environment_signals.space_requirements,
+        lighting_conditions: environment_signals.lighting_conditions,
+        noise_tolerance: environment_signals.noise_tolerance,
+        customer_visibility: environment_signals.customer_visibility
+      } : null,
+      audience_signals: target_audience_signals ? {
+        age_range: target_audience_signals.age_range,
+        income_level: target_audience_signals.income_level,
+        lifestyle_tags: target_audience_signals.lifestyle_tags || [],
+        primary_occasion: target_audience_signals.primary_occasion,
+        vibe_alignment: target_audience_signals.vibe_alignment
+      } : null
+    };
+
+    // Upsert into video_brand_ratings
+    const { error: brandRatingError } = await supabase
+      .from('video_brand_ratings')
+      .upsert(brandRatingData, { onConflict: 'video_id,rater_id' });
+
+    if (brandRatingError) {
+      console.error('Error saving to video_brand_ratings:', brandRatingError);
+      // Continue - don't fail the whole request
+    }
+
+    // Step 7: Also upsert into video_ratings (legacy table for compatibility)
     const ratingData = {
       video_id: videoId,
       overall_score: overallScore,

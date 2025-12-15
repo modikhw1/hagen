@@ -727,13 +727,18 @@ Errors:
 | Task | Status | File | Notes |
 |------|--------|------|-------|
 | 4.1 Analyze-rate replicability | ✅ | app/analyze-rate/page.tsx | Added structured inputs for actor_count, setup_complexity, skill_required, setting_type |
-| 4.2 Brand profile environment | ⬜ | app/brand-profile/page.tsx | |
-| 4.3 Operational constraints UI | ⬜ | app/brand-profile/page.tsx | |
-| 4.4 Target audience builder | ⬜ | components/features/AudienceBuilder.tsx | |
-| 4.5 Match explanations | ⬜ | components/features/MatchResults.tsx | |
-| 4.6 Filter failure display | ⬜ | components/features/MatchResults.tsx | |
-| 4.7 Aspiration level selector | ⬜ | app/brand-profile/page.tsx | |
+| 4.2 Brand profile environment | ✅ | app/brand-profile/page.tsx | Environment availability section with settings, customer visibility, space |
+| 4.3 Operational constraints UI | ✅ | app/brand-profile/page.tsx | Team size, time per video, equipment selectors implemented |
+| 4.4 Target audience builder | ✅ | app/brand-profile/page.tsx | Primary age, income level, lifestyle tags, vibe selectors |
+| 4.5 Match explanations | ✅ | app/brand-profile/page.tsx | Score breakdown bars + explanation text displayed per match |
+| 4.6 Filter failure display | ⬜ | app/brand-profile/page.tsx | Filtered videos not shown, no "why excluded" UI yet |
+| 4.7 Aspiration level selector | ✅ | app/brand-profile/page.tsx | match_current/level_up/aspirational selector with descriptions |
 | 4.8 Brand analysis dashboard | ⬜ | app/brand-analysis/page.tsx | |
+| 4.9 Risk level signals (video) | ✅ | app/analyze-rate-v1/page.tsx | content_edge, humor_risk, trend_reliance in enhanced v1.1 page |
+| 4.10 Environment signals (video) | ✅ | app/analyze-rate-v1/page.tsx | setting_type, space_requirements, lighting, customer visibility |
+| 4.11 Audience signals (video) | ✅ | app/analyze-rate-v1/page.tsx | age_range, income_level, lifestyle_tags, vibe_alignment |
+| 4.12 Risk tolerance (brand) | ✅ | app/brand-profile/page.tsx | content_edge and humor_risk tolerance selectors |
+| 4.13 Legacy page flagging | ✅ | app/analyze-rate/page.tsx | Marked as legacy with link to v1.1 enhanced version |
 
 ### Phase 5: Validation
 
@@ -792,5 +797,36 @@ Before modifying any code, read these files to understand current structure:
 
 ---
 
-*Last Updated: December 15, 2025*
-*Document Version: 1.1 - Phase 1 & 3 Complete, Phase 4.1 Complete*
+## Recent Updates (December 2025)
+
+### Integration Improvements Completed
+
+The following integration improvements were made to connect the brand-profile chat, video analysis, and fingerprint matching systems:
+
+1. **video-context.ts → Schema v1.1** ✅
+   - Now uses `BrandAnalyzer` instead of `GeminiVideoAnalyzer`
+   - Captures full v1.1 signals: replicability, risk_level, environment_requirements, target_audience
+   - `formatVideoContextForPrompt()` includes operational signals for Claude context
+   - Defensible per Q0.1/Q3.5 diagnostics, impl plan Section 3.2
+
+2. **INSIGHT_EXTRACTION_INSTRUCTIONS extended** ✅
+   - Added `operational_signals`: team_available, equipment, time, filming_comfort, editing_skills
+   - Added `environment_signals`: available_locations, space_quality, lighting, noise, customer_visibility
+   - Defensible per Q0.4: "profile/videos/written intention should be combined"
+
+3. **SYNTHESIS_PROMPT extended** ✅
+   - Added `operational_constraints`: team_available, equipment_available, time_budget, skill_level, max_complexity
+   - Added `environment_availability`: available_locations, space_quality, lighting_conditions, customer_filming_ok
+   - Added `risk_tolerance`: content_edge, humor_style, trend_willingness, controversy_comfort
+   - Added enhanced `target_audience`: primary_generation, income_level, lifestyle_tags, primary_occasion
+   - Defensible per impl plan Section 4.1 brand fingerprint architecture
+
+4. **brand-profile UI pre-population** ✅
+   - `handleSynthesize()` now populates UI constraints from synthesis data
+   - Operational constraints, environment availability, target audience, and risk tolerance auto-fill
+   - Reduces manual user input by leveraging conversation insights
+
+---
+
+*Last Updated: December 2025*
+*Document Version: 1.4 - Phase 1-3 Complete, Phase 4 ~95% Complete, System Integration Improved*

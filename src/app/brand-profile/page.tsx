@@ -120,6 +120,28 @@ export default function BrandProfilePage() {
   
   const [ambitionLevel, setAmbitionLevel] = useState<string>('level_up')
   
+  // NEW v1.1: Target audience preferences (from brand perspective)
+  const [targetAudiencePrefs, setTargetAudiencePrefs] = useState<{
+    primary_age: string | null
+    income_level: string | null
+    lifestyle_tags: string[]
+    vibe: string | null
+  }>({
+    primary_age: null,
+    income_level: null,
+    lifestyle_tags: [],
+    vibe: null
+  })
+  
+  // NEW v1.1: Risk tolerance
+  const [riskTolerance, setRiskTolerance] = useState<{
+    content_edge: string
+    humor_risk: string
+  }>({
+    content_edge: 'brand_safe',
+    humor_risk: 'playful'
+  })
+  
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -321,6 +343,51 @@ export default function BrandProfilePage() {
 
       const data = await response.json()
       setSynthesis(data.synthesis)
+      
+      // Pre-populate UI constraints from synthesis data (Schema v1.1 integration)
+      const synth = data.synthesis
+      
+      // Operational constraints from synthesis
+      if (synth.operational_constraints || synth.characteristics) {
+        const ops = synth.operational_constraints || {}
+        const chars = synth.characteristics || {}
+        
+        setOperationalConstraints(prev => ({
+          team_size: ops.team_available || (chars.team_size === 'small' ? 'solo' : chars.team_size === 'medium' ? 'small_team' : prev.team_size),
+          time_per_video: ops.time_budget || prev.time_per_video,
+          equipment: ops.equipment_available?.length ? ops.equipment_available : prev.equipment
+        }))
+      }
+      
+      // Environment availability from synthesis
+      if (synth.environment_availability) {
+        const env = synth.environment_availability
+        setEnvironmentAvailability(prev => ({
+          settings: env.available_locations?.length ? env.available_locations : prev.settings,
+          can_feature_customers: env.customer_filming_ok ?? prev.can_feature_customers,
+          space: env.space_quality || prev.space
+        }))
+      }
+      
+      // Target audience from synthesis
+      if (synth.target_audience) {
+        const audience = synth.target_audience
+        setTargetAudiencePrefs(prev => ({
+          primary_age: audience.primary_generation || prev.primary_age,
+          income_level: audience.income_level || prev.income_level,
+          lifestyle_tags: audience.lifestyle_tags?.length ? audience.lifestyle_tags : prev.lifestyle_tags,
+          vibe: audience.vibe_alignment || prev.vibe
+        }))
+      }
+      
+      // Risk tolerance from synthesis
+      if (synth.risk_tolerance) {
+        const risk = synth.risk_tolerance
+        setRiskTolerance(prev => ({
+          content_edge: risk.content_edge || prev.content_edge,
+          humor_risk: risk.humor_style || prev.humor_risk
+        }))
+      }
 
       setMessages(prev => [...prev, {
         id: generateMessageId(),
@@ -362,7 +429,9 @@ export default function BrandProfilePage() {
           fingerprint: {
             operational_constraints: operationalConstraints,
             environment_availability: environmentAvailability,
-            ambition_level: ambitionLevel
+            ambition_level: ambitionLevel,
+            target_audience: targetAudiencePrefs,
+            risk_tolerance: riskTolerance
           }
         })
       })
@@ -1136,6 +1205,189 @@ export default function BrandProfilePage() {
                     <div className="text-sm text-gray-400">{opt.description}</div>
                   </button>
                 ))}
+              </div>
+            </Card>
+
+            {/* NEW v1.1: Target Audience Builder */}
+            <Card>
+              <h3 className="text-lg font-semibold text-white mb-4">Who Is Your Customer?</h3>
+              <p className="text-sm text-gray-400 mb-4">Help us find content that resonates with your target audience.</p>
+              
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Primary Age */}
+                <div>
+                  <label className="text-sm font-medium text-gray-300 block mb-2">Primary Age Group</label>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { value: 'gen_z', label: 'Gen Z (18-25)' },
+                      { value: 'millennial', label: 'Millennial' },
+                      { value: 'gen_x', label: 'Gen X' },
+                      { value: 'boomer', label: 'Boomer' },
+                      { value: 'broad', label: 'Broad Appeal' }
+                    ].map(opt => (
+                      <button
+                        key={opt.value}
+                        onClick={() => setTargetAudiencePrefs(prev => ({ ...prev, primary_age: opt.value }))}
+                        className={`px-3 py-1.5 text-sm rounded-lg transition-all ${
+                          targetAudiencePrefs.primary_age === opt.value
+                            ? 'bg-pink-600 text-white'
+                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Income Level */}
+                <div>
+                  <label className="text-sm font-medium text-gray-300 block mb-2">Income Level</label>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { value: 'budget', label: 'Budget' },
+                      { value: 'mid_range', label: 'Mid-Range' },
+                      { value: 'upscale', label: 'Upscale' },
+                      { value: 'luxury', label: 'Luxury' },
+                      { value: 'broad', label: 'Broad' }
+                    ].map(opt => (
+                      <button
+                        key={opt.value}
+                        onClick={() => setTargetAudiencePrefs(prev => ({ ...prev, income_level: opt.value }))}
+                        className={`px-3 py-1.5 text-sm rounded-lg transition-all ${
+                          targetAudiencePrefs.income_level === opt.value
+                            ? 'bg-pink-600 text-white'
+                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Lifestyle Tags */}
+                <div className="md:col-span-2">
+                  <label className="text-sm font-medium text-gray-300 block mb-2">Lifestyle Tags (select all that apply)</label>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { value: 'foodies', label: 'Foodies' },
+                      { value: 'families', label: 'Families' },
+                      { value: 'date_night', label: 'Date Night' },
+                      { value: 'business', label: 'Business' },
+                      { value: 'tourists', label: 'Tourists' },
+                      { value: 'locals', label: 'Locals' },
+                      { value: 'health_conscious', label: 'Health Conscious' },
+                      { value: 'indulgent', label: 'Indulgent' },
+                      { value: 'social_media_active', label: 'Social Media' }
+                    ].map(opt => (
+                      <button
+                        key={opt.value}
+                        onClick={() => {
+                          setTargetAudiencePrefs(prev => ({
+                            ...prev,
+                            lifestyle_tags: prev.lifestyle_tags.includes(opt.value)
+                              ? prev.lifestyle_tags.filter(t => t !== opt.value)
+                              : [...prev.lifestyle_tags, opt.value]
+                          }))
+                        }}
+                        className={`px-3 py-1.5 text-sm rounded-lg transition-all ${
+                          targetAudiencePrefs.lifestyle_tags.includes(opt.value)
+                            ? 'bg-pink-600 text-white'
+                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Vibe */}
+                <div className="md:col-span-2">
+                  <label className="text-sm font-medium text-gray-300 block mb-2">Brand Vibe</label>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { value: 'trendy', label: 'Trendy' },
+                      { value: 'classic', label: 'Classic' },
+                      { value: 'family_friendly', label: 'Family Friendly' },
+                      { value: 'upscale_casual', label: 'Upscale Casual' },
+                      { value: 'dive_authentic', label: 'Dive/Authentic' },
+                      { value: 'instagram_worthy', label: 'Instagram Worthy' },
+                      { value: 'neighborhood_gem', label: 'Neighborhood Gem' }
+                    ].map(opt => (
+                      <button
+                        key={opt.value}
+                        onClick={() => setTargetAudiencePrefs(prev => ({ ...prev, vibe: opt.value }))}
+                        className={`px-3 py-1.5 text-sm rounded-lg transition-all ${
+                          targetAudiencePrefs.vibe === opt.value
+                            ? 'bg-pink-600 text-white'
+                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            {/* NEW v1.1: Risk Tolerance */}
+            <Card>
+              <h3 className="text-lg font-semibold text-white mb-4">Content Risk Tolerance</h3>
+              <p className="text-sm text-gray-400 mb-4">How edgy can your content be?</p>
+              
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Content Edge */}
+                <div>
+                  <label className="text-sm font-medium text-gray-300 block mb-2">Content Edge</label>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { value: 'brand_safe', label: 'Brand Safe Only' },
+                      { value: 'mildly_edgy', label: 'Mildly Edgy OK' },
+                      { value: 'edgy', label: 'Edgy OK' },
+                      { value: 'provocative', label: 'Provocative OK' }
+                    ].map(opt => (
+                      <button
+                        key={opt.value}
+                        onClick={() => setRiskTolerance(prev => ({ ...prev, content_edge: opt.value }))}
+                        className={`px-3 py-1.5 text-sm rounded-lg transition-all ${
+                          riskTolerance.content_edge === opt.value
+                            ? 'bg-orange-600 text-white'
+                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Humor Risk */}
+                <div>
+                  <label className="text-sm font-medium text-gray-300 block mb-2">Humor Style</label>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { value: 'safe_humor', label: 'Safe/Clean' },
+                      { value: 'playful', label: 'Playful' },
+                      { value: 'sarcastic', label: 'Sarcastic' },
+                      { value: 'dark_humor', label: 'Dark Humor' }
+                    ].map(opt => (
+                      <button
+                        key={opt.value}
+                        onClick={() => setRiskTolerance(prev => ({ ...prev, humor_risk: opt.value }))}
+                        className={`px-3 py-1.5 text-sm rounded-lg transition-all ${
+                          riskTolerance.humor_risk === opt.value
+                            ? 'bg-orange-600 text-white'
+                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             </Card>
 

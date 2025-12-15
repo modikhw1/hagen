@@ -208,6 +208,21 @@ export const INSIGHT_EXTRACTION_INSTRUCTIONS = `After each response, extract the
     "risk_tolerance": "low" | "medium" | "high" | null,
     "openness_to_trends": "traditional" | "selective" | "trend-forward" | null
   },
+  "operational_signals": {
+    "team_available_for_content": "solo_owner" | "dedicated_person" | "small_team" | "full_marketing" | null,
+    "equipment_available": ["smartphone", "tripod", "ring_light", "camera", "microphone", "editing_software", "none_mentioned"],
+    "time_for_content": "minimal" | "few_hours_week" | "dedicated_time" | "full_time" | null,
+    "filming_comfort": "camera_shy" | "warming_up" | "comfortable" | "natural_performer" | null,
+    "editing_skills": "none" | "basic" | "intermediate" | "advanced" | null
+  },
+  "environment_signals": {
+    "available_locations": string[], // e.g., ["kitchen", "bar area", "outdoor seating"]
+    "space_quality": "cramped" | "adequate" | "photogenic" | "stunning" | null,
+    "lighting_situation": "challenging" | "natural_light" | "controlled" | null,
+    "noise_level": "noisy" | "moderate" | "quiet" | null,
+    "customer_presence_ok": boolean | null, // can they film with customers around?
+    "after_hours_filming": boolean | null // can they film when closed?
+  },
   "clarification_needed": string[], // aspects that need follow-up
   "notable_quotes": string[], // exact phrases that reveal character
   "confidence": number // 0-1, how confident are we in these signals
@@ -257,7 +272,37 @@ Output the following JSON structure:
   "target_audience": {
     "description": "Natural language description of their audience",
     "demographics": { "age_range": "X-Y", "other": "details" },
-    "psychographics": ["trait1", "trait2"]
+    "psychographics": ["trait1", "trait2"],
+    "primary_generation": "gen_z" | "millennial" | "gen_x" | "boomer" | "broad" | null,
+    "income_level": "budget" | "mid_range" | "upscale" | "luxury" | "broad" | null,
+    "lifestyle_tags": ["foodies", "families", "date_night", "tourists", "locals", ...],
+    "primary_occasion": "quick_meal" | "casual_dining" | "special_occasion" | "takeout" | "bar_drinks" | "coffee_cafe" | "brunch" | null
+  },
+  
+  "operational_constraints": {
+    "team_available": "solo_owner" | "dedicated_person" | "small_team" | "full_marketing" | null,
+    "equipment_available": ["smartphone", "tripod", "ring_light", "camera", "microphone", "editing_software"],
+    "time_budget": "minimal" | "few_hours_week" | "dedicated_time" | "full_time" | null,
+    "skill_level": "beginner" | "intermediate" | "advanced" | null,
+    "filming_comfort": "camera_shy" | "warming_up" | "comfortable" | "natural_performer" | null,
+    "max_complexity": "phone_only" | "basic_tripod" | "lighting_setup" | "full_studio" | null
+  },
+  
+  "environment_availability": {
+    "available_locations": ["kitchen", "bar", "dining_room", "outdoor", "storefront", ...],
+    "best_filming_spot": "description of the most photogenic/practical spot",
+    "space_quality": "cramped" | "adequate" | "photogenic" | "stunning" | null,
+    "lighting_conditions": "natural" | "artificial" | "low_light" | "flexible" | null,
+    "noise_tolerance": "quiet_needed" | "moderate_ok" | "noisy_ok" | null,
+    "customer_filming_ok": true | false | null,
+    "after_hours_available": true | false | null
+  },
+  
+  "risk_tolerance": {
+    "content_edge": "brand_safe" | "mildly_edgy" | "edgy" | "provocative" | null,
+    "humor_style": "safe_humor" | "playful" | "sarcastic" | "dark_humor" | null,
+    "trend_willingness": "evergreen_only" | "light_trends" | "trend_forward" | null,
+    "controversy_comfort": "avoid_all" | "low" | "moderate" | "comfortable" | null
   },
   
   "key_insights": [
@@ -273,7 +318,7 @@ Output the following JSON structure:
     "production_level": "raw" | "polished" | "mixed"
   },
   
-  "embedding_text": "A dense paragraph combining all key characteristics, tone words, and goals - optimized for semantic similarity matching with video content"
+  "embedding_text": "A dense paragraph combining all key characteristics, tone words, goals, operational constraints, and target audience - optimized for semantic similarity matching with video content"
 }`
 
 export function buildPhasePrompt(

@@ -15,6 +15,7 @@ import { createClient } from '@supabase/supabase-js'
 import { createVideoDownloader } from '@/lib/services/video/downloader'
 import { createVideoStorageService } from '@/lib/services/video/storage'
 import { GeminiVideoAnalyzer } from '@/lib/services/video/gemini'
+import { BrandAnalyzer } from '@/lib/services/brand/brand-analyzer'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -24,13 +25,14 @@ const deepAnalysisSchema = z.object({
   videoId: z.string().uuid('Invalid video ID'),
   detailLevel: z.enum(['basic', 'detailed', 'comprehensive']).default('comprehensive'),
   skipDownload: z.boolean().default(false), // If you already have the file
-  cleanupAfter: z.boolean().default(true)
+  cleanupAfter: z.boolean().default(true),
+  useSchemaV1: z.boolean().default(false) // Enable Schema v1.1 via BrandAnalyzer
 })
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { videoId, detailLevel, skipDownload, cleanupAfter } = deepAnalysisSchema.parse(body)
+    const { videoId, detailLevel, skipDownload, cleanupAfter, useSchemaV1 } = deepAnalysisSchema.parse(body)
 
     console.log(`🎬 Starting deep analysis for video: ${videoId}`)
 
@@ -111,12 +113,56 @@ export async function POST(request: NextRequest) {
         throw new Error('No cloud URL available for analysis')
       }
 
-      console.log('🤖 Analyzing with Gemini...')
-      const analyzer = new GeminiVideoAnalyzer()
-      const analysis = await analyzer.analyzeVideo(cloudUrl, {
-        detailLevel,
-        includeTimestamps: true
+      let analysis: any
+      let schemaV1Signals: any = null
+      
+      // Always run legacy analyzer for display data (visual summary, humor type, scores)
+      console.log('🤖 Analyzing with Gemini (for display data)...')
+      const legacyAnalyzer = new GeminiVideoAnalyzer()
+      analysis = await legacyAnalyzer.analyzeVideo(cloudUrl, {
+        detailLevel
       })
+      
+      // If Schema v1.1 requested, also run BrandAnalyzer for structured signals
+      if (useSchemaV1) {
+        console.log('🤖 Also extracting Schema v1.1 signals via BrandAnalyzer...')
+        const brandAnalyzer = new BrandAnalyzer()
+        
+        // BrandAnalyzer can use GCS URI (for Vertex) or Gemini File API URI
+        const isGcsUri = cloudUrl.startsWith('gs://')
+        console.log('🔍 BrandAnalyzer config:', {
+          isConfigured: brandAnalyzer.isConfigured(),
+          isGcsUri,
+          cloudUrlPrefix: cloudUrl.substring(0, 50)
+        })
+        
+        try {
+          // Pass both URI options - BrandAnalyzer will choose the best one
+          schemaV1Signals = await brandAnalyzer.analyze({
+            videoUrl: video.video_url,
+            videoId: video.video_id || videoId,
+            gcsUri: isGcsUri ? cloudUrl : undefined,
+            geminiFileUri: !isGcsUri ? cloudUrl : undefined
+          })
+          console.log('✅ Schema v1.1 signals extracted:', {
+            hasRawOutput: !!schemaV1Signals.raw_output,
+            hasSignals: !!schemaV1Signals.signals,
+            rawOutputKeys: schemaV1Signals.raw_output ? Object.keys(schemaV1Signals.raw_output) : [],
+            confidence: schemaV1Signals.confidence,
+            replicability: schemaV1Signals.raw_output?.signals?.replicability || schemaV1Signals.signals?.replicability
+          })
+          
+          // Merge Schema v1.1 signals into the analysis object
+          // This allows the UI to access both legacy fields AND v1.1 signals
+          analysis.schema_v1_signals = schemaV1Signals.raw_output?.signals || schemaV1Signals.signals
+          analysis.schema_version = 1
+        } catch (v1Error: any) {
+          console.error('❌ Schema v1.1 extraction failed:', {
+            errorMessage: v1Error?.message || String(v1Error),
+            errorStack: v1Error?.stack?.substring(0, 500)
+          })
+        }
+      }
 
       // Step 5: Save analysis to database
       console.log('💾 Saving analysis results...')
@@ -165,6 +211,11 @@ export async function POST(request: NextRequest) {
         .eq('id', videoId)
 
       console.log('✅ Deep analysis complete!')
+      console.log('🔍 Final analysis object keys:', Object.keys(analysis))
+      console.log('🔍 schema_v1_signals present:', !!analysis.schema_v1_signals)
+      if (analysis.schema_v1_signals) {
+        console.log('🔍 schema_v1_signals keys:', Object.keys(analysis.schema_v1_signals))
+      }
 
       // Step 7: Cleanup
       if (cleanupAfter && localFilePath) {

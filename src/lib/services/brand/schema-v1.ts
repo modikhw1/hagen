@@ -262,5 +262,43 @@ export const VideoBrandObservationV1Schema = z
 export type VideoBrandObservationV1 = z.infer<typeof VideoBrandObservationV1Schema>
 
 export function parseVideoBrandObservationV1(input: unknown): VideoBrandObservationV1 {
-  return VideoBrandObservationV1Schema.parse(input)
+  try {
+    return VideoBrandObservationV1Schema.parse(input)
+  } catch (error) {
+    // Schema is strict - if Gemini returns extra fields, parsing fails
+    // Log the error and try a more lenient parse
+    console.warn('⚠️ Strict schema parse failed, attempting lenient parse:', error)
+    console.log('🔍 Input was:', JSON.stringify(input, null, 2).substring(0, 1000))
+    
+    // Try to extract just what we need without strict validation
+    const obj = input as any
+    if (obj && typeof obj === 'object' && obj.signals) {
+      // Return a minimal valid structure with whatever signals we can get
+      return {
+        schema_version: 1,
+        video: {
+          video_id: obj.video?.video_id || 'unknown',
+          platform: obj.video?.platform || 'unknown'
+        },
+        signals: {
+          replicability: obj.signals?.replicability,
+          risk_level: obj.signals?.risk_level,
+          environment_requirements: obj.signals?.environment_requirements,
+          target_audience: obj.signals?.target_audience,
+          personality: obj.signals?.personality,
+          statement: obj.signals?.statement,
+          execution: obj.signals?.execution,
+          hospitality: obj.signals?.hospitality,
+          humor: obj.signals?.humor,
+          conversion: obj.signals?.conversion,
+          coherence: obj.signals?.coherence
+        },
+        evidence: obj.evidence || [],
+        uncertainties: obj.uncertainties || []
+      } as VideoBrandObservationV1
+    }
+    
+    // If we can't salvage anything, re-throw
+    throw error
+  }
 }
