@@ -5,9 +5,9 @@
  * This script migrates data from legacy tables to the new unified video_signals table.
  * 
  * Usage:
- *   npx ts-node scripts/migrate-to-video-signals.ts --dry-run    # Preview changes
- *   npx ts-node scripts/migrate-to-video-signals.ts              # Execute migration
- *   npx ts-node scripts/migrate-to-video-signals.ts --force      # Skip confirmations
+ *   npx tsx scripts/migrate-to-video-signals.ts --dry-run    # Preview changes
+ *   npx tsx scripts/migrate-to-video-signals.ts              # Execute migration
+ *   npx tsx scripts/migrate-to-video-signals.ts --force      # Skip confirmations
  * 
  * Sources:
  *   1. analyzed_videos.visual_analysis → extract signals → video_signals.extracted
@@ -29,14 +29,19 @@ dotenv.config({ path: '.env.local' });
 // =============================================================================
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+// Try service role key first, fall back to anon key
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
-  console.error('❌ Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+  console.error('❌ Missing SUPABASE_URL or SUPABASE key (service role or anon)');
   process.exit(1);
 }
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  console.log('⚠️  Using anon key - writes may fail if RLS policies don\'t allow it');
+}
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 const extractor = new SignalExtractor(CURRENT_SCHEMA_VERSION);
 
 // =============================================================================

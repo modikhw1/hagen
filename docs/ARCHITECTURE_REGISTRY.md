@@ -1,8 +1,64 @@
 # Architecture Registry
 
 > **Purpose**: Single source of truth for component dependencies. Update this file BEFORE modifying any component.
+> 
+> **For Future Claude Sessions**: Read this file FIRST. It explains how the codebase is structured and what NOT to break.
 
-## Quick Reference: What To Update When...
+---
+
+## 🚀 WORKFLOW GUIDE: How to Make Changes
+
+### The Golden Rule
+**UI changes should NEVER require database changes. Database changes should NEVER break UI.**
+
+### Common Tasks & What Files to Touch
+
+#### Task 1: "Add a new field to the rating UI"
+**Files to modify**: ONLY the UI component
+```
+src/app/analyze-rate-v1/page.tsx   ← Add form field here
+```
+**What NOT to touch**: Database, API routes, SignalExtractor
+**Why it works**: The `human_overrides` JSONB column accepts ANY structure. Just save the new field there.
+
+#### Task 2: "Change how Gemini output is parsed into signals"
+**Files to modify**:
+```
+src/lib/services/signals/extractor.ts  ← Update extraction logic
+src/lib/services/signals/types.ts      ← Add new type if needed
+```
+**What NOT to touch**: Database schema, UI
+**After**: Run migration script to re-extract existing videos (optional)
+
+#### Task 3: "Add a completely new signal category (e.g., 'brand_safety_signals')"
+**Files to modify**:
+```
+src/lib/services/signals/types.ts      ← Add new interface
+src/lib/services/signals/extractor.ts  ← Add extraction logic
+```
+**Database**: No change needed (JSONB accepts new fields)
+**UI**: Add form fields as needed (Task 1)
+
+#### Task 4: "Change the fingerprint algorithm"
+**Files to modify**:
+```
+src/lib/services/brand/profile-fingerprint.ts  ← Update algorithm
+```
+**After**: Re-compute fingerprints for existing videos:
+```sql
+UPDATE video_signals SET fingerprint = NULL;  -- Mark for recompute
+```
+
+#### Task 5: "Change the embedding model"
+**Files to modify**:
+```
+src/lib/openai/embeddings.ts  ← Update model name
+```
+**After**: Re-generate all embeddings (expensive, plan carefully)
+
+---
+
+## 🎯 Quick Reference: What To Update When...
 
 | If you change... | You MUST also update... |
 |------------------|-------------------------|
@@ -10,7 +66,21 @@
 | Signal schema/types | `types.ts`, `video_signals` table, migration script |
 | Embedding model | Re-run embeddings for all `video_signals` |
 | Fingerprint algorithm | Re-compute all fingerprints, update `profile-fingerprint.ts` |
-| Rating UI fields | Nothing else (decoupled by design) |
+| Rating UI fields | **Nothing else** (decoupled by design) ✨ |
+| Add new signal category | `types.ts` + `extractor.ts` only |
+
+---
+
+## 📦 Data Storage: Where Things Live
+
+| Data Type | Storage Location | Editable? |
+|-----------|------------------|-----------|
+| Raw Gemini output | `analyzed_videos.visual_analysis` | ❌ Never |
+| Extracted signals | `video_signals.extracted` | ❌ Re-extract only |
+| User corrections | `video_signals.human_overrides` | ✅ Yes |
+| User rating (1-10) | `video_signals.rating` | ✅ Yes |
+| Embeddings | `video_signals.embedding` | ❌ Re-compute only |
+| Fingerprints | `video_signals.fingerprint` | ❌ Re-compute only |
 
 ---
 
@@ -268,7 +338,53 @@ User requests brand profile
 
 ---
 
-## File Locations
+## 🤖 FOR FUTURE AI SESSIONS (Claude/Copilot)
+
+### Before Making ANY Changes, Ask:
+1. "Which layer does this change affect?" (A/B/C)
+2. "Does this require a database migration?"
+3. "Will this break existing data?"
+
+### SAFE Changes (Do Freely)
+- ✅ UI form field additions → save to `human_overrides`
+- ✅ UI styling/layout changes
+- ✅ New extraction paths in `SignalExtractor`
+- ✅ New type definitions in `types.ts`
+
+### CAREFUL Changes (Plan First)
+- ⚠️ Changing existing signal field names
+- ⚠️ Modifying fingerprint algorithm (requires re-compute)
+- ⚠️ Changing embedding model (expensive re-run)
+
+### DANGEROUS Changes (Avoid Unless Necessary)
+- ❌ Modifying `video_signals` table schema
+- ❌ Changing `analyzed_videos.visual_analysis` structure
+- ❌ Deleting migration history
+
+### How to Tell Claude What You Want
+
+**Good prompts:**
+- "Add a new slider for 'authenticity' to the rating UI" → Claude touches only UI
+- "Extract 'brand_safety' from Gemini output" → Claude touches only extractor
+- "Show videos similar to this fingerprint" → Claude reads from video_signals
+
+**Prompts that need clarification:**
+- "Change how ratings work" → Ask: "UI only, or data structure too?"
+- "Add a new signal" → Ask: "Just extraction, or also UI?"
+
+### Key Files to Reference
+
+| For... | Read This File |
+|--------|----------------|
+| Understanding data flow | `docs/ARCHITECTURE_REGISTRY.md` (this file) |
+| Signal types | `src/lib/services/signals/types.ts` |
+| How signals are extracted | `src/lib/services/signals/extractor.ts` |
+| Database schema | `supabase/migrations/016_video_signals_table.sql` |
+| Fingerprint logic | `src/lib/services/brand/profile-fingerprint.ts` |
+
+---
+
+## File Locations## File Locations
 
 ```
 src/
