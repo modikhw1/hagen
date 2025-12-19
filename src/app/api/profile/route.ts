@@ -77,11 +77,10 @@ export async function PUT(request: NextRequest) {
 
     const supabase = supabaseAdmin()
 
-    const { data, error } = await supabase
-      .from('profiles')
+    const { data, error } = await (supabase.from('profiles') as any)
       .update({
-        full_name,
-        avatar_url,
+        full_name: full_name ?? null,
+        avatar_url: avatar_url ?? null,
         updated_at: new Date().toISOString(),
       })
       .eq('id', userId)

@@ -139,34 +139,6 @@ export interface EmbeddingProvider {
   }): string
 }
 
-// Pattern Discovery Interface
-export interface PatternDiscoveryProvider {
-  name: string
-  discoverPatterns(videos: RatedVideo[]): Promise<DiscoveredPattern[]>
-}
-
-export interface RatedVideo {
-  id: string
-  metadata: VideoMetadata
-  analysis: VideoAnalysis
-  userRatings: Record<string, number | string | boolean>
-  userTags: string[]
-  computedMetrics?: Record<string, number>
-}
-
-export interface DiscoveredPattern {
-  type: 'correlation' | 'suggestion' | 'insight'
-  confidence: number
-  description: string
-  data: {
-    field?: string
-    suggestedField?: string
-    correlation?: number
-    examples?: string[] // video IDs
-    [key: string]: unknown
-  }
-}
-
 // Metrics Calculator Interface
 export interface MetricsCalculator {
   name: string

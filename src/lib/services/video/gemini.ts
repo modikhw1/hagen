@@ -285,7 +285,17 @@ Provide detailed, actionable analysis. Rate everything on 1-10 scales. Be specif
     try {
       // Extract JSON from markdown code blocks if present
       const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/) || [null, text]
-      const jsonText = jsonMatch[1].trim()
+      let jsonText = jsonMatch[1].trim()
+      
+      // Sanitize common LLM JSON issues
+      // 1. Extract just the JSON object
+      const firstBrace = jsonText.indexOf('{')
+      const lastBrace = jsonText.lastIndexOf('}')
+      if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+        jsonText = jsonText.slice(firstBrace, lastBrace + 1)
+      }
+      // 2. Remove trailing commas before } or ]
+      jsonText = jsonText.replace(/,(\s*[}\]])/g, '$1')
       
       const parsed = JSON.parse(jsonText)
 
@@ -412,6 +422,7 @@ Provide detailed, actionable analysis. Rate everything on 1-10 scales. Be specif
 
     } catch (error) {
       console.error('Failed to parse Gemini response:', error)
+      console.error('Raw response (first 500 chars):', text.substring(0, 500))
       throw new Error('Failed to parse video analysis response')
     }
   }

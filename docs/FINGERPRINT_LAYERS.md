@@ -281,6 +281,8 @@ confidence = (
 | `src/app/api/brand-profile/fingerprint/route.ts` | API endpoint |
 | `src/app/brand-profile/page.tsx` | UI for fingerprint tool |
 
+> **Maintenance**: To explore the file history and identify stale files in the codebase, run the helper script `bash scripts/audit_codebase.sh`. To find potentially unused files, run `bash scripts/find_unreferenced_files.sh`.
+
 ---
 
 ## Version History

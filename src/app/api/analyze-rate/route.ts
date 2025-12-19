@@ -1,18 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
+import { SignalExtractor } from '@/lib/services/signals/extractor';
+import { VideoSignals, CURRENT_SCHEMA_VERSION } from '@/lib/services/signals/types';
 
+// Use service role key for server-side operations (bypasses RLS)
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!
 });
 
+// Initialize the signal extractor with current schema version
+const extractor = new SignalExtractor(CURRENT_SCHEMA_VERSION);
+
 export async function POST(request: NextRequest) {
   try {
+    console.log('📝 /api/analyze-rate - Processing request...');
+    
     const body = await request.json();
     const {
       video_url,
@@ -23,12 +31,15 @@ export async function POST(request: NextRequest) {
       analysis_notes,
       gemini_analysis,
       similar_videos,
-      // v1.1: Complete structured signals
+      // v1.1: Complete structured signals (human overrides)
       structured_replicability,
       risk_level_signals,
       environment_signals,
       target_audience_signals
     } = body;
+
+    console.log('📹 Video URL:', video_url);
+    console.log('⭐ Quality tier:', quality_tier);
 
     if (!video_url || !quality_tier) {
       return NextResponse.json(
@@ -94,60 +105,27 @@ export async function POST(request: NextRequest) {
       videoId = newVideo.id;
     }
 
-    // Step 2: Build embedding text from all notes
-    const embeddingParts: string[] = [];
-    
-    embeddingParts.push(`Quality: ${quality_tier}`);
-    
-    if (notes) {
-      embeddingParts.push(`Notes: ${notes}`);
-    }
-    
-    if (replicability_notes) {
-      embeddingParts.push(`Replicability: ${replicability_notes}`);
-    }
-    
-    if (brand_tone_notes) {
-      embeddingParts.push(`Brand/Tone: ${brand_tone_notes}`);
-    }
-    
-    // Include user's corrections to the AI analysis
-    if (analysis_notes) {
-      embeddingParts.push(`Analysis corrections: ${analysis_notes}`);
-    }
-    
-    // Include Gemini's interpretation for context (using correct structure)
-    if (gemini_analysis?.script?.humor?.humorType) {
-      embeddingParts.push(`Gemini saw: ${gemini_analysis.script.humor.humorType}`);
-    }
-    if (gemini_analysis?.script?.humor?.humorMechanism) {
-      embeddingParts.push(`Mechanism: ${gemini_analysis.script.humor.humorMechanism}`);
-    }
-    if (gemini_analysis?.visual?.summary) {
-      embeddingParts.push(`Visual: ${gemini_analysis.visual.summary}`);
+    // Step 2: Extract signals from Gemini analysis using SignalExtractor
+    const extractionResult = extractor.extract({
+      visual_analysis: gemini_analysis || {},
+      schema_version: CURRENT_SCHEMA_VERSION,
+    });
+
+    if (!extractionResult.success || !extractionResult.signals) {
+      console.warn('Signal extraction had issues:', extractionResult.errors);
+      // Continue with empty signals - user overrides will still be saved
     }
 
-    const embeddingText = embeddingParts.join('\n');
-
-    // Step 3: Convert quality tier to numeric score
-    const tierToScore: Record<string, number> = {
-      'excellent': 0.9,
-      'good': 0.7,
-      'mediocre': 0.5,
-      'bad': 0.3
-    };
-    const overallScore = tierToScore[quality_tier] || 0.5;
-
-    // Step 4: Build dimensions from Gemini scores (using correct structure)
-    const dimensions = {
-      hook: (gemini_analysis?.visual?.hookStrength || 0) / 10 || overallScore,
-      pacing: (gemini_analysis?.technical?.pacing || 0) / 10 || overallScore,
-      originality: (gemini_analysis?.script?.originality?.score || 0) / 10 || overallScore,
-      payoff: (gemini_analysis?.script?.structure?.payoffStrength || 0) / 10 || overallScore,
-      rewatchable: (gemini_analysis?.engagement?.replayValue || 0) / 10 || overallScore
+    const extractedSignals: VideoSignals = extractionResult.signals || {
+      schema_version: CURRENT_SCHEMA_VERSION,
+      extracted_at: new Date().toISOString(),
+      extraction_source: 'gemini',
     };
 
-    // Step 5: Build combined notes
+    // Step 3: Build human overrides from UI input
+    const humanOverrides: Partial<VideoSignals> = {};
+
+    // Build combined notes for the notes field
     const combinedNotes = [
       `[${quality_tier.toUpperCase()}]`,
       notes,
@@ -156,125 +134,140 @@ export async function POST(request: NextRequest) {
       analysis_notes ? `Analysis Notes: ${analysis_notes}` : null
     ].filter(Boolean).join('\n\n');
 
-    // Step 6: Upsert into video_brand_ratings (the main table for v1.1 signals)
-    // This table has the JSONB columns for fingerprint signals
-    const brandRatingData = {
-      video_id: videoId,
-      rater_id: 'primary', // Default rater for general video ratings
-      personality_notes: combinedNotes, // Store combined notes in personality_notes field
-      // v1.1 JSONB signal columns
-      replicability_signals: structured_replicability ? {
-        actor_count: structured_replicability.actor_count,
-        setup_complexity: structured_replicability.setup_complexity,
-        skill_required: structured_replicability.skill_required,
-        environment_dependency: structured_replicability.environment_dependency || null,
-        equipment_needed: structured_replicability.equipment_needed || [],
-        estimated_time: structured_replicability.estimated_time
-      } : null,
-      risk_level_signals: risk_level_signals ? {
-        content_edge: risk_level_signals.content_edge,
-        humor_risk: risk_level_signals.humor_risk,
-        trend_reliance: risk_level_signals.trend_reliance,
-        controversy_potential: risk_level_signals.controversy_potential
-      } : null,
-      environment_signals: environment_signals ? {
-        setting_type: environment_signals.setting_type,
-        space_requirements: environment_signals.space_requirements,
-        lighting_conditions: environment_signals.lighting_conditions,
-        noise_tolerance: environment_signals.noise_tolerance,
-        customer_visibility: environment_signals.customer_visibility
-      } : null,
-      audience_signals: target_audience_signals ? {
-        age_range: target_audience_signals.age_range,
-        income_level: target_audience_signals.income_level,
-        lifestyle_tags: target_audience_signals.lifestyle_tags || [],
-        primary_occasion: target_audience_signals.primary_occasion,
-        vibe_alignment: target_audience_signals.vibe_alignment
-      } : null
-    };
-
-    // Upsert into video_brand_ratings
-    const { error: brandRatingError } = await supabase
-      .from('video_brand_ratings')
-      .upsert(brandRatingData, { onConflict: 'video_id,rater_id' });
-
-    if (brandRatingError) {
-      console.error('Error saving to video_brand_ratings:', brandRatingError);
-      // Continue - don't fail the whole request
+    // Add structured overrides if provided by user
+    if (structured_replicability) {
+      humanOverrides.replicability_signals = {
+        equipment_requirements: structured_replicability.equipment_needed?.length > 0 ? 5 : 2,
+        skill_requirements: structured_replicability.skill_required === 'anyone' ? 2 : 
+                           structured_replicability.skill_required === 'comfortable_on_camera' ? 4 :
+                           structured_replicability.skill_required === 'acting_required' ? 7 : 9,
+        time_investment: structured_replicability.estimated_time === 'under_15min' ? 2 :
+                        structured_replicability.estimated_time === 'under_1hr' ? 4 :
+                        structured_replicability.estimated_time === 'half_day' ? 7 : 9,
+        budget_requirements: 3, // Default moderate
+      };
     }
 
-    // Step 7: Also upsert into video_ratings (legacy table for compatibility)
-    const ratingData = {
+    if (target_audience_signals) {
+      humanOverrides.audience_signals = {
+        primary_ages: target_audience_signals.age_range ? [target_audience_signals.age_range] : undefined,
+        vibe_alignments: target_audience_signals.lifestyle_tags,
+        engagement_style: 'passive',
+        niche_specificity: 5,
+      };
+    }
+
+    // Step 4: Convert quality tier to numeric rating (1-10)
+    const tierToRating: Record<string, number> = {
+      'excellent': 9,
+      'good': 7,
+      'mediocre': 5,
+      'bad': 3
+    };
+    const rating = tierToRating[quality_tier] || 5;
+
+    // Step 5: Build embedding text for similarity search
+    const embeddingParts: string[] = [];
+    embeddingParts.push(`Quality: ${quality_tier}`);
+    if (notes) embeddingParts.push(`Notes: ${notes}`);
+    if (replicability_notes) embeddingParts.push(`Replicability: ${replicability_notes}`);
+    if (brand_tone_notes) embeddingParts.push(`Brand/Tone: ${brand_tone_notes}`);
+    if (analysis_notes) embeddingParts.push(`Analysis corrections: ${analysis_notes}`);
+    
+    // Include Gemini's interpretation for context
+    if (gemini_analysis?.script?.humor?.humorType) {
+      embeddingParts.push(`Humor type: ${gemini_analysis.script.humor.humorType}`);
+    }
+    if (gemini_analysis?.visual?.summary) {
+      embeddingParts.push(`Visual: ${gemini_analysis.visual.summary}`);
+    }
+    if (extractedSignals.sigma_taste?.content_classification?.content_type) {
+      embeddingParts.push(`Content type: ${extractedSignals.sigma_taste.content_classification.content_type}`);
+    }
+
+    const embeddingText = embeddingParts.join('\n');
+    
+    // Generate embedding (with error handling)
+    let embedding: number[] | undefined;
+    try {
+      embedding = await generateEmbedding(embeddingText);
+    } catch (embeddingError) {
+      console.error('Error generating embedding:', embeddingError);
+      // Continue without embedding - can be generated later
+      embedding = undefined;
+    }
+
+    // Step 6: Upsert into video_signals (NEW unified table)
+    const videoSignalsData = {
       video_id: videoId,
-      overall_score: overallScore,
-      dimensions,
+      brand_id: null, // No brand association for general ratings
+      schema_version: CURRENT_SCHEMA_VERSION,
+      extracted: extractedSignals,
+      human_overrides: Object.keys(humanOverrides).length > 0 ? humanOverrides : null,
+      rating,
+      rating_confidence: 'high' as const, // Human ratings are high confidence
       notes: combinedNotes,
-      tags: [quality_tier, gemini_analysis?.script?.humor?.humorType].filter(Boolean),
-      ai_prediction: gemini_analysis,
-      replicability_notes: replicability_notes || null,
-      brand_context: brand_tone_notes || null,
-      humor_type: gemini_analysis?.script?.humor?.humorType || null
+      embedding,
+      source: 'manual' as const,
     };
 
-    // Check if rating exists
-    const { data: existingRating } = await supabase
-      .from('video_ratings')
+    // Check if signal record exists for this video
+    const { data: existingSignal } = await supabase
+      .from('video_signals')
       .select('id')
       .eq('video_id', videoId)
-      .eq('rater_id', 'primary')
+      .is('brand_id', null)
       .single();
 
-    let data;
-    let error;
-
-    if (existingRating) {
-      // Update existing rating
-      const result = await supabase
-        .from('video_ratings')
-        .update(ratingData)
-        .eq('id', existingRating.id)
-        .select()
+    let signalResult;
+    if (existingSignal) {
+      // Update existing
+      signalResult = await supabase
+        .from('video_signals')
+        .update(videoSignalsData)
+        .eq('id', existingSignal.id)
+        .select('id')
         .single();
-      data = result.data;
-      error = result.error;
     } else {
-      // Insert new rating
-      const result = await supabase
-        .from('video_ratings')
-        .insert({ ...ratingData, rater_id: 'primary' })
-        .select()
+      // Insert new
+      signalResult = await supabase
+        .from('video_signals')
+        .insert(videoSignalsData)
+        .select('id')
         .single();
-      data = result.data;
-      error = result.error;
     }
 
-    if (error) {
-      console.error('Supabase error:', error);
+    if (signalResult.error) {
+      console.error('Error saving to video_signals:', signalResult.error);
       return NextResponse.json(
-        { error: 'Failed to save rating', details: error.message },
+        { error: 'Failed to save rating', details: signalResult.error.message },
         { status: 500 }
       );
     }
 
-    // Step 7: Update analyzed_videos with embedding
+    // Step 7: Update analyzed_videos with rated_at timestamp
     await supabase
       .from('analyzed_videos')
       .update({ 
-        content_embedding: await generateEmbedding(embeddingText),
         rated_at: new Date().toISOString()
       })
       .eq('id', videoId);
 
+    console.log('✅ Successfully saved to video_signals');
+    
     return NextResponse.json({
       success: true,
-      id: data.id,
+      id: signalResult.data.id,
       video_id: videoId,
       quality_tier,
-      message: 'Rating saved and embedded for future learning'
+      schema_version: CURRENT_SCHEMA_VERSION,
+      extraction_coverage: extractionResult.coverage,
+      message: 'Rating saved to video_signals with v1.1 schema'
     });
 
   } catch (error) {
-    console.error('API error:', error);
+    console.error('❌ API error in /api/analyze-rate:', error);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     return NextResponse.json(
       { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
@@ -283,9 +276,14 @@ export async function POST(request: NextRequest) {
 }
 
 async function generateEmbedding(text: string): Promise<number[]> {
-  const response = await openai.embeddings.create({
-    model: 'text-embedding-3-small',
-    input: text
-  });
-  return response.data[0].embedding;
+  try {
+    const response = await openai.embeddings.create({
+      model: 'text-embedding-3-small',
+      input: text
+    });
+    return response.data[0].embedding;
+  } catch (error) {
+    console.error('OpenAI embedding error:', error);
+    throw error;
+  }
 }

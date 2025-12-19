@@ -3,6 +3,9 @@
  *
  * Computes a multi-layer fingerprint from a set of video embeddings and signals.
  * Layer weights: Quality (L1) > Likeness (L2) > Visual (L3)
+ * 
+ * σTaste v1.1 Weight Configuration (Dec 2025)
+ * Based on 254 pairwise comparisons from hagen_ta analysis
  */
 
 import { createClient } from '@supabase/supabase-js'
@@ -19,6 +22,48 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
+
+// -----------------------------------------------------------------------------
+// σTaste v1.1 Weight Configuration
+// Source: hagen_ta 254 pairwise comparisons correlation analysis
+// -----------------------------------------------------------------------------
+
+/**
+ * Signal weights based on correlation analysis from hagen_ta.
+ * Higher correlation = stronger predictor of preference.
+ * Negative correlation (hookStrength) = inverse relationship with preference.
+ */
+export const SIGMA_TASTE_WEIGHTS = {
+  // TOP PREDICTORS (weight UP)
+  attentionRetention: 2.0,    // r=+0.173, top predictor
+  audioQuality: 1.8,          // r=+0.169, 2nd strongest (often unnoticed)
+  cutsPerMinute: 1.5,         // r=+0.129, pacing proxy
+  scriptOriginality: 1.4,     // r=+0.123, creativity signal
+  
+  // STANDARD WEIGHT
+  productionPolish: 1.0,
+  performerExecution: 1.0,
+  narrativeFlow: 1.0,
+  payoffQuality: 1.0,
+  
+  // WEIGHT DOWN (low/negative correlation)
+  hookStrength: 0.5,          // r=-0.047, NEGATIVE correlation - desperation signal
+  scriptReplicability: 0.7,   // r=+0.033, discussed but doesn't predict
+  technicalPacing: 0.8,       // weak signal
+  
+  // NEW v1.1-sigma: Hook desperation penalty
+  desperationPenalty: -0.3,   // Applied when desperation_signals.detected = true
+} as const
+
+/**
+ * Layer matching weights for overall match computation.
+ */
+export const LAYER_MATCH_WEIGHTS = {
+  l1_quality: 0.25,
+  l2_likeness: 0.35,
+  l3_visual: 0.10,
+  embedding: 0.30,
+} as const
 
 // -----------------------------------------------------------------------------
 // Video data fetching
@@ -531,12 +576,48 @@ function extractSignals(
 /**
  * Compute weight for a video based on quality and coherence.
  * Higher weight = more influence on fingerprint.
+ * 
+ * Updated with σTaste v1.1 weights from hagen_ta correlation analysis:
+ * - audioQuality is 2nd strongest predictor (+0.169)
+ * - attentionRetention is top predictor (+0.173)
+ * - hookStrength has NEGATIVE correlation (-0.047) - desperation signal
  */
 function computeVideoWeight(signals: VideoSignals): number {
   const quality = signals.quality_score ?? 0.5
   const coherence = signals.execution_coherence ?? 0.5
-  // Quality 60%, coherence 40%
-  return quality * 0.6 + coherence * 0.4
+  
+  // Base weight: Quality 50%, coherence 30%
+  let weight = quality * 0.5 + coherence * 0.3
+  
+  // σTaste v1.1 adjustments based on correlation data
+  
+  // Audio quality boost (r=+0.169, 2nd strongest predictor)
+  // Often unnoticed but highly predictive
+  const audioQuality = signals.production_investment ?? 5 // production as proxy for audio
+  if (audioQuality >= 7) {
+    weight += 0.1 * SIGMA_TASTE_WEIGHTS.audioQuality / 10
+  }
+  
+  // Intentionality boost (proxy for attention retention, r=+0.173)
+  const intentionality = signals.intentionality ?? 5
+  if (intentionality >= 7) {
+    weight += 0.1 * SIGMA_TASTE_WEIGHTS.attentionRetention / 10
+  }
+  
+  // Hook desperation penalty (hookStrength has NEGATIVE correlation)
+  // If we detect desperation signals, reduce weight
+  // This is extracted from sigma_taste in the full pipeline
+  // For now, use a simple heuristic: very high "flash" with low substance
+  const effortlessness = signals.effortlessness ?? 5
+  const productionInvestment = signals.production_investment ?? 5
+  
+  // High production but low effortlessness might indicate "trying too hard"
+  if (productionInvestment >= 8 && effortlessness <= 3) {
+    weight -= 0.05 // Small penalty for "overproduced" content
+  }
+  
+  // Clamp to valid range
+  return Math.max(0.1, Math.min(1.0, weight))
 }
 
 // -----------------------------------------------------------------------------
@@ -902,13 +983,13 @@ export async function computeMatch(
     }
   }
 
-  // Overall match: weighted combination
+  // Overall match: weighted combination using configurable layer weights
   // L1 (quality) and L2 (likeness) matter most, L3 (visual) less, embedding is baseline
   const overallMatch =
-    l1QualityCompatible * 0.25 +
-    l2LikenessMatch * 0.35 +
-    l3VisualProximity * 0.10 +
-    embeddingSimilarity * 0.30
+    l1QualityCompatible * LAYER_MATCH_WEIGHTS.l1_quality +
+    l2LikenessMatch * LAYER_MATCH_WEIGHTS.l2_likeness +
+    l3VisualProximity * LAYER_MATCH_WEIGHTS.l3_visual +
+    embeddingSimilarity * LAYER_MATCH_WEIGHTS.embedding
 
   // Generate explanation
   const explanationParts: string[] = []

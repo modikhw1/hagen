@@ -379,7 +379,6 @@ export async function POST(request: NextRequest) {
         // The result is already parsed JSON with our structure
         // analyzeVideoWithGemini does: return JSON.parse(jsonMatch[0])
         // So 'analysis' already contains { visual, audio, content, ... }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let parsedAnalysis: any = analysis;
         
         // If it has 'reasoning' but no 'visual', it failed to parse properly

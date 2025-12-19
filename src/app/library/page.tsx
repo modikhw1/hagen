@@ -579,7 +579,7 @@ export default function LibraryPage() {
                           <div className="text-xs text-gray-500 mt-0.5">
                             @{typeof video.metadata?.author === 'string' 
                               ? video.metadata.author 
-                              : video.metadata?.author?.username || video.metadata?.author?.displayName || 'unknown'} • 
+                              : (video.metadata?.author as any)?.username || (video.metadata?.author as any)?.displayName || 'unknown'} • 
                             Rated {video.rating?.rated_at ? new Date(video.rating.rated_at).toLocaleDateString() : 'N/A'}
                           </div>
                         </div>

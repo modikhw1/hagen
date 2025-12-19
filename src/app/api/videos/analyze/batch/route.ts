@@ -145,8 +145,7 @@ export async function POST(request: NextRequest) {
 
         // Analyze with Gemini
         const analysis = await analyzer.analyzeVideo(cloudUrl, {
-          detailLevel: 'comprehensive',
-          includeTimestamps: true
+          detailLevel: 'comprehensive'
         })
 
         // Save analysis to database

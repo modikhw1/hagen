@@ -197,7 +197,7 @@ export async function POST(request: NextRequest) {
       const embeddingText = embeddingProvider.prepareTextForEmbedding({
         metadata: video.metadata,
         analysis,
-        userRatings: existingRating,
+        userRatings: existingRating || undefined,
         userTags: video.user_tags,
         computedMetrics: {} // Could recalculate with new data
       })
