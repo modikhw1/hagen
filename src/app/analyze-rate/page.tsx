@@ -444,34 +444,64 @@ export default function AnalyzeRatePage() {
                     placeholder="e.g., 'The humor is actually self-deprecating, not contrast-based' or 'Missing: the callback to their previous viral video'..."
                     className="w-full h-32 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                   />
-                  {analysisNotes && (
+                  <div className="flex gap-2 mt-2">
+                    {/* Confirm as Correct button */}
                     <button
                       onClick={async () => {
                         try {
                           await fetch('/api/corrections', {
-                            method: 'POST',
+                            method: 'PUT',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
                               videoUrl: result.url,
-                              originalAnalysis: result.analysis,
-                              correction: {
-                                humor_type: analysisNotes.includes('humor') ? analysisNotes : undefined,
-                                joke_structure: analysisNotes.includes('structure') || analysisNotes.includes('setup') || analysisNotes.includes('payoff') ? analysisNotes : undefined
-                              },
-                              correctionType: 'humor_analysis',
-                              notes: analysisNotes
+                              analysis: result.analysis,
+                              notes: analysisNotes || undefined
                             })
                           });
                           setEditingAnalysis(false);
+                          setAnalysisNotes('✓ Confirmed correct');
                         } catch (e) {
-                          console.error('Failed to save correction:', e);
+                          console.error('Failed to confirm analysis:', e);
                         }
                       }}
-                      className="mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm transition-colors"
+                      className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm transition-colors flex items-center gap-2"
                     >
-                      Save Correction
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Analysis is Correct
                     </button>
-                  )}
+                    
+                    {/* Save Correction button - only when notes exist */}
+                    {analysisNotes && (
+                      <button
+                        onClick={async () => {
+                          try {
+                            await fetch('/api/corrections', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({
+                                videoUrl: result.url,
+                                originalAnalysis: result.analysis,
+                                correction: {
+                                  humor_type: analysisNotes.includes('humor') ? analysisNotes : undefined,
+                                  joke_structure: analysisNotes.includes('structure') || analysisNotes.includes('setup') || analysisNotes.includes('payoff') ? analysisNotes : undefined
+                                },
+                                correctionType: 'humor_analysis',
+                                notes: analysisNotes
+                              })
+                            });
+                            setEditingAnalysis(false);
+                          } catch (e) {
+                            console.error('Failed to save correction:', e);
+                          }
+                        }}
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm transition-colors"
+                      >
+                        Save Correction
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
 

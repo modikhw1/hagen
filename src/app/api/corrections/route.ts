@@ -250,3 +250,100 @@ function buildCorrectionEmbeddingText(
 
   return parts.join('\n');
 }
+
+/**
+ * PUT /api/corrections
+ * 
+ * Confirm that Gemini's analysis was CORRECT - positive reinforcement
+ * Creates a 'good_interpretation' learning example
+ */
+export async function PUT(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { videoUrl, analysis, notes } = body;
+
+    if (!videoUrl || !analysis) {
+      return NextResponse.json(
+        { error: 'videoUrl and analysis are required' },
+        { status: 400 }
+      );
+    }
+
+    // Get existing video record if any
+    const { data: existingVideo } = await supabase
+      .from('analyzed_videos')
+      .select('id, metadata')
+      .eq('video_url', videoUrl)
+      .maybeSingle();
+
+    // Build summary from analysis
+    const videoSummary = analysis.content?.summary || 
+                        analysis.summary || 
+                        analysis.script?.conceptCore ||
+                        'Video analysis confirmed as correct';
+
+    // Build the Gemini interpretation text (what was correct)
+    const geminiParts: string[] = [];
+    if (analysis.script?.humor?.humorType) {
+      geminiParts.push(`Humor Type: ${analysis.script.humor.humorType}`);
+    }
+    if (analysis.script?.humor?.humorMechanism) {
+      geminiParts.push(`Mechanism: ${analysis.script.humor.humorMechanism}`);
+    }
+    if (analysis.content?.humorMechanism) {
+      geminiParts.push(`Content Humor: ${analysis.content.humorMechanism}`);
+    }
+    if (analysis.script?.humor?.visualComedyElement) {
+      geminiParts.push(`Visual Comedy: ${analysis.script.humor.visualComedyElement}`);
+    }
+    
+    const geminiInterpretation = geminiParts.length > 0 
+      ? geminiParts.join('\n')
+      : 'Gemini analysis was correct';
+
+    // Extract humor types
+    const humorTypes: string[] = [];
+    if (analysis.script?.humor?.humorType) {
+      humorTypes.push(analysis.script.humor.humorType);
+    }
+
+    // Create positive learning example
+    const learningResult = await saveVideoAnalysisExample({
+      videoId: existingVideo?.id,
+      videoUrl,
+      exampleType: 'good_interpretation',
+      videoSummary,
+      geminiInterpretation,
+      correctInterpretation: geminiInterpretation, // Same as Gemini - it was correct!
+      explanation: notes || 'Human confirmed Gemini analysis is accurate',
+      humorTypeCorrection: {
+        original: analysis.script?.humor?.humorType || 'analyzed',
+        correct: analysis.script?.humor?.humorType || 'confirmed',
+        why: notes || 'User confirmed this interpretation is correct',
+        transcript: analysis.script?.transcript?.slice(0, 500),
+        scenes: analysis.scenes?.description?.slice(0, 500)
+      },
+      humorTypes,
+      industry: 'restaurant',
+      qualityScore: 1.0  // Perfect quality - human verified as correct
+    });
+
+    if (learningResult.success) {
+      console.log(`✅ Created positive learning example: ${learningResult.id}`);
+    } else {
+      console.warn('⚠️ Failed to create positive learning example:', learningResult.error);
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Analysis confirmed as correct',
+      learningExampleId: learningResult.id
+    });
+
+  } catch (err) {
+    console.error('Failed to confirm analysis:', err);
+    return NextResponse.json({
+      error: err instanceof Error ? err.message : 'Failed to confirm analysis'
+    }, { status: 500 });
+  }
+}

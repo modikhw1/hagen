@@ -26,45 +26,127 @@ export interface VideoAnalysisOptions {
     hashtags?: string[]
     industry?: string
     contentFormat?: string
+    existingAnalysis?: unknown       // Prior analysis (for re-analysis with learning)
   }
   useLearning?: boolean              // Whether to fetch learning examples (default: true)
+  evaluateQuality?: boolean          // Whether to run LLM judge after analysis
+  humanBaseline?: string             // Human correction for quality evaluation
 }
 
 export interface VideoAnalysis {
   provider: string
   analyzedAt: string
   
+  // These interfaces are flexible to support different analysis providers
+  // Each provider may return different fields
   visual?: {
-    scenes: Scene[]
-    colorPalette: string[]
-    lighting: string
-    composition: string
-    aestheticStyle: string
-    overallQuality: number // 0-1
+    scenes?: Scene[]
+    colorPalette?: string[]
+    lighting?: string
+    composition?: string
+    aestheticStyle?: string
+    overallQuality?: number
+    // Gemini-specific fields
+    hookStrength?: number
+    hookDescription?: string
+    mainElements?: string[]
+    colorDiversity?: number
+    transitions?: string[]
+    textOverlays?: string[]
+    visualHierarchy?: string
+    compositionQuality?: number
+    brandingElements?: string[]
+    summary?: string
+    [key: string]: unknown  // Allow additional provider-specific fields
   }
   
   audio?: {
     musicGenre?: string
-    musicEnergy?: number // 0-1
+    musicEnergy?: number
     voiceTone?: string
     soundEffects?: string[]
-    audioQuality: number // 0-1
+    audioQuality?: number
+    // Gemini-specific fields
+    quality?: number
+    musicType?: string
+    hasVoiceover?: boolean
+    voiceoverQuality?: number | null
+    voiceoverTone?: string
+    energyLevel?: string
+    audioEnergy?: number
+    audioVisualSync?: number
+    audioMix?: string
+    [key: string]: unknown  // Allow additional provider-specific fields
   }
   
   content?: {
-    pacing: string
-    emotions: string[]
-    themes: string[]
-    hooks: Hook[]
+    pacing?: string
+    emotions?: string[]
+    themes?: string[]
+    hooks?: Hook[]
     callToAction?: string
+    // Gemini-specific fields
+    topic?: string
+    style?: string
+    format?: string
+    duration?: number
+    keyMessage?: string
+    narrativeStructure?: string
+    callsToAction?: string[]
+    [key: string]: unknown  // Allow additional provider-specific fields
   }
   
   technical?: {
-    duration: number
+    duration?: number
     resolution?: string
     fps?: number
-    editingStyle: string
-    cutFrequency: number // cuts per minute
+    editingStyle?: string
+    cutFrequency?: number
+    // Gemini-specific fields
+    pacing?: string
+    [key: string]: unknown  // Allow additional provider-specific fields
+  }
+  
+  // Gemini comprehensive analysis fields
+  script?: {
+    transcript?: string
+    [key: string]: unknown
+  }
+  humor?: {
+    type?: string
+    interpretation?: string
+    [key: string]: unknown
+  }
+  engagement?: {
+    [key: string]: unknown
+  }
+  production?: {
+    [key: string]: unknown
+  }
+  trends?: {
+    trendingElements?: string[]
+    trendAlignment?: number
+    timelessness?: number
+    [key: string]: unknown
+  }
+  scenes?: {
+    sceneBreakdown?: unknown[]
+    editAsPunchline?: boolean
+    editPunchlineExplanation?: string
+    visualNarrativeSync?: number
+    misdirectionTechnique?: string
+    [key: string]: unknown
+  }
+  
+  // Quality evaluation scores (from LLM judge)
+  qualityScore?: {
+    mechanism_match: number      // 0-100: Does analysis identify correct humor mechanism?
+    key_insight_captured: number // 0-100: Does it capture the human's main insight?
+    error_avoided: number        // 0-100: Does it avoid previous errors?
+    depth_of_analysis: number    // 0-100: How deep/nuanced is the analysis?
+    overall: number              // 0-100: Overall alignment with human understanding
+    explanation: string          // Brief explanation of the score
+    evaluated_at?: string
   }
   
   // Raw response from provider (for debugging/re-processing)

@@ -75,8 +75,10 @@ async function analyzeTableUsage() {
         .order(col, { ascending: false })
         .limit(1);
 
-      if (latest && latest.length > 0 && latest[0][col]) {
-        const date = new Date(latest[0][col]);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const row = latest?.[0] as any;
+      if (row && row[col]) {
+        const date = new Date(row[col]);
         lastActivity = date.toISOString().split('T')[0]; // YYYY-MM-DD
         break; // Found a valid timestamp
       }

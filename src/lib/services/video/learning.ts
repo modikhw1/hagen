@@ -24,15 +24,20 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 
 export interface VideoAnalysisExample {
   id: string
-  exampleType: 'humor_interpretation' | 'cultural_context' | 'visual_punchline' | 'misdirection' | 'replicability' | 'bad_interpretation'
+  exampleType: 'humor_interpretation' | 'cultural_context' | 'visual_punchline' | 'misdirection' | 'replicability' | 'bad_interpretation' | 'good_interpretation'
   videoSummary: string
   geminiInterpretation: string | null
   correctInterpretation: string
   explanation: string
   humorTypeCorrection: {
-    original: string
-    correct: string
-    why: string
+    original?: string
+    correct?: string
+    why?: string
+    pattern?: string
+    geminiMissed?: string[]
+    humanInsight?: string
+    scenes?: string
+    transcript?: string
   } | null
   culturalContext: string | null
   visualElements: string[]
@@ -40,6 +45,10 @@ export interface VideoAnalysisExample {
   humorTypes: string[]
   qualityScore: number
   similarity: number
+  // New fields for better matching
+  transcript?: string
+  sceneBreakdown?: string
+  effectiveness?: number
 }
 
 export interface SaveExampleInput {
@@ -48,8 +57,8 @@ export interface SaveExampleInput {
   exampleType: VideoAnalysisExample['exampleType']
   videoSummary: string
   geminiInterpretation?: string
-  correctInterpretation: string
-  explanation: string
+  correctInterpretation: string  // For good_interpretation, this is same as geminiInterpretation
+  explanation: string            // For good_interpretation, this explains why Gemini got it right
   humorTypeCorrection?: VideoAnalysisExample['humorTypeCorrection']
   culturalContext?: string
   visualElements?: string[]
@@ -141,39 +150,53 @@ export async function findRelevantVideoExamples(
   }
 }
 
+import { DEEP_REASONING_CHAIN } from './deep-reasoning'
+
 /**
  * Build the few-shot learning prompt section from retrieved examples
  * This gets injected into the Gemini prompt to provide context
  * 
- * Structure: Video Scene Model → AI Interpretation → Human Correction → Delta → Pattern
+ * ENHANCED: Now includes Deep Reasoning Chain to force generative analysis
+ * Structure: Deep Reasoning Chain → Video Examples → Human Corrections → Requirements
  */
 export function buildFewShotPrompt(examples: VideoAnalysisExample[]): string {
   if (examples.length === 0) {
-    return ''
+    // Even without examples, inject the reasoning chain
+    return DEEP_REASONING_CHAIN
   }
 
-  let prompt = `
+  // Start with the Deep Reasoning Chain
+  let prompt = DEEP_REASONING_CHAIN
+
+  // Separate positive and negative examples
+  const corrections = examples.filter(e => e.exampleType !== 'good_interpretation')
+  const confirmations = examples.filter(e => e.exampleType === 'good_interpretation')
+
+  // Show corrections first (what you got wrong)
+  if (corrections.length > 0) {
+    prompt += `
 ═══════════════════════════════════════════════════════════════════════════════
-CRITICAL: LEARNING FROM HUMAN-VERIFIED CORRECTIONS
+LEARNING FROM HUMAN-VERIFIED CORRECTIONS
 ═══════════════════════════════════════════════════════════════════════════════
 
-You have made interpretation errors on similar videos before. Study these corrections carefully:
+You have made interpretation errors on similar videos before. Study these corrections 
+and notice HOW the human reasoning differs from surface-level labeling:
 
 `
 
-  for (let i = 0; i < examples.length; i++) {
-    const ex = examples[i]
-    const patternType = ex.exampleType.replace(/_/g, ' ').toUpperCase()
-    
-    prompt += `┌─────────────────────────────────────────────────────────────────────────────
+    for (let i = 0; i < corrections.length; i++) {
+      const ex = corrections[i]
+      const patternType = ex.exampleType.replace(/_/g, ' ').toUpperCase()
+      
+      prompt += `┌─────────────────────────────────────────────────────────────────────────────
 │ CORRECTION #${i + 1}: ${patternType}
 ├─────────────────────────────────────────────────────────────────────────────
 │ VIDEO CONTEXT: ${ex.videoSummary}
 │
 `
 
-    if (ex.geminiInterpretation && ex.geminiInterpretation !== 'Original Gemini analysis') {
-      prompt += `│ ❌ YOUR ORIGINAL ANALYSIS:
+      if (ex.geminiInterpretation && ex.geminiInterpretation !== 'Original Gemini analysis') {
+        prompt += `│ ❌ YOUR ORIGINAL ANALYSIS:
 │    ${ex.geminiInterpretation.split('\n').join('\n│    ')}
 │
 │ ✅ CORRECT INTERPRETATION:
@@ -182,76 +205,103 @@ You have made interpretation errors on similar videos before. Study these correc
 │ 📚 WHAT YOU MISSED:
 │    ${ex.explanation.split('\n').join('\n│    ')}
 `
-    } else {
-      prompt += `│ ✅ CORRECT INTERPRETATION:
+      } else {
+        prompt += `│ ✅ CORRECT INTERPRETATION:
 │    ${ex.correctInterpretation.split('\n').join('\n│    ')}
 │
 │ 📚 KEY INSIGHT:
 │    ${ex.explanation.split('\n').join('\n│    ')}
 `
-    }
+      }
 
-    // Show specific correction patterns
-    if (ex.humorTypeCorrection) {
-      const htc = ex.humorTypeCorrection
-      if (htc.pattern) {
+      // Add scene/transcript context
+      const scenes = ex.humorTypeCorrection?.scenes || ex.sceneBreakdown
+      if (scenes) {
         prompt += `│
-│ 🎯 PATTERN DETECTED: ${htc.pattern.replace(/_/g, ' ').toUpperCase()}
-`
-        if (htc.geminiMissed?.length) {
-          prompt += `│    - ${htc.geminiMissed.join('\n│    - ')}
-`
-        }
-      } else if (htc.original && htc.correct) {
-        prompt += `│
-│ 🎯 HUMOR CORRECTION: "${htc.original}" → "${htc.correct}"
-│    Reason: ${htc.why || 'See explanation above'}
+│ 🎬 SCENE BREAKDOWN:
+│    ${scenes.split('\n').slice(0, 4).join('\n│    ')}
 `
       }
-    }
 
-    if (ex.culturalContext) {
-      prompt += `│
-│ 🌍 CULTURAL CONTEXT YOU MISSED:
-│    ${ex.culturalContext}
+      const transcript = ex.humorTypeCorrection?.transcript || ex.transcript
+      if (transcript && transcript.length > 50) {
+        prompt += `│
+│ 📜 TRANSCRIPT EXCERPT:
+│    "${transcript.slice(0, 200)}${transcript.length > 200 ? '...' : ''}"
+`
+      }
+
+      prompt += `└─────────────────────────────────────────────────────────────────────────────
+
 `
     }
-
-    if (ex.visualElements.length > 0) {
-      prompt += `│
-│ 👁️ VISUAL ELEMENTS YOU OVERLOOKED:
-│    ${ex.visualElements.join(', ')}
-`
-    }
-
-    prompt += `└─────────────────────────────────────────────────────────────────────────────
-
-`
   }
 
-  prompt += `═══════════════════════════════════════════════════════════════════════════════
-MANDATORY REQUIREMENTS FOR THIS ANALYSIS:
+  // Show confirmations (what you got right - positive reinforcement)
+  if (confirmations.length > 0) {
+    prompt += `
+═══════════════════════════════════════════════════════════════════════════════
+VERIFIED CORRECT: These interpretations were confirmed accurate by humans
 ═══════════════════════════════════════════════════════════════════════════════
 
-1. LOOK FOR SIMILAR PATTERNS: Does this video share traits with any corrections above?
-   - Same humor mechanism (visual reveal, subversion, relatability)?
-   - Similar cultural/generational context?
-   - Visual punchlines in editing rather than dialogue?
+For similar videos, replicate this analysis approach:
 
-2. BEFORE FINALIZING YOUR INTERPRETATION:
-   - Re-watch the punchline moment - is it verbal OR visual?
-   - Consider: what would a 25-year-old service worker find funny?
-   - Ask: am I describing what happens, or WHY it's funny?
+`
 
-3. COMMON MISTAKES TO AVOID:
+    for (let i = 0; i < confirmations.length; i++) {
+      const ex = confirmations[i]
+      
+      prompt += `┌─────────────────────────────────────────────────────────────────────────────
+│ ✅ VERIFIED CORRECT #${i + 1}
+├─────────────────────────────────────────────────────────────────────────────
+│ VIDEO CONTEXT: ${ex.videoSummary}
+│
+│ YOUR ANALYSIS (CONFIRMED CORRECT):
+│    ${ex.correctInterpretation.split('\n').join('\n│    ')}
+│
+│ WHY THIS IS RIGHT:
+│    ${ex.explanation.split('\n').join('\n│    ')}
+└─────────────────────────────────────────────────────────────────────────────
+
+`
+    }
+  }
+
+  // Only add requirements if we have corrections
+  if (corrections.length > 0) {
+    prompt += `═══════════════════════════════════════════════════════════════════════════════
+MANDATORY REQUIREMENTS FOR THIS ANALYSIS (Enforcing Deep Reasoning)
+═══════════════════════════════════════════════════════════════════════════════
+
+1. COMPLETE THE DEEP REASONING CHAIN FIRST:
+   Before assigning any humor labels, fill out the deep_reasoning object:
+   - character_dynamic: What relationship/tension exists between characters?
+   - underlying_tension: What gap or conflict creates the humor?
+   - format_participation: Does the structure/format participate in the joke?
+   - editing_contribution: What editing choices add to humor?
+   - audience_surrogate: Which character represents viewer feelings?
+
+2. YOUR HUMOR MECHANISM MUST REFLECT THE REASONING:
+   ❌ WRONG: "The humor is contrast between the characters"
+   ✅ RIGHT: "The humor comes from each answer revealing self-interest based on
+              job role - those who profit want more, those who labor want less"
+
+3. CHECK YOUR EXPLANATION:
+   - If your explanation could apply to multiple videos, it's too shallow
+   - Ask: Am I explaining WHAT HAPPENS or WHY IT'S FUNNY?
+   - Ask: What would a 25-year-old service worker find relatable here?
+
+4. LOOK FOR PATTERNS FROM CORRECTIONS ABOVE:
+   - Same humor mechanism (format subversion, incentive reveal, rebel worker)?
+   - Similar character dynamics (worker vs management, performance vs reality)?
+   - Visual/editing punchlines rather than dialogue?
+
+5. COMMON MISTAKES TO AVOID:
    - Calling something "subversion of expectations" without explaining WHAT expectation
    - Missing visual comedy (facial expressions, physical gags)
    - Over-intellectualizing simple relatable humor
-   - Not noticing when the edit/cut IS the punchline
-
-═══════════════════════════════════════════════════════════════════════════════
-
 `
+  }
 
   return prompt
 }
@@ -264,16 +314,77 @@ export async function saveVideoAnalysisExample(
   input: SaveExampleInput
 ): Promise<{ success: boolean; id?: string; error?: string }> {
   try {
-    // Build text for embedding from the key teaching content
-    const embeddingText = [
-      input.videoSummary,
-      input.correctInterpretation,
-      input.explanation,
-      input.culturalContext,
-      ...(input.visualElements || []),
-      ...(input.tags || []),
-      ...(input.humorTypes || [])
-    ].filter(Boolean).join(' ')
+    // Build embedding focused on JOKE CONCEPT/MECHANISM for better similarity matching
+    // Priority: concept > mechanism > interpretation > transcript
+    // This captures "what makes it funny" not just "what was said"
+    const embeddingParts: string[] = []
+    
+    // 1. Video summary - THE CONCEPT (most important for matching similar jokes)
+    if (input.videoSummary) {
+      embeddingParts.push(`JOKE_CONCEPT: ${input.videoSummary}`)
+    }
+    
+    // 2. Humor mechanism - HOW THE JOKE WORKS (critical for format matching)
+    if (input.geminiInterpretation) {
+      // Extract mechanism from Gemini's interpretation
+      embeddingParts.push(`HUMOR_MECHANISM: ${input.geminiInterpretation}`)
+    }
+    
+    // 3. Human correction - THE INSIGHT (what makes this specific pattern)
+    if (input.correctInterpretation) {
+      embeddingParts.push(`CORRECT_INTERPRETATION: ${input.correctInterpretation}`)
+    }
+    
+    // 4. Humor pattern/type - CATEGORICAL (helps cluster similar formats)
+    if (input.humorTypeCorrection?.pattern) {
+      embeddingParts.push(`HUMOR_PATTERN: ${input.humorTypeCorrection.pattern}`)
+    }
+    if (input.humorTypes?.length) {
+      embeddingParts.push(`HUMOR_TYPES: ${input.humorTypes.join(', ')}`)
+    }
+    
+    // 5. Explanation - WHY IT'S FUNNY (teaching content)
+    if (input.explanation && input.explanation !== input.correctInterpretation) {
+      embeddingParts.push(`EXPLANATION: ${input.explanation}`)
+    }
+    
+    // 6. Human insight - WHAT AI MISSED
+    if (input.humorTypeCorrection?.humanInsight) {
+      embeddingParts.push(`INSIGHT: ${input.humorTypeCorrection.humanInsight}`)
+    }
+    if (input.humorTypeCorrection?.geminiMissed?.length) {
+      embeddingParts.push(`MISSED_ELEMENTS: ${input.humorTypeCorrection.geminiMissed.join(', ')}`)
+    }
+    
+    // 7. Visual elements - VISUAL PUNCHLINES
+    if (input.visualElements?.length) {
+      embeddingParts.push(`VISUAL_ELEMENTS: ${input.visualElements.join(', ')}`)
+    }
+    
+    // 8. Cultural context
+    if (input.culturalContext) {
+      embeddingParts.push(`CULTURAL_CONTEXT: ${input.culturalContext}`)
+    }
+    
+    // 9. Scene breakdown - NARRATIVE STRUCTURE (secondary)
+    if (input.humorTypeCorrection?.scenes) {
+      embeddingParts.push(`SCENES: ${input.humorTypeCorrection.scenes}`)
+    }
+    
+    // 10. Transcript - LAST (exact words matter less than concept)
+    // Include only a summary portion for context
+    if (input.humorTypeCorrection?.transcript) {
+      const shortTranscript = input.humorTypeCorrection.transcript.slice(0, 300)
+      embeddingParts.push(`TRANSCRIPT_EXCERPT: ${shortTranscript}`)
+    }
+    
+    // 11. Tags
+    if (input.tags?.length) {
+      embeddingParts.push(`TAGS: ${input.tags.join(', ')}`)
+    }
+    
+    const embeddingText = embeddingParts.join('\n')
+    console.log(`📝 Building embedding from ${embeddingParts.length} parts (${embeddingText.length} chars)`)
 
     // Generate embedding
     const embedding = await generateEmbedding(embeddingText)
@@ -429,6 +540,11 @@ export async function saveVideoCorrection(
 /**
  * Get learning context for a video before analysis
  * Call this before Gemini analysis to get relevant examples
+ * 
+ * Priority for matching:
+ * 1. Transcript (most semantic match)
+ * 2. Title + Description
+ * 3. Industry/Format filters
  */
 export async function getLearningContext(
   videoMetadata: {
@@ -438,29 +554,76 @@ export async function getLearningContext(
     hashtags?: string[]
     industry?: string
     contentFormat?: string
-  }
+    existingAnalysis?: any  // Previous analysis if re-analyzing
+  },
+  videoId?: string  // For tracking which examples were used
 ): Promise<string> {
-  // Build context string from metadata
-  const contextParts = [
-    videoMetadata.title,
-    videoMetadata.description,
-    videoMetadata.transcript,
-    ...(videoMetadata.hashtags || [])
-  ].filter(Boolean)
+  // Build context string from metadata - prioritize transcript
+  const contextParts: string[] = []
+  
+  // Transcript is most valuable for semantic matching
+  if (videoMetadata.transcript) {
+    contextParts.push(videoMetadata.transcript.slice(0, 2000))
+  }
+  
+  // Existing analysis can provide context
+  if (videoMetadata.existingAnalysis) {
+    const ea = videoMetadata.existingAnalysis
+    if (ea.content?.conceptCore) contextParts.push(ea.content.conceptCore)
+    if (ea.content?.keyMessage) contextParts.push(ea.content.keyMessage)
+    if (ea.script?.transcript) contextParts.push(ea.script.transcript.slice(0, 1000))
+    if (ea.summary) contextParts.push(ea.summary)
+  }
+  
+  // Title and description
+  if (videoMetadata.title) contextParts.push(videoMetadata.title)
+  if (videoMetadata.description) contextParts.push(videoMetadata.description)
+  
+  // Hashtags can indicate topic
+  if (videoMetadata.hashtags?.length) {
+    contextParts.push(videoMetadata.hashtags.join(' '))
+  }
 
   if (contextParts.length === 0) {
+    console.log('📚 No context available for learning retrieval')
     return ''
   }
 
-  const context = contextParts.join(' ')
+  const context = contextParts.join('\n\n')
+  console.log(`📚 Building learning context from: ${contextParts.length} sources (${context.length} chars)`)
 
-  // Find relevant examples
+  // Find relevant examples with lower threshold for more matches
   const examples = await findRelevantVideoExamples(context, {
     industry: videoMetadata.industry,
     contentFormat: videoMetadata.contentFormat,
-    limit: 3,
-    threshold: 0.4
+    limit: 4,  // Get 4 examples for better coverage
+    threshold: 0.35  // Lower threshold to find more matches
   })
+
+  if (examples.length === 0) {
+    console.log('📚 No matching learning examples found')
+    return ''
+  }
+
+  console.log(`📚 Found ${examples.length} relevant examples (similarities: ${examples.map(e => e.similarity?.toFixed(2)).join(', ')})`)
+
+  // Track which examples were used (if videoId provided)
+  if (videoId) {
+    for (const ex of examples) {
+      // Async tracking, don't wait - wrap in IIFE to handle promise
+      (async () => {
+        try {
+          await supabase.rpc('record_example_usage_with_tracking', {
+            p_example_id: ex.id,
+            p_video_id: videoId,
+            p_similarity: ex.similarity
+          })
+        } catch {
+          // Ignore tracking errors
+        }
+      })()
+    }
+  }
 
   // Build few-shot prompt
   return buildFewShotPrompt(examples)

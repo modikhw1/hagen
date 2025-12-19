@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
     // Get videos that need analysis
     let query = supabase
       .from('analyzed_videos')
-      .select('id, gcs_uri, video_url, metadata')
+      .select('id, gcs_uri, video_url, metadata, visual_analysis')
       .not('gcs_uri', 'is', null)
       .order('created_at', { ascending: false })
       .limit(limit)
