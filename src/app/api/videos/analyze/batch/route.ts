@@ -143,9 +143,20 @@ export async function POST(request: NextRequest) {
           continue
         }
 
-        // Analyze with Gemini
+        // Build video metadata for learning context
+        const videoMetadata = {
+          title: video.metadata?.title || '',
+          description: video.metadata?.description || '',
+          industry: video.visual_analysis?.industry,
+          contentFormat: video.visual_analysis?.content?.format,
+          existingAnalysis: video.visual_analysis
+        }
+
+        // Analyze with Gemini (with learning from corrected examples)
         const analysis = await analyzer.analyzeVideo(cloudUrl, {
-          detailLevel: 'comprehensive'
+          detailLevel: 'comprehensive',
+          useLearning: true,
+          videoMetadata
         })
 
         // Save analysis to database

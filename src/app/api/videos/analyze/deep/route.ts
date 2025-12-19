@@ -116,11 +116,22 @@ export async function POST(request: NextRequest) {
       let analysis: any
       let schemaV1Signals: any = null
       
+      // Build video metadata for learning context
+      const videoMetadata = {
+        title: video.title || '',
+        description: video.description || '',
+        industry: video.visual_analysis?.industry || video.brand_id ? 'restaurant' : undefined,
+        contentFormat: video.visual_analysis?.content?.format,
+        existingAnalysis: video.visual_analysis
+      }
+      
       // Always run legacy analyzer for display data (visual summary, humor type, scores)
       console.log('🤖 Analyzing with Gemini (for display data)...')
       const legacyAnalyzer = new GeminiVideoAnalyzer()
       analysis = await legacyAnalyzer.analyzeVideo(cloudUrl, {
-        detailLevel
+        detailLevel,
+        useLearning: true,
+        videoMetadata
       })
       
       // If Schema v1.1 requested, also run BrandAnalyzer for structured signals
