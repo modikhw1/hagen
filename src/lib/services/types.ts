@@ -17,6 +17,17 @@ export interface VideoAnalysisOptions {
   includeVisual?: boolean
   includeText?: boolean
   detailLevel?: 'basic' | 'detailed' | 'comprehensive'
+  // Learning context options
+  learningContext?: string           // Pre-built few-shot prompt from RAG
+  videoMetadata?: {                  // Metadata for RAG retrieval
+    transcript?: string
+    title?: string
+    description?: string
+    hashtags?: string[]
+    industry?: string
+    contentFormat?: string
+  }
+  useLearning?: boolean              // Whether to fetch learning examples (default: true)
 }
 
 export interface VideoAnalysis {

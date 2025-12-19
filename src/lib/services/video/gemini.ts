@@ -4,10 +4,12 @@ import type {
   VideoAnalysisOptions, 
   VideoAnalysis 
 } from '../types'
+import { getLearningContext } from './learning'
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY!
 
 export class GeminiVideoAnalyzer implements VideoAnalysisProvider {
+  name = 'gemini'
   private client: GoogleGenerativeAI
   private model: string
 
@@ -21,14 +23,30 @@ export class GeminiVideoAnalyzer implements VideoAnalysisProvider {
     options: VideoAnalysisOptions = {}
   ): Promise<VideoAnalysis> {
     const detailLevel = options.detailLevel || 'comprehensive'
+    const useLearning = options.useLearning !== false  // Default to true
     
     console.log(`🎬 Analyzing video with Gemini (${detailLevel} detail)`)
     
     try {
       const model = this.client.getGenerativeModel({ model: this.model })
 
+      // Get learning context from RAG if enabled
+      let learningContext = options.learningContext || ''
+      if (useLearning && !learningContext && options.videoMetadata) {
+        console.log('📚 Fetching learning context from RAG...')
+        learningContext = await getLearningContext(options.videoMetadata)
+        if (learningContext) {
+          console.log('✅ Found relevant learning examples')
+        }
+      }
+
       // Generate detailed analysis prompt based on detail level
-      const prompt = this.buildAnalysisPrompt(detailLevel)
+      const basePrompt = this.buildAnalysisPrompt(detailLevel)
+      
+      // Inject learning context if available
+      const prompt = learningContext 
+        ? `${learningContext}\n\n${basePrompt}`
+        : basePrompt
 
       const result = await model.generateContent([
         {
