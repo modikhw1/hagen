@@ -144,6 +144,8 @@ export async function findRelevantVideoExamples(
 /**
  * Build the few-shot learning prompt section from retrieved examples
  * This gets injected into the Gemini prompt to provide context
+ * 
+ * Structure: Video Scene Model → AI Interpretation → Human Correction → Delta → Pattern
  */
 export function buildFewShotPrompt(examples: VideoAnalysisExample[]): string {
   if (examples.length === 0) {
@@ -151,52 +153,103 @@ export function buildFewShotPrompt(examples: VideoAnalysisExample[]): string {
   }
 
   let prompt = `
----
-LEARNING FROM PAST CORRECTIONS:
-The following are examples of videos similar to what you're analyzing, with human-verified corrections to guide your interpretation:
+═══════════════════════════════════════════════════════════════════════════════
+CRITICAL: LEARNING FROM HUMAN-VERIFIED CORRECTIONS
+═══════════════════════════════════════════════════════════════════════════════
+
+You have made interpretation errors on similar videos before. Study these corrections carefully:
 
 `
 
   for (let i = 0; i < examples.length; i++) {
     const ex = examples[i]
-    prompt += `### Example ${i + 1}: ${ex.exampleType.replace(/_/g, ' ').toUpperCase()}
-**Video:** ${ex.videoSummary}
+    const patternType = ex.exampleType.replace(/_/g, ' ').toUpperCase()
+    
+    prompt += `┌─────────────────────────────────────────────────────────────────────────────
+│ CORRECTION #${i + 1}: ${patternType}
+├─────────────────────────────────────────────────────────────────────────────
+│ VIDEO CONTEXT: ${ex.videoSummary}
+│
 `
 
-    if (ex.geminiInterpretation) {
-      prompt += `**AI Initially Said:** ${ex.geminiInterpretation}
+    if (ex.geminiInterpretation && ex.geminiInterpretation !== 'Original Gemini analysis') {
+      prompt += `│ ❌ YOUR ORIGINAL ANALYSIS:
+│    ${ex.geminiInterpretation.split('\n').join('\n│    ')}
+│
+│ ✅ CORRECT INTERPRETATION:
+│    ${ex.correctInterpretation.split('\n').join('\n│    ')}
+│
+│ 📚 WHAT YOU MISSED:
+│    ${ex.explanation.split('\n').join('\n│    ')}
+`
+    } else {
+      prompt += `│ ✅ CORRECT INTERPRETATION:
+│    ${ex.correctInterpretation.split('\n').join('\n│    ')}
+│
+│ 📚 KEY INSIGHT:
+│    ${ex.explanation.split('\n').join('\n│    ')}
 `
     }
 
-    prompt += `**Correct Interpretation:** ${ex.correctInterpretation}
-**Why:** ${ex.explanation}
-`
-
+    // Show specific correction patterns
     if (ex.humorTypeCorrection) {
-      prompt += `**Humor Correction:** "${ex.humorTypeCorrection.original}" → "${ex.humorTypeCorrection.correct}" because ${ex.humorTypeCorrection.why}
+      const htc = ex.humorTypeCorrection
+      if (htc.pattern) {
+        prompt += `│
+│ 🎯 PATTERN DETECTED: ${htc.pattern.replace(/_/g, ' ').toUpperCase()}
 `
+        if (htc.geminiMissed?.length) {
+          prompt += `│    - ${htc.geminiMissed.join('\n│    - ')}
+`
+        }
+      } else if (htc.original && htc.correct) {
+        prompt += `│
+│ 🎯 HUMOR CORRECTION: "${htc.original}" → "${htc.correct}"
+│    Reason: ${htc.why || 'See explanation above'}
+`
+      }
     }
 
     if (ex.culturalContext) {
-      prompt += `**Cultural Context Needed:** ${ex.culturalContext}
+      prompt += `│
+│ 🌍 CULTURAL CONTEXT YOU MISSED:
+│    ${ex.culturalContext}
 `
     }
 
     if (ex.visualElements.length > 0) {
-      prompt += `**Visual Elements Missed:** ${ex.visualElements.join(', ')}
+      prompt += `│
+│ 👁️ VISUAL ELEMENTS YOU OVERLOOKED:
+│    ${ex.visualElements.join(', ')}
 `
     }
 
-    prompt += '\n'
+    prompt += `└─────────────────────────────────────────────────────────────────────────────
+
+`
   }
 
-  prompt += `---
-APPLY THESE LEARNINGS: Use the patterns above to better interpret this video. Pay attention to:
-- Visual punchlines that happen in the edit/cut, not just dialogue
-- Cultural/generational references that may not be obvious
-- Misdirection setups where the viewer's assumption is subverted
-- The ACTUAL humor mechanism, not surface-level description
----
+  prompt += `═══════════════════════════════════════════════════════════════════════════════
+MANDATORY REQUIREMENTS FOR THIS ANALYSIS:
+═══════════════════════════════════════════════════════════════════════════════
+
+1. LOOK FOR SIMILAR PATTERNS: Does this video share traits with any corrections above?
+   - Same humor mechanism (visual reveal, subversion, relatability)?
+   - Similar cultural/generational context?
+   - Visual punchlines in editing rather than dialogue?
+
+2. BEFORE FINALIZING YOUR INTERPRETATION:
+   - Re-watch the punchline moment - is it verbal OR visual?
+   - Consider: what would a 25-year-old service worker find funny?
+   - Ask: am I describing what happens, or WHY it's funny?
+
+3. COMMON MISTAKES TO AVOID:
+   - Calling something "subversion of expectations" without explaining WHAT expectation
+   - Missing visual comedy (facial expressions, physical gags)
+   - Over-intellectualizing simple relatable humor
+   - Not noticing when the edit/cut IS the punchline
+
+═══════════════════════════════════════════════════════════════════════════════
 
 `
 

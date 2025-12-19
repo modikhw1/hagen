@@ -67,13 +67,25 @@ export async function POST(request: NextRequest) {
 
     // === NEW: Save to video_analysis_examples for RAG learning ===
     const videoSummary = originalAnalysis?.content?.keyMessage ||
+                         originalAnalysis?.content?.conceptCore ||
                          originalAnalysis?.visual?.summary ||
-                         originalAnalysis?.script?.conceptCore ||
+                         existingVideo?.visual_analysis?.content?.keyMessage ||
                          'Video analysis';
     
-    const geminiInterpretation = originalAnalysis?.script?.humor?.humorType ||
-                                  originalAnalysis?.script?.humor?.humorMechanism ||
-                                  'Gemini interpretation';
+    // Build comprehensive Gemini interpretation from all fields
+    const geminiParts: string[] = [];
+    const analysis = originalAnalysis || existingVideo?.visual_analysis || {};
+    
+    if (analysis.content?.humorType) geminiParts.push(`Humor Type: ${analysis.content.humorType}`);
+    if (analysis.content?.humorMechanism) geminiParts.push(`Humor Mechanism: ${analysis.content.humorMechanism}`);
+    if (analysis.content?.comedyTiming) geminiParts.push(`Comedy Timing: ${analysis.content.comedyTiming}`);
+    if (analysis.content?.whyFunny) geminiParts.push(`Why Funny: ${analysis.content.whyFunny}`);
+    if (analysis.script?.humor?.humorType) geminiParts.push(`Script Humor: ${analysis.script.humor.humorType}`);
+    if (analysis.visual?.punchlineDelivery) geminiParts.push(`Punchline: ${analysis.visual.punchlineDelivery}`);
+    
+    const geminiInterpretation = geminiParts.length > 0 
+      ? geminiParts.join('\n')
+      : 'Gemini interpretation not captured';
 
     // Determine example type based on correction
     let exampleType: 'humor_interpretation' | 'cultural_context' | 'visual_punchline' | 'misdirection' | 'replicability' = 'humor_interpretation';
