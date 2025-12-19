@@ -2,15 +2,17 @@
  * Analysis Corrections API
  * 
  * Stores corrections to Gemini's analysis for learning
+ * Now wired to the RAG-based video analysis learning system
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
+import { saveVideoAnalysisExample } from '@/lib/services/video/learning';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -18,7 +20,7 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 /**
  * POST /api/corrections
  * 
- * Save a correction to Gemini's analysis
+ * Save a correction to Gemini's analysis AND create a learning example for RAG
  */
 export async function POST(request: NextRequest) {
   try {
@@ -38,7 +40,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Save the correction
+    // Save the correction to analysis_corrections table (legacy)
     const { data, error } = await supabase
       .from('analysis_corrections')
       .insert({
@@ -56,13 +58,74 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to save correction' }, { status: 500 });
     }
 
-    // If this video exists in analyzed_videos, update its embedding with the correction
+    // Get the video ID if it exists
     const { data: existingVideo } = await supabase
       .from('analyzed_videos')
-      .select('id, metadata')
+      .select('id, metadata, visual_analysis')
       .eq('video_url', videoUrl)
       .single();
 
+    // === NEW: Save to video_analysis_examples for RAG learning ===
+    const videoSummary = originalAnalysis?.content?.keyMessage ||
+                         originalAnalysis?.visual?.summary ||
+                         originalAnalysis?.script?.conceptCore ||
+                         'Video analysis';
+    
+    const geminiInterpretation = originalAnalysis?.script?.humor?.humorType ||
+                                  originalAnalysis?.script?.humor?.humorMechanism ||
+                                  'Gemini interpretation';
+
+    // Determine example type based on correction
+    let exampleType: 'humor_interpretation' | 'cultural_context' | 'visual_punchline' | 'misdirection' | 'replicability' = 'humor_interpretation';
+    const notesLower = (notes || '').toLowerCase();
+    if (notesLower.includes('cultural') || notesLower.includes('generation') || notesLower.includes('gen z') || notesLower.includes('millennial')) {
+      exampleType = 'cultural_context';
+    } else if (notesLower.includes('visual') || notesLower.includes('cut') || notesLower.includes('edit') || notesLower.includes('reveal')) {
+      exampleType = 'visual_punchline';
+    } else if (notesLower.includes('misdirect') || notesLower.includes('subvert') || notesLower.includes('expect')) {
+      exampleType = 'misdirection';
+    }
+
+    // Extract humor types from the correction
+    const humorTypes: string[] = [];
+    if (correction.humor_type) {
+      // Try to extract humor type keywords
+      const humorKeywords = ['wordplay', 'visual-reveal', 'subversion', 'absurdist', 'observational', 
+                             'physical', 'callback', 'contrast', 'deadpan', 'escalation', 'satire', 
+                             'parody', 'edit-punchline', 'exaggeration', 'self-deprecating'];
+      const correctionLower = correction.humor_type.toLowerCase();
+      for (const keyword of humorKeywords) {
+        if (correctionLower.includes(keyword)) {
+          humorTypes.push(keyword);
+        }
+      }
+    }
+
+    const learningResult = await saveVideoAnalysisExample({
+      videoId: existingVideo?.id,
+      videoUrl,
+      exampleType,
+      videoSummary,
+      geminiInterpretation,
+      correctInterpretation: notes || correction.humor_type || correction.joke_structure || 'Corrected',
+      explanation: notes || 'Human correction of Gemini analysis',
+      humorTypeCorrection: correction.humor_type ? {
+        original: originalAnalysis?.script?.humor?.humorType || 'unknown',
+        correct: correction.humor_type,
+        why: notes || 'User correction'
+      } : undefined,
+      humorTypes,
+      industry: 'restaurant', // Default for hospitality focus
+      qualityScore: 0.9  // Human corrections are high quality
+    });
+
+    if (learningResult.success) {
+      console.log(`✅ Created learning example: ${learningResult.id}`);
+    } else {
+      console.warn('⚠️ Failed to create learning example:', learningResult.error);
+    }
+
+    // If this video exists, update its embedding with the correction
     if (existingVideo) {
       // Build new embedding text with correction context
       const embeddingText = buildCorrectionEmbeddingText(
@@ -91,7 +154,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       correction: data,
-      embeddingUpdated: !!existingVideo
+      embeddingUpdated: !!existingVideo,
+      learningExampleCreated: learningResult.success,
+      learningExampleId: learningResult.id
     });
 
   } catch (err) {
