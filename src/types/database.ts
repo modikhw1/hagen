@@ -38,6 +38,100 @@ export interface Database {
           avatar_url?: string | null
         }
       }
+      analyzed_videos: {
+        Row: {
+          id: string
+          platform: string
+          video_url: string
+          video_id: string
+          metadata: Json | null
+          visual_analysis: Json | null
+          audio_analysis: Json | null
+          user_tags: string[]
+          user_notes: string | null
+          rating_schema_version: number
+          content_embedding: number[] | null
+          computed_scores: Json | null
+          created_at: string
+          analyzed_at: string | null
+          rated_at: string | null
+          gcs_uri: string | null
+        }
+        Insert: {
+          id?: string
+          platform: string
+          video_url: string
+          video_id: string
+          metadata?: Json | null
+          visual_analysis?: Json | null
+          audio_analysis?: Json | null
+          user_tags?: string[]
+          user_notes?: string | null
+          rating_schema_version?: number
+          content_embedding?: number[] | null
+          computed_scores?: Json | null
+          created_at?: string
+          analyzed_at?: string | null
+          rated_at?: string | null
+          gcs_uri?: string | null
+        }
+        Update: {
+          id?: string
+          platform?: string
+          video_url?: string
+          video_id?: string
+          metadata?: Json | null
+          visual_analysis?: Json | null
+          audio_analysis?: Json | null
+          user_tags?: string[]
+          user_notes?: string | null
+          rating_schema_version?: number
+          content_embedding?: number[] | null
+          computed_scores?: Json | null
+          created_at?: string
+          analyzed_at?: string | null
+          rated_at?: string | null
+          gcs_uri?: string | null
+        }
+      }
+      video_ratings: {
+        Row: {
+          id: string
+          video_id: string
+          overall_score: number | null
+          dimensions: Json
+          tags: string[]
+          notes: string | null
+          rated_at: string
+          training_exported: boolean
+          exported_at: string | null
+          rater_id: string
+        }
+        Insert: {
+          id?: string
+          video_id: string
+          overall_score?: number | null
+          dimensions?: Json
+          tags?: string[]
+          notes?: string | null
+          rated_at?: string
+          training_exported?: boolean
+          exported_at?: string | null
+          rater_id?: string
+        }
+        Update: {
+          id?: string
+          video_id?: string
+          overall_score?: number | null
+          dimensions?: Json
+          tags?: string[]
+          notes?: string | null
+          rated_at?: string
+          training_exported?: boolean
+          exported_at?: string | null
+          rater_id?: string
+        }
+      }
       // Add more tables as needed
     }
     Views: {
