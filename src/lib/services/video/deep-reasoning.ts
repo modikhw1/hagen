@@ -649,5 +649,134 @@ export const SEED_DEEP_REASONING_EXAMPLES: DeepReasoningExample[] = [
     key_teaching: "Absence of action can be a punchline. Not getting the discount implies rejection. The humor is in the GAP between expectation (I might be beautiful!) and reality (I'm not).",
     tags: ['implied-rejection', 'beauty-standards', 'casual-cruelty', 'deadpan'],
     humor_types: ['mean-humor', 'subversion', 'social-dynamics']
+  },
+  // ============================================================================
+  // CULTURAL CONTEXT EXAMPLES (Gap: 57 instances)
+  // ============================================================================
+  {
+    video_summary: "Kitchen bell rings. Cut to: server throws drink mid-conversation, waitress slides across table, busboy vaults counter. All staff drop everything instantly to respond to kitchen bell.",
+    original_analysis: "Script Humor: absurdist",
+    deep_reasoning: {
+      character_dynamic: "Kitchen staff (demanding, expects immediate obedience) vs. Front-of-house staff (absurdly compliant)",
+      underlying_tension: "CULTURAL TRUTH: Kitchen staff in restaurants DO have unrealistic expectations that food should be picked up immediately. This shared cultural knowledge makes the absurdist response feel like exaggerated truth.",
+      format_participation: "Visual gag format - escalating absurdity with each scene builds comedic momentum",
+      editing_contribution: "Quick cuts between different staff members amplify the 'everyone drops everything' effect",
+      audience_surrogate: "Anyone who's worked in restaurants recognizes this power dynamic - the kitchen bell commands everyone"
+    },
+    correct_interpretation: "Absurdist commentary on restaurant culture. The joke works because restaurant workers ACTUALLY experience this pressure from kitchen staff. By showing extreme compliance (throwing drinks, sliding across tables), it exaggerates a shared cultural experience to absurd proportions. The humor requires knowing that 'kitchen runs the show' is a real industry trope.",
+    key_teaching: "When a joke exaggerates a workplace dynamic, identify the CULTURAL TRUTH underneath. Ask: 'What shared experience makes this recognizable?' The absurdity is funny BECAUSE the underlying dynamic is real.",
+    tags: ['workplace-culture', 'restaurant-industry', 'absurdist-exaggeration', 'shared-experience'],
+    humor_types: ['absurdist', 'cultural-commentary', 'workplace']
+  },
+  {
+    video_summary: "Customer asks for pizza with vanilla ice cream and six pickles. Worker refuses. Customer reveals it's for his pregnant wife. Worker's demeanor changes instantly, now accommodating.",
+    original_analysis: "Script Humor: subversion",
+    deep_reasoning: {
+      character_dynamic: "Worker (gatekeeping food culture) vs. Customer (advocating for pregnant wife)",
+      underlying_tension: "CULTURAL RULE: Pregnancy cravings override normal food rules. This is a widely understood social exception.",
+      format_participation: "Setup (absurd request + refusal) → Reveal (pregnancy) → Resolution (accommodation). The pregnancy reveal is the pivot.",
+      editing_contribution: "Worker's face shift from dismissive to understanding IS the payoff",
+      audience_surrogate: "Anyone familiar with pregnancy craving culture understands why the dynamic shifts"
+    },
+    correct_interpretation: "Cultural exception humor. The worker's initial refusal is about respecting 'pizza culture' (you don't do that to pizza). But 'pregnancy cravings' is a culturally recognized exception - we're supposed to accommodate weird requests because 'she's pregnant'. The worker's instant demeanor change shows this cultural rule overriding his personal standards. The humor requires knowing this unwritten social rule.",
+    key_teaching: "Identify CULTURAL EXCEPTIONS - unwritten rules that override normal behavior. 'Pregnancy cravings' is one such rule. Ask: 'What cultural knowledge does the audience need to understand why this is funny?'",
+    tags: ['pregnancy-cravings', 'cultural-exception', 'social-rules', 'demeanor-shift'],
+    humor_types: ['cultural-reference', 'subversion', 'relatable']
+  },
+  {
+    video_summary: "Child pretends to work at restaurant, negotiates 'pay' with adult. Child understands some real-world concepts but misses others, creating charming confusion.",
+    original_analysis: "Script Humor: contrast",
+    deep_reasoning: {
+      character_dynamic: "Child (playing adult roles) vs. Adult (playing along with make-believe)",
+      underlying_tension: "GENERATIONAL GAP: The humor comes from a child approximating adult concepts imperfectly. They grasp SOME rules (negotiation, payment) but miss others entirely.",
+      format_participation: "Meta-perspective: We're watching through an 'adult lens' as a child navigates grown-up concepts",
+      editing_contribution: "Holding on the child's earnest attempts emphasizes their innocence",
+      audience_surrogate: "The adult - we've all seen children try to mimic adult behaviors"
+    },
+    correct_interpretation: "Generational humor + make-believe. The child understands fragments of adult world (jobs = pay, negotiation exists) but their incomplete understanding creates charm. It's wholesome because we're seeing innocent attempts to join the adult world. This is CUTE content with humor elements, not pure comedy. The cultural knowledge required: children often engage in 'playing house/work' and their misunderstandings are endearing.",
+    key_teaching: "Distinguish between COMEDY and CUTE/WHOLESOME content. When a child's misunderstanding of adult concepts is the core appeal, the emotional register is warmth, not laughter. Label content type accurately.",
+    tags: ['child-humor', 'make-believe', 'generational-gap', 'wholesome'],
+    humor_types: ['wholesome', 'generational', 'relatable']
+  },
+  // ============================================================================
+  // QUALITY MISJUDGED EXAMPLES (Gap: 31 instances)
+  // ============================================================================
+  {
+    video_summary: "Text overlay: 'waiting for my coworker to finish serving so I can finish my story'. Worker stands idle with impatient expression.",
+    original_analysis: "Script Humor: relatable",
+    deep_reasoning: {
+      character_dynamic: "Worker waiting vs. Worker serving (implied off-screen)",
+      underlying_tension: "Very low - the premise is thin and doesn't develop",
+      format_participation: "Single static shot with text overlay. No escalation, no payoff.",
+      editing_contribution: "Minimal - just a reaction shot",
+      audience_surrogate: "Workers who gossip, but the connection is weak"
+    },
+    correct_interpretation: "MEDIOCRE content. While the scenario is relatable (we've all paused a story for interruptions), the execution lacks depth. There's no twist, no escalation, no clever observation. Relatability alone doesn't equal quality. This is a one-note observation without comedic development. Rate accordingly: [MEDIOCRE]",
+    key_teaching: "Relatability is not enough for GOOD comedy. Ask: 'Does this go anywhere beyond the initial observation?' If it's just 'here's a thing that happens' without development, it's MEDIOCRE at best.",
+    tags: ['thin-premise', 'no-escalation', 'mediocre', 'underdeveloped'],
+    humor_types: ['relatable', 'observational']
+  },
+  {
+    video_summary: "Customer asks which coffee is iced. Barista: 'The cold one.' Customer asks which is oat. Barista: 'The one that says oat.' Customer asks which is large. Barista: 'The one that isn't small.'",
+    original_analysis: "Script Humor: sarcasm",
+    deep_reasoning: {
+      character_dynamic: "Obtuse customer vs. sarcastic barista",
+      underlying_tension: "Customer asks obvious questions, worker responds with obvious answers",
+      format_participation: "Repetition format - same setup/payoff pattern three times",
+      editing_contribution: "Minimal - relies on dialogue",
+      audience_surrogate: "Service workers who deal with obvious questions"
+    },
+    correct_interpretation: "MEDIOCRE content. The script has a clear structure but lacks cleverness. Each exchange follows the same pattern (obvious question → obvious answer) without escalation or surprise. The third response isn't funnier than the first - it's just more of the same. Compare to great comedy where each beat raises the stakes. This is functional but not clever. Rate: [MEDIOCRE]",
+    key_teaching: "Evaluate COMEDIC CRAFT, not just concept. Ask: 'Does each beat escalate or just repeat?' 'Is there surprise or just pattern?' A good concept with flat execution is still MEDIOCRE.",
+    tags: ['flat-execution', 'no-escalation', 'repetitive', 'mediocre'],
+    humor_types: ['sarcasm', 'workplace']
+  },
+  {
+    video_summary: "Bartender looks confused at the term 'dry wine' because 'they're all wet'. Makes a confused face.",
+    original_analysis: "Script Humor: wordplay",
+    deep_reasoning: {
+      character_dynamic: "Confused bartender who takes 'dry' literally",
+      underlying_tension: "Wordplay (dry wine = taste profile vs. dry = not wet)",
+      format_participation: "Single joke, single shot. Very brief.",
+      editing_contribution: "Reaction shot of confusion",
+      audience_surrogate: "None - we're observing an obtuse character"
+    },
+    correct_interpretation: "MEDIOCRE content. The wordplay is surface-level (dry wine = literally wet) without any additional layer. The bartender's confusion implies incompetence, which is mildly amusing but not clever. Very short with no development. The joke would be better if it escalated or had a second twist. As-is, it's a single obvious pun with a reaction shot. Rate: [MEDIOCRE]",
+    key_teaching: "Rate EXECUTION, not just category. Wordplay CAN be excellent, but obvious puns without layers are MEDIOCRE. Ask: 'How clever is this actually?' not just 'What type of humor is this?'",
+    tags: ['surface-level', 'single-pun', 'no-depth', 'mediocre'],
+    humor_types: ['wordplay', 'character-stupidity']
+  },
+  // ============================================================================
+  // VISUAL REVEAL EXAMPLES (Gap: 21 instances)
+  // ============================================================================
+  {
+    video_summary: "Man's girlfriend offers him her leftover food. He smiles eagerly. CUT TO: Stock footage of a satisfied pig with same expression/angle.",
+    original_analysis: "Script Humor: relatable",
+    deep_reasoning: {
+      character_dynamic: "Boyfriend (eager for food) with pig comparison",
+      underlying_tension: "The 'men are pigs about food' trope",
+      format_participation: "The VISUAL EDIT is the punchline - position matching between human and pig face",
+      editing_contribution: "THE ENTIRE JOKE IS EDITING. The cut to matching pig footage at the exact angle/expression IS the humor.",
+      audience_surrogate: "Women who've seen partners' excitement about leftover food"
+    },
+    correct_interpretation: "VISUAL-DEPENDENT humor. The joke cannot exist without the edit. The comedy is: 1) matching facial angle between human and pig, 2) the implication that the man is 'piggish' about food, 3) the editing technique showing the transition. If you only read the transcript, you miss 100% of the joke. The punchline is VISUAL, not verbal.",
+    key_teaching: "When the punchline is a CUT or VISUAL EDIT, state explicitly that this is visual-dependent humor. Ask: 'Would this joke work in audio-only format?' If no, the editing IS the comedy.",
+    tags: ['visual-punchline', 'editing-dependent', 'stock-footage-insert', 'position-matching'],
+    humor_types: ['visual', 'editing-comedy', 'relatable']
+  },
+  {
+    video_summary: "Employee sets up camera gear, takes task seriously to photograph food. Text says 'Results:' followed by countdown clip. Reveal: It's all selfies of the employee, no food photos.",
+    original_analysis: "Key Message: Capable of handling social media",
+    deep_reasoning: {
+      character_dynamic: "Employee who misunderstands the assignment",
+      underlying_tension: "Expectation (professional food content) vs. Reality (vanity selfies)",
+      format_participation: "Setup → Movie countdown (builds anticipation) → Visual reveal (subverted expectation)",
+      editing_contribution: "The REVEAL (selfies instead of food) is a VISUAL payoff. The countdown builds anticipation for this visual reveal.",
+      audience_surrogate: "Anyone who's seen someone misunderstand an assignment"
+    },
+    correct_interpretation: "Visual reveal comedy. The setup establishes competence (proper equipment, serious demeanor). The 'Results:' text with countdown creates anticipation. The REVEAL (selfies instead of food photos) is entirely VISUAL - you must SEE the selfies to get the joke. The incompetence is shown, not told. This is [GOOD] content because the structure is well-executed and the payoff is earned.",
+    key_teaching: "When a punchline is a VISUAL REVEAL (something you must see to understand), describe what changes visually between setup and payoff. Don't just say 'reveal' - say what is revealed and why it subverts the visual expectation.",
+    tags: ['visual-reveal', 'incompetence-comedy', 'setup-payoff', 'expectation-subversion'],
+    humor_types: ['reveal', 'visual', 'workplace']
   }
 ]
