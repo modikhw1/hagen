@@ -121,10 +121,10 @@ export class BrandAnalyzer {
     const observation = parseVideoBrandObservationV1(candidate)
     console.log('🔍 BrandAnalyzer parsed observation:', {
       hasSignals: !!observation.signals,
-      replicability: observation.signals?.replicability,
-      environment: observation.signals?.environment_requirements,
-      risk: observation.signals?.risk_level,
-      audience: observation.signals?.target_audience
+      hasReplicability: !!observation.signals?.replicability,
+      hasEnvironment: !!observation.signals?.environment_requirements,
+      hasRisk: !!observation.signals?.risk_level,
+      hasAudience: !!observation.signals?.target_audience
     })
 
     return {

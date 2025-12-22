@@ -54,8 +54,13 @@ export class VideoDownloader {
       console.log(`📥 Downloading video: ${url}`)
 
       // Use Python's yt-dlp (handles SSL/certificates better than system yt-dlp)
+      // Try multiple Python commands (python3, python, or full path on Windows)
+      const pythonCmd = process.platform === 'win32' 
+        ? `"${process.env.LOCALAPPDATA}\\Programs\\Python\\Python314\\python.exe"`
+        : 'python3'
+      
       const command = [
-        'python3',
+        pythonCmd,
         '-m',
         'yt_dlp',
         '--no-playlist',

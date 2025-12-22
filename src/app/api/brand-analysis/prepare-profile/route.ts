@@ -129,7 +129,7 @@ export async function POST(request: NextRequest) {
     // Fetch existing Schema v1 ratings (old flow: rater_id='schema_v1')
     const { data: brandRatings } = await supabase
       .from('video_brand_ratings')
-      .select('video_id, rater_id, replicability_signals, audience_signals')
+      .select('video_id, rater_id, extracted_signals')
       .in('video_id', dbVideoIds)
 
     // A video has brand signals if it has EITHER:
@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
     const hasSchemaV1 = new Set(
       brandRatings?.filter((r) => 
         r.rater_id === 'schema_v1' || 
-        (r.rater_id === 'primary' && (r.replicability_signals || r.audience_signals))
+        (r.rater_id === 'primary' && r.extracted_signals)
       ).map((r) => r.video_id) || []
     )
 

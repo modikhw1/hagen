@@ -148,8 +148,8 @@ export async function POST(request: NextRequest) {
             hasRawOutput: !!schemaV1Signals.raw_output,
             hasSignals: !!schemaV1Signals.signals,
             rawOutputKeys: schemaV1Signals.raw_output ? Object.keys(schemaV1Signals.raw_output) : [],
-            confidence: schemaV1Signals.confidence,
-            replicability: schemaV1Signals.raw_output?.signals?.replicability || schemaV1Signals.signals?.replicability
+            confidenceOverall: schemaV1Signals.confidence?.overall || null,
+            hasReplicability: !!(schemaV1Signals.raw_output?.signals?.replicability || schemaV1Signals.signals?.replicability)
           })
           
           // Merge Schema v1.1 signals into the analysis object
