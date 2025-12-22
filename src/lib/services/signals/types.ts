@@ -12,9 +12,9 @@
 // SCHEMA VERSIONS
 // =============================================================================
 
-export type SchemaVersion = 'v1.0' | 'v1.1';
+export type SchemaVersion = 'v1.0' | 'v1.1' | 'v1.1-sigma';
 
-export const CURRENT_SCHEMA_VERSION: SchemaVersion = 'v1.1';
+export const CURRENT_SCHEMA_VERSION: SchemaVersion = 'v1.1-sigma';
 
 // =============================================================================
 // V1.0 SIGNALS (Original)
@@ -72,10 +72,216 @@ export interface V1_1_Signals extends V1_0_Signals {
 }
 
 // =============================================================================
+// V1.1-SIGMA SIGNALS (σTaste Schema from hagen_ta)
+// =============================================================================
+
+// STAGE 1: Content Classification
+export interface ContentClassification {
+  content_type: 
+    | 'sketch_comedy' 
+    | 'reaction_content'
+    | 'informational'
+    | 'interview_format'
+    | 'montage_visual'
+    | 'tutorial_how_to'
+    | 'testimonial'
+    | 'promotional_direct'
+    | 'trend_recreation'
+    | 'hybrid';
+  service_relevance: 'in_scope' | 'out_of_scope' | 'edge_case';
+  classification_reasoning?: string;
+  strata_id?: 
+    | 'hospitality_sketch'
+    | 'workplace_relatable'
+    | 'customer_interaction'
+    | 'product_showcase'
+    | 'atmosphere_vibe';
+}
+
+// STAGE 2: Replicability Decomposed
+export interface ReplicabilityDecomposed {
+  one_to_one_copy_feasibility: {
+    score: 1 | 2 | 3;
+    reasoning: string;
+    required_adaptations?: string[];
+  };
+  actor_requirements: {
+    count: 'solo' | 'duo' | 'small_group' | 'crowd';
+    skill_level: 'anyone' | 'comfortable_on_camera' | 'acting_required' | 'professional';
+    social_risk_required: 'none' | 'mild' | 'significant' | 'extreme';
+    appearance_dependency?: 'none' | 'low' | 'moderate' | 'high';
+  };
+  environment_requirements: {
+    backdrop_interchangeability: 'any_venue' | 'similar_venue_type' | 'specific_setting_needed';
+    prop_dependency: {
+      level: 'none' | 'common_items' | 'specific_props' | 'custom_fabrication';
+      items?: string[];
+      substitutable?: boolean;
+    };
+    setup_complexity: 'point_and_shoot' | 'basic_tripod' | 'multi_location' | 'elaborate_staging';
+  };
+  production_requirements: {
+    editing_skill: 'basic_cuts' | 'timed_edits' | 'effects_required' | 'professional_post';
+    editing_as_punchline: boolean;
+    estimated_time: 'under_15min' | 'under_1hr' | 'half_day' | 'full_day_plus';
+  };
+  concept_transferability: {
+    product_swappable: boolean;
+    humor_travels: boolean;
+    audience_narrowing_factors?: string[];
+  };
+}
+
+// STAGE 3: Narrative Flow
+export interface NarrativeFlow {
+  story_direction: 'linear_build' | 'escalating' | 'revelation_based' | 'circular' | 'fragmented';
+  beat_progression: {
+    type: 'incremental_heightening' | 'steady_examples' | 'dialogue_escalation' | 'visual_accumulation';
+    additive_per_beat: boolean;
+    filler_detected: boolean;
+  };
+  momentum_type: 'building_to_climax' | 'steady_stream' | 'single_beat_payoff' | 'no_clear_structure';
+  coherence_score: 1 | 2 | 3 | 4 | 5;
+  coherence_notes?: string;
+}
+
+// STAGE 3: Performer Execution
+export interface PerformerExecution {
+  concept_selling: {
+    score: 1 | 2 | 3 | 4 | 5;
+    persona_clarity: 'clear_character' | 'ambiguous' | 'just_themselves';
+  };
+  tonal_match: {
+    matches_content: boolean;
+    mismatch_notes?: string;
+  };
+  commitment_signals: {
+    facial_expressiveness: 'minimal' | 'appropriate' | 'highly_animated';
+    physical_commitment: 'static' | 'moderate_movement' | 'full_physical_comedy';
+    embarrassment_tolerance: 'safe_performance' | 'mild_vulnerability' | 'full_commitment';
+  };
+  performance_dependency: 'concept_carries_itself' | 'good_delivery_helps' | 'requires_strong_performer';
+}
+
+// STAGE 3: Hook Analysis (Replaces simple hookStrength)
+export interface HookAnalysis {
+  hook_style: 'relatable_situation' | 'question' | 'action' | 'visual_intrigue' | 'text_overlay' | 'sound_grab';
+  desperation_signals: {
+    detected: boolean;
+    signals?: Array<
+      | 'excessive_text_first_second'
+      | 'entire_premise_in_hook'
+      | 'clickbait_promise'
+      | 'overexplained_setup'
+      | 'loud_attention_grab'
+    >;
+  };
+  promise_quality: {
+    curiosity_generated: 1 | 2 | 3 | 4 | 5;
+    promise_fulfilled: boolean;
+    allows_slow_burn: boolean;
+  };
+  emotional_undertone?: string[];
+}
+
+// STAGE 3: Payoff Analysis
+export interface PayoffAnalysis {
+  payoff_type: 'visual_reveal' | 'edit_cut' | 'dialogue_delivery' | 'twist' | 'callback' | 'escalation_peak';
+  closure_quality: {
+    meaningful_ending: boolean;
+    feels_empty: boolean;
+    earned_vs_cheap: 'fully_earned' | 'somewhat_earned' | 'cheap_shortcut' | 'no_real_payoff';
+  };
+  surprise_fit: {
+    predictability: 'completely_obvious' | 'somewhat_expected' | 'pleasant_surprise' | 'total_twist';
+    logical_in_hindsight: boolean;
+  };
+  trope_handling: {
+    uses_known_trope: boolean;
+    trope_name?: string;
+    trope_treatment: 'subverted_cleverly' | 'played_straight_well' | 'lazy_execution';
+  };
+  substance_level: {
+    content_type: 'empty_calories' | 'moderate_substance' | 'genuinely_clever';
+    memorability: 1 | 2 | 3 | 4 | 5;
+  };
+}
+
+// STAGE 3: Production Polish
+export interface ProductionPolish {
+  audio_intentionality: {
+    purposeful: boolean;
+    elements_aligned: boolean;
+    comedic_audio_timing: 'perfect' | 'good' | 'off' | 'none';
+  };
+  visual_intentionality: {
+    purposeful_framing: boolean;
+    quality_consistency: boolean;
+    lighting_appropriate: boolean;
+  };
+  polish_composite: {
+    score: 1 | 2 | 3 | 4 | 5;
+    elevating_factors?: string[];
+    detracting_factors?: string[];
+  };
+  cuts_per_minute?: number;
+  pacing_feel: 'rushed' | 'snappy' | 'comfortable' | 'slow' | 'dragging';
+}
+
+// Scene Breakdown (preserved from v1.0)
+export interface SceneBreakdown {
+  sceneBreakdown: Array<{
+    sceneNumber: number;
+    timestamp: string;
+    duration: string;
+    visualContent: string;
+    audioContent: string;
+    impliedMeaning?: string;
+    viewerAssumption?: string;
+    narrativeFunction: 'hook' | 'setup' | 'development' | 'misdirection' | 'payoff' | 'tag';
+    editSignificance?: string;
+  }>;
+  editAsPunchline?: boolean;
+  editPunchlineExplanation?: string;
+  misdirectionTechnique?: string;
+}
+
+// Top-level σTaste v1.1 Schema
+export interface SigmaTasteV1_1 {
+  schema_version: 'v1.1-sigma';
+  
+  // STAGE 1: Classification (Soft filter per user request)
+  content_classification: ContentClassification;
+  
+  // STAGE 2: Utility
+  replicability_decomposed: ReplicabilityDecomposed;
+  
+  // STAGE 3: Quality
+  narrative_flow: NarrativeFlow;
+  performer_execution: PerformerExecution;
+  hook_analysis: HookAnalysis;
+  payoff_analysis: PayoffAnalysis;
+  production_polish: ProductionPolish;
+  
+  // Preserved from v1.0
+  scenes?: SceneBreakdown;
+  
+  // Computed composites (calculated from signals)
+  utility_score?: number;  // 0-1, from Stage 2
+  quality_score?: number;  // 0-1, from Stage 3  
+  sigma_taste_final?: number;  // Weighted combination
+}
+
+// V1.1-Sigma Signals extends V1.1 with σTaste schema
+export interface V1_1_Sigma_Signals extends V1_1_Signals {
+  sigma_taste?: SigmaTasteV1_1;
+}
+
+// =============================================================================
 // UNIFIED SIGNAL TYPE
 // =============================================================================
 
-export interface VideoSignals extends V1_1_Signals {
+export interface VideoSignals extends V1_1_Sigma_Signals {
   // Schema tracking
   schema_version: SchemaVersion;
   
@@ -236,4 +442,7 @@ export const SIGNAL_DEFINITIONS: SignalDefinition[] = [
   { key: 'production_quality_signals', label: 'Production Quality', description: 'Signals about production value', type: 'object', required: false, version_added: 'v1.1' },
   { key: 'replicability_signals', label: 'Replicability', description: 'Signals about how easy to replicate', type: 'object', required: false, version_added: 'v1.1' },
   { key: 'audience_signals', label: 'Audience', description: 'Signals about target audience', type: 'object', required: false, version_added: 'v1.1' },
+  
+  // V1.1-sigma signals (σTaste schema from hagen_ta)
+  { key: 'sigma_taste', label: 'σTaste Analysis', description: 'Complete σTaste v1.1 analysis from hagen_ta schema', type: 'object', required: false, version_added: 'v1.1' },
 ];

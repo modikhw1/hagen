@@ -305,6 +305,29 @@ User requests brand profile
 |---------|------|---------|
 | v1.0 | 2024-11 | Initial: basic signals (pacing, humor, teaching_style) |
 | v1.1 | 2024-12 | Added: content_density_signals, production_quality_signals, replicability_signals, audience_signals |
+| v1.1-sigma | 2025-12 | σTaste schema from hagen_ta: content_classification, replicability_decomposed (8 sub-factors), narrative_flow, performer_execution, hook_analysis (with desperation detection), payoff_analysis, production_polish. Weight calibration from 254 pairwise comparisons. |
+
+---
+
+## σTaste v1.1 Weight Configuration
+
+Based on 254 pairwise comparisons from `hagen_ta` analysis:
+
+| Signal | Correlation | Weight | Notes |
+|--------|-------------|--------|-------|
+| `attentionRetention` | +0.173 | **2.0x** | TOP predictor |
+| `audioQuality` | +0.169 | **1.8x** | 2nd strongest, often unnoticed |
+| `cutsPerMinute` | +0.129 | **1.5x** | Pacing proxy |
+| `scriptOriginality` | +0.123 | **1.4x** | Creativity signal |
+| `hookStrength` | -0.047 | **0.5x** | NEGATIVE correlation - desperation signal |
+| `scriptReplicability` | +0.033 | **0.7x** | Discussed but doesn't predict |
+
+### Key v1.1-sigma Files
+- `prompts/v1.1_sigma_taste.md` - Copy-paste ready Vertex AI instructions
+- `src/lib/services/signals/types.ts` - TypeScript interfaces for all σTaste signals
+- `src/lib/services/signals/extractor.ts` - Extraction logic for σTaste fields
+- `src/lib/services/brand/profile-fingerprint.ts` - `SIGMA_TASTE_WEIGHTS` and `LAYER_MATCH_WEIGHTS`
+- `docs/integration/` - Full context from hagen_ta (CONTEXT.md, SCHEMA_V1.1_SIGMA_TASTE.md)
 
 ---
 

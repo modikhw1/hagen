@@ -10,21 +10,18 @@ import type {
   VideoAnalysisProvider,
   MetadataProvider,
   EmbeddingProvider,
-  PatternDiscoveryProvider,
   MetricsCalculator
 } from './types'
 
 import { createGeminiAnalyzer } from './video/gemini'
 import { createSupadataProvider } from './metadata/supadata'
 import { createOpenAIEmbeddings } from './embeddings/openai'
-import { createGPTPatternDiscovery } from './patterns/gpt'
 import { createMetricsCalculator } from './metrics/calculator'
 
 class ServiceRegistry {
   private videoAnalyzer?: VideoAnalysisProvider
   private metadataProvider?: MetadataProvider
   private embeddingProvider?: EmbeddingProvider
-  private patternDiscovery?: PatternDiscoveryProvider
   private metricsCalculator?: MetricsCalculator
 
   // Video Analyzer
@@ -64,19 +61,6 @@ class ServiceRegistry {
       throw new Error('Embedding provider not configured. Call setEmbeddingProvider() first.')
     }
     return this.embeddingProvider
-  }
-
-  // Pattern Discovery Provider
-  setPatternDiscoveryProvider(provider: PatternDiscoveryProvider) {
-    this.patternDiscovery = provider
-    console.log(`🔬 Pattern discovery provider set: ${provider.name}`)
-  }
-
-  getPatternDiscoveryProvider(): PatternDiscoveryProvider {
-    if (!this.patternDiscovery) {
-      throw new Error('Pattern discovery provider not configured. Call setPatternDiscoveryProvider() first.')
-    }
-    return this.patternDiscovery
   }
 
   // Metrics Calculator
@@ -121,15 +105,6 @@ class ServiceRegistry {
         this.setEmbeddingProvider(createOpenAIEmbeddings(undefined, model))
       } catch (e) {
         console.warn('⚠️  Could not initialize OpenAI embeddings:', e)
-      }
-    }
-
-    // GPT pattern discovery
-    if (process.env.OPENAI_API_KEY) {
-      try {
-        this.setPatternDiscoveryProvider(createGPTPatternDiscovery())
-      } catch (e) {
-        console.warn('⚠️  Could not initialize pattern discovery:', e)
       }
     }
 

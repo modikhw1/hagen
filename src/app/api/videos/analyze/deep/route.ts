@@ -116,11 +116,33 @@ export async function POST(request: NextRequest) {
       let analysis: any
       let schemaV1Signals: any = null
       
+      // Build video metadata for learning context retrieval
+      // Include as much context as possible for better RAG matching
+      const videoMetadata = {
+        title: video.title || video.metadata?.title || '',
+        description: video.description || video.metadata?.description || '',
+        hashtags: video.metadata?.hashtags || [],
+        industry: video.visual_analysis?.industry || (video.brand_id ? 'restaurant' : 'hospitality'),
+        contentFormat: video.visual_analysis?.content?.format || video.metadata?.content_format,
+        // Include previous analysis summary for better matching
+        transcript: video.visual_analysis?.script?.transcript?.slice(0, 500),
+        existingAnalysis: video.visual_analysis
+      }
+      
+      console.log('📚 Learning metadata:', {
+        hasTitle: !!videoMetadata.title,
+        hasDescription: !!videoMetadata.description,
+        industry: videoMetadata.industry,
+        hasTranscript: !!videoMetadata.transcript
+      })
+      
       // Always run legacy analyzer for display data (visual summary, humor type, scores)
       console.log('🤖 Analyzing with Gemini (for display data)...')
       const legacyAnalyzer = new GeminiVideoAnalyzer()
       analysis = await legacyAnalyzer.analyzeVideo(cloudUrl, {
-        detailLevel
+        detailLevel,
+        useLearning: true,
+        videoMetadata
       })
       
       // If Schema v1.1 requested, also run BrandAnalyzer for structured signals
@@ -197,7 +219,7 @@ export async function POST(request: NextRequest) {
       const embeddingText = embeddingProvider.prepareTextForEmbedding({
         metadata: video.metadata,
         analysis,
-        userRatings: existingRating,
+        userRatings: existingRating || undefined,
         userTags: video.user_tags,
         computedMetrics: {} // Could recalculate with new data
       })

@@ -4,10 +4,13 @@ import type {
   VideoAnalysisOptions, 
   VideoAnalysis 
 } from '../types'
+import { getLearningContext } from './learning'
+import { evaluateAnalysisQuality, type QualityScore } from './quality-judge'
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY!
 
 export class GeminiVideoAnalyzer implements VideoAnalysisProvider {
+  name = 'gemini'
   private client: GoogleGenerativeAI
   private model: string
 
@@ -16,19 +19,89 @@ export class GeminiVideoAnalyzer implements VideoAnalysisProvider {
     this.model = model
   }
 
+  /**
+   * Quick concept extraction for learning context matching
+   * Gets joke structure/mechanism for better semantic matching with learning examples
+   */
+  private async extractQuickTranscript(videoUrl: string): Promise<string> {
+    try {
+      const model = this.client.getGenerativeModel({ model: this.model })
+      
+      const result = await model.generateContent([
+        {
+          fileData: {
+            mimeType: 'video/mp4',
+            fileUri: videoUrl
+          }
+        },
+        { text: `Analyze this video and extract the humor concept. Format your response as:
+
+JOKE_CONCEPT: [One sentence describing what the joke/concept is about - e.g., "Restaurant employee offers attractiveness discount but price stays the same"]
+HUMOR_MECHANISM: [How the humor works - e.g., "Subverts expectation by offering discount that provides no benefit"]  
+HUMOR_TYPE: [Category: observational, physical, deadpan, absurdist, sarcastic, subversion, wordplay, or none]
+SETUP: [What expectation is created]
+PUNCHLINE: [What happens that's unexpected]
+TRANSCRIPT: [Key dialogue, abbreviated]` }
+      ])
+      
+      return result.response.text()
+    } catch (error) {
+      console.error('⚠️ Quick concept extraction failed:', error)
+      return ''
+    }
+  }
+
   async analyzeVideo(
     videoUrl: string,
     options: VideoAnalysisOptions = {}
   ): Promise<VideoAnalysis> {
     const detailLevel = options.detailLevel || 'comprehensive'
+    const useLearning = options.useLearning !== false  // Default to true
     
     console.log(`🎬 Analyzing video with Gemini (${detailLevel} detail)`)
     
     try {
       const model = this.client.getGenerativeModel({ model: this.model })
 
+      // Get learning context from RAG if enabled
+      let learningContext = options.learningContext || ''
+      if (useLearning && !learningContext) {
+        // Check if we have enough metadata for learning context
+        const existingAnalysis = options.videoMetadata?.existingAnalysis as { script?: { transcript?: string } } | undefined
+        const hasContext = options.videoMetadata?.transcript || 
+                          options.videoMetadata?.title || 
+                          options.videoMetadata?.description ||
+                          existingAnalysis?.script?.transcript
+        
+        if (!hasContext) {
+          // No existing context - extract quick transcript first (two-pass approach)
+          console.log('📚 No existing context - extracting quick transcript for learning...')
+          const quickTranscript = await this.extractQuickTranscript(videoUrl)
+          
+          if (quickTranscript) {
+            console.log('📚 Got quick transcript, fetching learning context...')
+            learningContext = await getLearningContext({
+              ...options.videoMetadata,
+              transcript: quickTranscript
+            })
+          }
+        } else if (options.videoMetadata) {
+          console.log('📚 Fetching learning context from existing metadata...')
+          learningContext = await getLearningContext(options.videoMetadata)
+        }
+        
+        if (learningContext) {
+          console.log('✅ Found relevant learning examples')
+        }
+      }
+
       // Generate detailed analysis prompt based on detail level
-      const prompt = this.buildAnalysisPrompt(detailLevel)
+      const basePrompt = this.buildAnalysisPrompt(detailLevel)
+      
+      // Inject learning context if available
+      const prompt = learningContext 
+        ? `${learningContext}\n\n${basePrompt}`
+        : basePrompt
 
       const result = await model.generateContent([
         {
@@ -47,6 +120,24 @@ export class GeminiVideoAnalyzer implements VideoAnalysisProvider {
       const analysis = this.parseAnalysisResponse(analysisText, detailLevel)
 
       console.log('✅ Gemini analysis complete')
+
+      // Optionally evaluate quality against human baseline
+      if (options.evaluateQuality && options.humanBaseline) {
+        console.log('📊 Evaluating analysis quality...')
+        try {
+          const qualityScore = await evaluateAnalysisQuality(
+            analysis,
+            options.humanBaseline
+          )
+          analysis.qualityScore = {
+            ...qualityScore,
+            evaluated_at: new Date().toISOString()
+          }
+          console.log(`📊 Quality score: ${qualityScore.overall}% overall`)
+        } catch (error) {
+          console.error('⚠️ Quality evaluation failed:', error)
+        }
+      }
 
       return analysis
 
@@ -201,10 +292,19 @@ export class GeminiVideoAnalyzer implements VideoAnalysisProvider {
     "scriptQuality": <1-10, how well-written/structured is the script (null if unscripted)>,
     "transcript": "approximate transcript or description of what is said/shown",
     "visualTranscript": "scene-by-scene description integrating BOTH what is shown AND what is said, in sequence",
+    "deep_reasoning": {
+      "character_dynamic": "REQUIRED: What relationship/tension exists between characters? (e.g., 'Workers who labor vs. those who profit - each answer reveals incentive structure')",
+      "underlying_tension": "REQUIRED: What gap or conflict creates the humor? (e.g., 'Self-interest based on job role: profit-motivated want high numbers, labor-motivated want low')",
+      "format_participation": "Does the structure/format participate in the joke? (e.g., 'Chef breaks established format by refusing to give a number')",
+      "editing_contribution": "What editing choices add to humor? (e.g., 'Mid-word cut on profanity implies without stating')",
+      "audience_surrogate": "Which character represents viewer feelings? (e.g., 'The chef - anyone who has worked service knows this frustration')",
+      "why_this_is_funny": "REQUIRED: 2-3 sentences explaining the MECHANISM, not just describing what happens",
+      "what_makes_it_work": "The core insight that makes this joke land"
+    },
     "humor": {
       "isHumorous": <boolean>,
-      "humorType": "subversion|absurdist|observational|physical|wordplay|callback|contrast|deadpan|escalation|satire|parody|visual-reveal|edit-punchline|none",
-      "humorMechanism": "detailed explanation of HOW the humor works - include VISUAL elements if the joke relies on what is shown, not just said",
+      "humorType": "subversion|absurdist|observational|physical|wordplay|callback|contrast|deadpan|escalation|satire|parody|visual-reveal|edit-punchline|format-subversion|incentive-reveal|rebel-worker|malicious-compliance|none",
+      "humorMechanism": "MUST REFLECT deep_reasoning above - detailed explanation of HOW the humor works, not just a label",
       "visualComedyElement": "describe any visual element essential to the joke (reveal shots, reaction cuts, visual contradictions)",
       "comedyTiming": <1-10, effectiveness of timing and beats>,
       "absurdismLevel": <1-10, how much does this violate normal logic or expectations>,
@@ -268,15 +368,23 @@ export class GeminiVideoAnalyzer implements VideoAnalysisProvider {
 }
 
 IMPORTANT: 
-1. SCENE-BY-SCENE ANALYSIS IS CRITICAL: Break down the video into individual scenes/shots. For each scene, note what is SHOWN and what is SAID. Many jokes rely on VISUAL reveals, not just dialogue.
+1. DEEP REASONING FIRST: Complete the "deep_reasoning" object BEFORE filling out humor labels. Ask yourself:
+   - What dynamic exists between these characters? (power, incentive, performance vs reality)
+   - What tension creates the humor? (the GAP between two things)
+   - Does the format/structure participate in the joke?
+   - Did editing choices add to the humor?
+   
+2. YOUR humorMechanism MUST REFLECT YOUR deep_reasoning:
+   ❌ WRONG: "The humor is contrast between different perspectives"
+   ✅ RIGHT: "Each answer reveals self-interest based on job role - profit-motivated want high, labor-motivated want low. The chef breaks the format entirely, expressing the frustration of being the one actually doing the work."
 
-2. EDITS CAN BE PUNCHLINES: A cut or scene change can itself deliver the joke. Example: if someone says "I'm fine" but then a cut reveals they're talking to nobody, the EDIT is the punchline showing they're NOT fine.
+3. SCENE-BY-SCENE ANALYSIS IS CRITICAL: Break down the video into individual scenes/shots. For each scene, note what is SHOWN and what is SAID. Many jokes rely on VISUAL reveals, not just dialogue.
 
-3. For the "script" section, focus on analyzing the CONCEPT and STRUCTURE as intellectual property that could be extracted and reused. Think about what makes this format work and how another creator could adapt it. Be specific about humor mechanics - don't just say "it's funny", explain WHY and HOW it creates humor.
+4. EDITS CAN BE PUNCHLINES: A cut or scene change can itself deliver the joke. Mid-word cuts on profanity imply without stating. Hard cuts create abruptness matching character emotion.
 
-4. VISUAL COMEDY: If a joke depends on what is SHOWN (not said), you MUST capture this. The transcript alone may miss the point entirely if the punchline is visual.
+5. THE EXPLANATION TEST: If your humor explanation could apply to multiple videos, it's too shallow. Be specific about THIS video's mechanism.
 
-5. MISDIRECTION: Note when the video deliberately misleads viewers visually before a reveal. What assumptions does the framing create?
+6. For the "script" section, focus on analyzing the CONCEPT and STRUCTURE as intellectual property that could be extracted and reused. Think about what makes this format work and how another creator could adapt it.
 
 Provide detailed, actionable analysis. Rate everything on 1-10 scales. Be specific about what works and what doesn't.`
   }
@@ -285,12 +393,24 @@ Provide detailed, actionable analysis. Rate everything on 1-10 scales. Be specif
     try {
       // Extract JSON from markdown code blocks if present
       const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/) || [null, text]
-      const jsonText = jsonMatch[1].trim()
+      let jsonText = jsonMatch[1].trim()
+      
+      // Sanitize common LLM JSON issues
+      // 1. Extract just the JSON object
+      const firstBrace = jsonText.indexOf('{')
+      const lastBrace = jsonText.lastIndexOf('}')
+      if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+        jsonText = jsonText.slice(firstBrace, lastBrace + 1)
+      }
+      // 2. Remove trailing commas before } or ]
+      jsonText = jsonText.replace(/,(\s*[}\]])/g, '$1')
       
       const parsed = JSON.parse(jsonText)
 
       // Normalize to comprehensive format
       return {
+        provider: this.name,
+        analyzedAt: new Date().toISOString(),
         visual: {
           hookStrength: parsed.visual?.hookStrength || 5,
           hookDescription: parsed.visual?.hookDescription || '',
@@ -412,6 +532,7 @@ Provide detailed, actionable analysis. Rate everything on 1-10 scales. Be specif
 
     } catch (error) {
       console.error('Failed to parse Gemini response:', error)
+      console.error('Raw response (first 500 chars):', text.substring(0, 500))
       throw new Error('Failed to parse video analysis response')
     }
   }

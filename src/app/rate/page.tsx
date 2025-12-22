@@ -880,7 +880,7 @@ export default function RatePage() {
                     <textarea
                       value={replicabilityNotes}
                       onChange={(e) => setReplicabilityNotes(e.target.value)}
-                      placeholder="e.g., 'Simple concept, any café can do this with 2 people' or 'Requires specific equipment/location'"
+                      placeholder="e.g., &apos;Simple concept, any café can do this with 2 people&apos; or &apos;Requires specific equipment/location&apos;"
                       className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                       rows={2}
                     />
@@ -889,12 +889,12 @@ export default function RatePage() {
                   {/* Brand Context */}
                   <div>
                     <label className="text-xs text-gray-500 block mb-1">
-                      Brand Fit — What type of establishment suits this? (or doesn't)
+                      Brand Fit — What type of establishment suits this? (or doesn&apos;t)
                     </label>
                     <textarea
                       value={brandContext}
                       onChange={(e) => setBrandContext(e.target.value)}
-                      placeholder="e.g., 'Not for upscale dining, better for casual spots' or 'Works for any restaurant willing to be playful'"
+                      placeholder="e.g., &apos;Not for upscale dining, better for casual spots&apos; or &apos;Works for any restaurant willing to be playful&apos;"
                       className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                       rows={2}
                     />

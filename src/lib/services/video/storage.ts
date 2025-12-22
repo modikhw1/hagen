@@ -166,6 +166,10 @@ export class VideoStorageService {
    */
   async verifyBucket(): Promise<boolean> {
     try {
+      if (!this.storage) {
+        console.error('GCS not configured')
+        return false
+      }
       const [exists] = await this.bucket.exists()
       if (!exists) {
         console.log(`📦 Creating bucket: ${this.bucketName}`)
