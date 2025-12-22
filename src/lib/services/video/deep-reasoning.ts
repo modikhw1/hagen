@@ -72,6 +72,12 @@ For EVERY video with humor, answer these questions IN ORDER before assigning lab
 │ • Mid-word/mid-action cut (implies without stating)
 │ • Interview format subverted (interviewee or interviewer breaks role)
 │
+│ POV MISDIRECTION (common and important):
+│ • Voice assumed to be POV character's internal monologue → reveal it's someone else
+│ • Camera angle suggests we're seeing one person's view → reveal different context
+│ • Example: "Internal tipping debate" sounds like customer → reveal it's cashier speaking out loud
+│ • The reveal REFRAMES everything we just experienced
+│
 │ OUTPUT: format_participation field
 └─────────────────────────────────────────────────────────────────────────────
 
@@ -122,6 +128,33 @@ For EVERY video with humor, answer these questions IN ORDER before assigning lab
 └─────────────────────────────────────────────────────────────────────────────
 
 ┌─────────────────────────────────────────────────────────────────────────────
+│ STEP 4.6: TONE & DELIVERY
+├─────────────────────────────────────────────────────────────────────────────
+│ HOW something is said can be funnier than WHAT is said.
+│
+│ Ask: "Is the humor in the delivery, tone, or attitude?"
+│
+│ Delivery styles that ARE the joke:
+│ • Deadpan: Flat affect while saying absurd things (makes it funnier)
+│ • Fed up but professional: Worker barely holding it together
+│ • Caustic but restrained: Says something cutting while keeping composure  
+│ • Overly polite hostility: Sweetly passive-aggressive
+│ • Innocent delivery of brutal content: Child or naive person, unaware of impact
+│ • Enthusiastic incompetence: Trying really hard but failing
+│
+│ Small injected jokes through delivery:
+│ • Brief reactions that show frustration
+│ • Micro-expressions that undercut what's being said
+│ • Tone shifts that reveal true feelings
+│ • "Look at camera" moments that break the fourth wall
+│
+│ CRITICAL: If the script reads flat but the performance is funny,
+│ the delivery IS the joke. Note what makes the performance land.
+│
+│ OUTPUT: tone_delivery field (describe what makes the delivery funny, or 'none')
+└─────────────────────────────────────────────────────────────────────────────
+
+┌─────────────────────────────────────────────────────────────────────────────
 │ STEP 5: AUDIENCE SURROGATE
 ├─────────────────────────────────────────────────────────────────────────────
 │ Often one character represents what the audience feels.
@@ -138,6 +171,36 @@ For EVERY video with humor, answer these questions IN ORDER before assigning lab
 └─────────────────────────────────────────────────────────────────────────────
 
 ┌─────────────────────────────────────────────────────────────────────────────
+│ STEP 5.5: WORDPLAY & MISUNDERSTANDING
+├─────────────────────────────────────────────────────────────────────────────
+│ Many jokes rely on deliberate or accidental miscommunication.
+│
+│ Ask: "Is there a word or phrase being interpreted two different ways?"
+│
+│ Types of linguistic humor:
+│ • Literal vs intended: "Shake it" → shakes body instead of drink
+│ • Finish this: "Finish this" → drinks the drink instead of completing task
+│ • Ambiguous pronouns: "Made by a 4-year-old" → turns out literally true
+│ • Sarcasm misread: "Do you work here?" + obvious uniform = sarcastic "no"
+│ • Instruction misread: What seems obvious has another interpretation
+│
+│ THE REVEAL MOMENT:
+│ • When does the audience realize the misinterpretation?
+│ • Is there a visual reveal that confirms the wrong reading?
+│ • Who is "in" on the joke vs. oblivious?
+│
+│ CRITICAL: If a phrase has two meanings, and the joke is someone taking 
+│ the wrong one, you MUST articulate BOTH meanings explicitly.
+│
+│ Example analysis format:
+│ ❌ "The humor comes from misunderstanding"
+│ ✅ "The worker says 'finish this' meaning 'complete the task', but the 
+│    colleague interprets it as 'finish drinking this' and chugs it"
+│
+│ OUTPUT: wordplay_misunderstanding field (describe both interpretations, or 'none')
+└─────────────────────────────────────────────────────────────────────────────
+
+┌─────────────────────────────────────────────────────────────────────────────
 │ STEP 6: SOCIAL DYNAMICS & CRUELTY
 ├─────────────────────────────────────────────────────────────────────────────
 │ Many jokes involve social power, embarrassment, or casual cruelty.
@@ -150,9 +213,23 @@ For EVERY video with humor, answer these questions IN ORDER before assigning lab
 │ • Status reversal: Low-status person gains power, high-status person humbled
 │ • Escalation: Small disagreement builds to absurd proportions
 │ • Misunderstanding comedy: Literal vs intended interpretation (shake = dance)
+│ • Sarcasm as annoyance: "Of course I work here" (obvious visual cues + sarcastic denial)
+│ • Bill-paying dance: Social ritual where both parties know the "right" answer but play games
+│ • The "fold": Someone gives in when social rules say they shouldn't (he let her pay)
+│
+│ SARCASM AS RESPONSE TO OBVIOUS QUESTIONS:
+│ • Someone asks an obviously dumb question ("Do you work here?" to uniformed employee)
+│ • The response is exaggerated sarcasm (removes uniform, says "No")
+│ • The subtext is "isn't it obvious?" expressed through action not words
+│ • This is SOCIAL CORRECTION humor - making the asker feel foolish for asking
 │
 │ Key insight: If someone is embarrassed or rejected, NAME IT. 
 │ "The joke is that she's told she's not attractive" is clearer than "subversion."
+│
+│ WHO LOOKS FOOLISH? This is critical for misunderstanding comedy:
+│ • Does the character who misunderstands REALIZE they look foolish?
+│ • Is their facial expression confident while we know they're wrong?
+│ • The gap between self-perception and reality IS the joke.
 │
 │ OUTPUT: social_dynamic field
 └─────────────────────────────────────────────────────────────────────────────
@@ -189,18 +266,49 @@ For EVERY video with humor, answer these questions IN ORDER before assigning lab
 └─────────────────────────────────────────────────────────────────────────────
 
 ┌─────────────────────────────────────────────────────────────────────────────
-│ STEP 7: CONTENT QUALITY ASSESSMENT (BE BRUTALLY HONEST)
+│ STEP 7: CONTENT TYPE & INTENT (BEFORE quality rating)
 ├─────────────────────────────────────────────────────────────────────────────
-│ Not all content works. Be honest - many videos are not actually funny.
+│ Not all engaging content is trying to be funny. Identify what this IS.
 │
-│ Ask: "Is this GENUINELY funny, or just recognizable/relatable?"
+│ Ask: "What is this content trying to BE? What response does it want?"
+│
+│ CONTENT TYPES:
+│ • Comedy: Goal is laughs. Punchline, surprise, absurdity, wit.
+│ • Wholesome/Cute: Goal is warmth. Child, pet, touching moment. "Aww" not "haha"
+│ • Relatable: Goal is recognition. "So true!" but not necessarily funny.
+│ • Charming/Endearing: Goal is to like the person/brand. Personality-driven.
+│ • Clever/Smart: Goal is appreciation. "That's clever" not laughs.
+│ • Chaotic/Unhinged: Goal is "what did I just watch?" energy.
+│ • Engagement Bait: Goal is comments/shares. Question, debate, reaction.
+│
+│ IMPORTANT: A video featuring a child TRYING to negotiate like an adult
+│ is WHOLESOME, not comedy. The cuteness IS the point.
+│ 
+│ A video where someone looks foolish is COMEDY.
+│ A video where a child looks innocent is WHOLESOME.
+│ Know the difference. Label accordingly.
+│
+│ OUTPUT: content_type field (Comedy / Wholesome / Relatable / Charming / Clever / Chaotic / Bait)
+└─────────────────────────────────────────────────────────────────────────────
+
+┌─────────────────────────────────────────────────────────────────────────────
+│ STEP 8: CONTENT QUALITY ASSESSMENT (BE BRUTALLY HONEST)
+├─────────────────────────────────────────────────────────────────────────────
+│ Now rate quality - but relative to CONTENT TYPE identified above.
+│
+│ Ask: "Does this succeed at what it's trying to be?"
+│
+│ FOR COMEDY - Does it make you laugh?
+│ FOR WHOLESOME - Does it create warmth/charm?
+│ FOR RELATABLE - Is the observation sharp or obvious?
+│ FOR CLEVER - Is the concept genuinely smart?
 │
 │ DISTINGUISH BETWEEN:
 │ • Humor: Makes you laugh or smile
 │ • Relatability: You recognize the situation (but it's not funny)
 │ • Engagement bait: Designed to get comments, not laughs
 │ • Clever: Smart concept but not actually funny
-│ • Cute/Charming: Pleasant but not comedic
+│ • Cute/Charming: Pleasant but not comedic (this is FINE if that's the goal)
 │
 │ BE CRITICAL - Don't inflate quality. Many videos are:
 │ • "Premise is obvious, execution is average"
@@ -211,10 +319,10 @@ For EVERY video with humor, answer these questions IN ORDER before assigning lab
 │
 │ QUALITY TIERS:
 │ • Exceptional: Genuinely clever, surprising, well-executed. Would share.
-│ • Good: Solid humor with good execution. Worth watching.
+│ • Good: Solid execution with clear appeal. Worth watching.
 │ • Average: Does what it sets out to do, nothing special. Forgettable.
-│ • Weak: Relatable but not funny, or poorly executed good idea.
-│ • Poor: Doesn't work. Concept is broken or humor doesn't land.
+│ • Weak: Misses the mark, or poorly executed good idea.
+│ • Poor: Doesn't work. Concept is broken or execution fails.
 │
 │ Common mistakes:
 │ ❌ Calling something "funny" because you understand what they're going for
@@ -225,7 +333,7 @@ For EVERY video with humor, answer these questions IN ORDER before assigning lab
 └─────────────────────────────────────────────────────────────────────────────
 
 ┌─────────────────────────────────────────────────────────────────────────────
-│ STEP 8: THE EXPLANATION TEST
+│ STEP 9: THE EXPLANATION TEST
 ├─────────────────────────────────────────────────────────────────────────────
 │ Before finalizing your humor analysis, check your explanation.
 │
@@ -238,6 +346,12 @@ For EVERY video with humor, answer these questions IN ORDER before assigning lab
 │    frustration of being the one 'actually doing the work'."
 │    (This explains the MECHANISM)
 │
+│ For misunderstanding jokes specifically:
+│ ❌ WRONG: "The humor comes from misunderstanding"
+│ ✅ RIGHT: "The customer reads 'shake it' as 'shake your body' (dance) rather
+│    than 'shake the drink'. Her confused expression shows she thinks the worker
+│    is strange - but WE know she's the one who misread, making her look foolish."
+│
 │ Rule: If your explanation could apply to multiple videos, it's too shallow.
 └─────────────────────────────────────────────────────────────────────────────
 
@@ -249,9 +363,12 @@ NOW output your deep reasoning analysis in this format:
   "format_participation": "<how does structure/format participate in the joke, or 'none'>",
   "editing_contribution": "<what editing choices add to humor, or 'none'>",
   "visual_punchline": "<if punchline is visual: describe what visual element delivers the joke, or 'none'>",
+  "tone_delivery": "<if relevant: what makes the delivery/performance funny beyond the words, or 'none'>",
   "audience_surrogate": "<which character represents viewer feelings, and what experience this taps into, or 'none'>",
+  "wordplay_misunderstanding": "<if relevant: word/phrase with two meanings - state BOTH interpretations explicitly, or 'none'>",
   "social_dynamic": "<if relevant: who is embarrassed/rejected/put down and how, or 'none'>",
   "cultural_context": "<what cultural knowledge, tropes, or shared experiences does this joke require, or 'none'>",
+  "content_type": "<Comedy/Wholesome/Relatable/Charming/Clever/Chaotic/Bait - what is this TRYING to be?>",
   "quality_assessment": "<tier (Exceptional/Good/Average/Weak/Poor) + honest 1-sentence assessment>",
   "why_this_is_funny": "<2-3 sentences explaining the MECHANISM, not just describing what happens>",
   "what_makes_it_work": "<the core insight that makes this joke land>"
@@ -272,10 +389,13 @@ export interface DeepHumorAnalysis {
     underlying_tension: string
     format_participation: string
     editing_contribution: string
-    visual_punchline: string  // NEW: What visual element delivers the punchline?
+    visual_punchline: string  // What visual element delivers the punchline?
+    tone_delivery: string  // NEW: What makes the delivery/performance funny?
     audience_surrogate: string
+    wordplay_misunderstanding: string  // Word/phrase with two meanings
     social_dynamic: string
     cultural_context: string  // What shared knowledge does this joke require?
+    content_type: string  // Comedy/Wholesome/Relatable/etc.
     quality_assessment: string
     why_this_is_funny: string
     what_makes_it_work: string
@@ -439,5 +559,95 @@ export const SEED_DEEP_REASONING_EXAMPLES: DeepReasoningExample[] = [
     key_teaching: "Look for subtext. This isn't just wordplay - it's worker solidarity disguised as compliance.",
     tags: ['malicious-compliance', 'workplace-resistance', 'escalation', 'management-cliches'],
     humor_types: ['wordplay', 'absurdist', 'escalation', 'subversive']
+  },
+  {
+    video_summary: "Bubble tea shop. Sign says 'shake it'. Customer reads sign, then starts shaking her body (dancing) with a confused face, looking at the worker like THEY'RE the weird one.",
+    original_analysis: "Script Humor: observational",
+    deep_reasoning: {
+      character_dynamic: "Customer who misreads vs. worker who watches in disbelief. The customer's confidence makes it funnier.",
+      underlying_tension: "'Shake it' means shake the DRINK (obvious to us) vs. shake your BODY (what she thinks it means). Gap between intended and literal interpretation.",
+      format_participation: "The sign sets up the misreading. The humor requires us to SEE the sign to understand what went wrong.",
+      editing_contribution: "Holding on her confused face while she dances - we see she genuinely thinks the worker is strange.",
+      audience_surrogate: "The worker (and viewer) - we see the obvious meaning she's missed."
+    },
+    correct_interpretation: "Misunderstanding comedy where the customer reads 'shake it' as an instruction to dance rather than shake the drink. The absurdity is heightened because her facial expression implies SHE thinks the worker is strange - but WE know she's the one who misread. The gap between her self-perception (rightfully confused) and reality (she's the foolish one) IS the joke.",
+    key_teaching: "When someone misunderstands something, ask: Who looks foolish? Do THEY know they look foolish? The gap between self-perception and audience knowledge is often where the humor lives.",
+    tags: ['misunderstanding', 'literal-vs-intended', 'self-perception-gap', 'visual-instruction'],
+    humor_types: ['wordplay', 'misunderstanding', 'absurdist']
+  },
+  {
+    video_summary: "Date at restaurant. Man and woman do the 'generosity dance' - she offers to pay, he says no. Back and forth. Then he FOLDS - 'ok, you can pay'. Her face drops.",
+    original_analysis: "Script Humor: subversion",
+    deep_reasoning: {
+      character_dynamic: "Dating ritual where both know the 'rules' - man is supposed to insist on paying. The woman offers as politeness, not genuine offer.",
+      underlying_tension: "Social ritual (offers/refuses/insists/accepts) vs. breaking the ritual (actually accepting her 'offer'). He 'folds' when he shouldn't.",
+      format_participation: "Back-and-forth builds expectation that he'll 'win' the ritual. His fold breaks the expected pattern.",
+      editing_contribution: "Hold on her face after he folds - her expression IS the punchline.",
+      audience_surrogate: "Anyone who's played the generosity game and knows the unwritten rules."
+    },
+    correct_interpretation: "The 'generosity game' is a social ritual where offering to pay is performative - you're SUPPOSED to be refused. The joke is that he 'folds' (accepts her offer when he should refuse), breaking the ritual. Her facial expression - shock, disappointment, realization - shows she didn't ACTUALLY want to pay; it was just the dance. The subversion is that he took her performative offer literally.",
+    key_teaching: "Identify SOCIAL RITUALS. The 'generosity dance' is a specific cultural pattern where both parties know the expected outcome. Breaking it reveals the gap between performance and reality.",
+    tags: ['generosity-game', 'social-ritual', 'facial-expression-punchline', 'dating-dynamics'],
+    humor_types: ['subversion', 'social-dynamics', 'relatable']
+  },
+  {
+    video_summary: "Worker says 'can you finish this for me?' while holding drink. Coworker takes drink and chugs it. Worker's face: shock/annoyance.",
+    original_analysis: "subversion",
+    deep_reasoning: {
+      character_dynamic: "One worker asking for help with a task, another who (deliberately?) misunderstands.",
+      underlying_tension: "'Finish this' = complete the task vs. 'finish this' = drink this beverage. Two valid interpretations, wrong one chosen.",
+      format_participation: "Simple setup-payoff. The misinterpretation is the whole joke.",
+      editing_contribution: "Hold on reaction face after the drink is finished - worker's annoyance sells it.",
+      audience_surrogate: "The worker who asked - we've all had someone take us too literally."
+    },
+    correct_interpretation: "Classic 'finish this' ambiguity. The worker means 'complete this task' but the coworker interprets it as 'finish drinking this'. The humor is in the coworker choosing the lazier/more convenient interpretation - whether deliberately obtuse or genuinely confused. The reaction shot confirms the miscommunication and pays off the joke.",
+    key_teaching: "When a phrase has two meanings, STATE BOTH EXPLICITLY. Don't just say 'misunderstanding' - say 'finish this (task) vs. finish this (drink)'.",
+    tags: ['ambiguous-phrasing', 'convenient-misreading', 'reaction-punchline'],
+    humor_types: ['wordplay', 'misunderstanding', 'workplace']
+  },
+  {
+    video_summary: "Customer complains pizza 'tastes like a 4-year-old made it'. Cut to reveal: an actual 4-year-old in chef hat, looking proud.",
+    original_analysis: "Script Humor: subversion",
+    deep_reasoning: {
+      character_dynamic: "Complaining customer vs. the reveal that undermines the complaint. The child is innocent/oblivious.",
+      underlying_tension: "'Made by a 4-year-old' as insult vs. literal truth. Expression becomes accidentally accurate.",
+      format_participation: "Setup (complaint) → Reveal (literal truth). Classic misdirect structure.",
+      editing_contribution: "Cut to reveal is the punchline. The child's proud face adds wholesome layer.",
+      audience_surrogate: "None - we're observers. The child adds cuteness factor."
+    },
+    correct_interpretation: "The customer uses 'made by a 4-year-old' as an INSULT (meaning amateur, low quality), but the reveal shows it's LITERALLY TRUE. The phrase shifts from metaphorical criticism to accurate description. The child's proud, innocent face adds a wholesome dimension - this is more CUTE than purely funny. Content type is Wholesome-Comedy hybrid.",
+    key_teaching: "Identify when metaphorical expressions become literally true. The 'insult-becomes-fact' reveal is a common structure. Also: recognize when content is WHOLESOME (cute child) vs. purely comedic.",
+    tags: ['literal-truth-reveal', 'child-humor', 'wholesome-comedy', 'expression-reversal'],
+    humor_types: ['reveal', 'wordplay', 'wholesome']
+  },
+  {
+    video_summary: "Customer asks 'Do you work here?' to person wearing full uniform with company logo on apron, holding branded box. Person looks at uniform, looks at customer, removes apron, says 'No.'",
+    original_analysis: "Subversion humor",
+    deep_reasoning: {
+      character_dynamic: "Customer asking obvious question vs. worker's exasperated sarcasm. The question is so obviously dumb it deserves a sarcastic response.",
+      underlying_tension: "Social expectation (politely answer 'yes') vs. worker's rebellion (sarcastically deny the obvious). The visual cues make the question absurd.",
+      format_participation: "The visual setup (uniform, branded items) is essential - it makes the question obviously stupid, which justifies the sarcastic response.",
+      editing_contribution: "Mid-action cut as uniform comes off emphasizes commitment to the bit.",
+      audience_surrogate: "The worker - anyone who's been asked an obvious question understands the impulse to respond sarcastically."
+    },
+    correct_interpretation: "Sarcasm as social correction. The customer asks a question so obviously answered by visual cues (uniform, apron, branded box) that it deserves mockery. The worker's response ('No' while removing uniform) isn't literal - it's exasperated sarcasm meaning 'isn't it obvious?' The humor is in the commitment to the bit and the worker expressing what we all wish we could say.",
+    key_teaching: "When someone sarcastically denies an obvious truth, they're not lying - they're expressing 'your question was stupid'. The subtext is more important than the literal words.",
+    tags: ['sarcasm-as-correction', 'obvious-question', 'uniform-visual', 'worker-frustration'],
+    humor_types: ['sarcasm', 'workplace', 'relatable']
+  },
+  {
+    video_summary: "Waitress says 'Beautiful people get a discount'. Customer looks hopeful. Waitress: 'That'll be $15.' (Same price, no discount given.)",
+    original_analysis: "Subversion humor",
+    deep_reasoning: {
+      character_dynamic: "Waitress with power (determines discount eligibility) vs. customer hoping to be validated as 'beautiful'. Classic setup for rejection.",
+      underlying_tension: "Expectation of compliment/discount vs. implied rejection (you're not beautiful enough).",
+      format_participation: "Setup (discount mentioned) → No discount given. The omission IS the punchline.",
+      editing_contribution: "Deadpan delivery without reaction - the waitress doesn't acknowledge what she just implied.",
+      audience_surrogate: "The customer - we've all hoped for validation and been subtly denied."
+    },
+    correct_interpretation: "Mean humor disguised as neutral transaction. By mentioning a 'beautiful people discount' and then NOT applying it, the waitress implies the customer doesn't qualify. The cruelty is in what's NOT said - she doesn't insult directly, she just doesn't give the discount. The customer's face shows the realization. This is casual rejection comedy.",
+    key_teaching: "Absence of action can be a punchline. Not getting the discount implies rejection. The humor is in the GAP between expectation (I might be beautiful!) and reality (I'm not).",
+    tags: ['implied-rejection', 'beauty-standards', 'casual-cruelty', 'deadpan'],
+    humor_types: ['mean-humor', 'subversion', 'social-dynamics']
   }
 ]

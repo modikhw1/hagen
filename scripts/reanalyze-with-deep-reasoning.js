@@ -222,11 +222,14 @@ function buildHumanText(example) {
 /**
  * Analyze a video with Gemini using deep reasoning prompt
  */
-async function analyzeWithDeepReasoning(example, originalAnalysis = null) {
+async function analyzeWithDeepReasoning(example, originalAnalysis = null, useProModel = false) {
   const prompt = buildPrompt(example, originalAnalysis);
   
+  // Use gemini-2.5-pro for more nuanced understanding, or flash for speed
+  const modelName = useProModel ? 'gemini-2.5-pro' : 'gemini-2.0-flash-exp';
+  
   const model = genAI.getGenerativeModel({ 
-    model: 'gemini-2.0-flash-exp',
+    model: modelName,
     generationConfig: {
       temperature: 0.3,
       responseMimeType: 'application/json'
@@ -315,8 +318,17 @@ async function computeScore(newAnalysis, example) {
 async function main() {
   const processAll = process.argv.includes('--all');
   const specificId = process.argv.find(a => a.startsWith('--id='))?.split('=')[1];
+  const limitArg = process.argv.find(a => a.startsWith('--limit='))?.split('=')[1];
+  const customLimit = limitArg ? parseInt(limitArg, 10) : null;
+  const richOnly = process.argv.includes('--rich'); // Only examples with rich notes
+  const randomize = process.argv.includes('--random'); // Randomize selection
+  const skipProcessed = process.argv.includes('--skip-processed'); // Skip already processed
+  const useProModel = process.argv.includes('--pro'); // Use gemini-1.5-pro for better quality
   
   console.log('=== RE-ANALYZE WITH DEEP REASONING ===\n');
+  if (useProModel) {
+    console.log('Using gemini-1.5-pro for higher quality analysis\n');
+  }
   
   // Load existing results
   let existingResults = {};
@@ -330,7 +342,9 @@ async function main() {
     existingResults = { comparisons: {} };
   }
   
-  // Fetch examples
+  // Fetch examples - get more than needed if randomizing
+  const fetchLimit = randomize ? 200 : (customLimit || 10);
+  
   let query = supabase
     .from('video_analysis_examples')
     .select('*')
@@ -339,17 +353,48 @@ async function main() {
   if (specificId) {
     query = query.eq('id', specificId);
   } else if (!processAll) {
-    query = query.limit(10);
+    query = query.limit(fetchLimit);
   }
   
-  const { data: examples, error } = await query;
+  let { data: examples, error } = await query;
   
   if (error) {
     console.error('Error fetching examples:', error);
     return;
   }
   
-  console.log(`Processing ${examples.length} examples...\n`);
+  // Filter for rich notes if requested (has substantial correct_interpretation or deep_reasoning)
+  if (richOnly) {
+    examples = examples.filter(ex => {
+      const noteLength = (ex.correct_interpretation || '').length;
+      const hasDeepReasoning = ex.humor_type_correction?.deep_reasoning || 
+                               ex.humor_type_correction?.why;
+      return noteLength > 50 || hasDeepReasoning;
+    });
+    console.log(`Filtered to ${examples.length} examples with rich notes`);
+  }
+  
+  // Skip already processed if requested
+  if (skipProcessed) {
+    const alreadyProcessed = new Set(Object.keys(existingResults.comparisons || {}));
+    const before = examples.length;
+    examples = examples.filter(ex => !alreadyProcessed.has(ex.id));
+    console.log(`Skipping ${before - examples.length} already processed, ${examples.length} remaining`);
+  }
+  
+  // Randomize if requested
+  if (randomize) {
+    examples = examples.sort(() => Math.random() - 0.5);
+    console.log(`Randomized order`);
+  }
+  
+  // Apply limit after filtering/randomizing
+  const finalLimit = customLimit || 10;
+  if (!processAll && examples.length > finalLimit) {
+    examples = examples.slice(0, finalLimit);
+  }
+  
+  console.log(`\nProcessing ${examples.length} examples...\n`);
   
   let processed = 0;
   let improved = 0;
@@ -371,7 +416,7 @@ async function main() {
       }
       
       // Re-analyze with deep reasoning
-      const newAnalysis = await analyzeWithDeepReasoning(example, originalAnalysis);
+      const newAnalysis = await analyzeWithDeepReasoning(example, originalAnalysis, useProModel);
       
       // Compute new score
       const newScore = await computeScore(newAnalysis, example);

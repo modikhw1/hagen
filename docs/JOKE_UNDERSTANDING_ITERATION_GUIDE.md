@@ -3,6 +3,24 @@
 ## 🎯 Goal
 Iteratively improve Gemini's ability to capture joke structure and humor understanding through systematic prompt engineering and benchmarking.
 
+**Target: 85%+ understanding** on focused evaluation questions.
+
+---
+
+## 📈 Current Status (Updated 2025-01-09)
+
+| Metric | Baseline | Current | Target |
+|--------|----------|---------|--------|
+| Embedding Similarity | 41% | 65.4% | N/A |
+| Focused Eval (manual) | - | TBD | 85%+ |
+| Videos Benchmarked | 10 | 75 | 143 |
+
+**Key Achievement:** +24% improvement through prompt engineering.
+
+**Limitation Discovered:** Embedding similarity penalizes semantically-equivalent explanations. Use focused evaluation for better assessment.
+
+**Next Focus:** See `docs/FOCUSED_EVALUATION.md` for 10 edge cases with specific questions.
+
 ---
 
 ## 📊 Current System Architecture
@@ -305,23 +323,114 @@ Ask: "Is there an actual JOKE here, or just a relatable observation?"
 
 ---
 
+## 🔬 Question Battery System
+
+For systematic gap identification and hypothesis testing:
+
+### Generate the Question Battery
+
+```bash
+# Basic: Generate list of all gaps
+node scripts/generate-question-battery.js
+
+# Categorize gaps by type (cultural, visual, social, etc.)
+node scripts/generate-question-battery.js --categorize
+
+# Generate hypotheses for prompt improvement
+node scripts/generate-question-battery.js --categorize --hypotheses
+
+# Focus on low-scoring examples only
+node scripts/generate-question-battery.js --low-only --categorize
+```
+
+**Output files:**
+- `datasets/question_battery.json` - Structured data
+- `datasets/question_battery.md` - Readable document with video links
+
+### Gap Categories Identified
+
+| Category | What it means |
+|----------|---------------|
+| `CULTURAL_CONTEXT` | AI missed cultural references, tropes, generational humor |
+| `VISUAL_REVEAL` | Punchline was visual, AI focused on words |
+| `SOCIAL_DYNAMICS` | Mean humor, embarrassment, rejection not named |
+| `QUALITY_MISJUDGED` | AI said funny when human said weak/relatable |
+| `MECHANISM_WRONG` | AI identified completely different type of humor |
+| `SUBTLE_ELEMENTS` | Between-the-lines meaning, tone, delivery missed |
+| `FORMAT_SUBVERSION` | Video structure/format was part of the joke |
+
+### Test a Hypothesis
+
+After identifying a gap category, test if a prompt change helps:
+
+```bash
+# Test prompt changes on SOCIAL_DYNAMICS gaps
+node scripts/test-hypothesis.js --gap=SOCIAL_DYNAMICS
+
+# Test on VISUAL_REVEAL gaps with verbose output
+node scripts/test-hypothesis.js --gap=VISUAL_REVEAL --verbose
+
+# Test with a custom prompt variant
+node scripts/test-hypothesis.js --gap=SOCIAL_DYNAMICS --prompt=v4.1_social_dynamics.md
+
+# Test specific videos by ID
+node scripts/test-hypothesis.js --ids=abc123,def456
+```
+
+**Success criteria:**
+- ✅ Average improvement > +5% → Hypothesis supported
+- 🟡 Improvement 0-5% → Marginal, may need refinement
+- ❌ Regression → Hypothesis rejected, revert changes
+
+---
+
+## 🔄 Complete Iteration Workflow
+
+```
+1. BASELINE
+   node scripts/compute-understanding-scores.js --stats
+   → Know your starting point (e.g., 57% average)
+
+2. IDENTIFY GAPS
+   node scripts/generate-question-battery.js --categorize --hypotheses
+   → Creates question_battery.md with gap analysis
+
+3. FORM HYPOTHESIS
+   "Adding examples for SOCIAL_DYNAMICS gaps will improve those videos by 10%"
+
+4. MODIFY PROMPT
+   Edit src/lib/services/video/deep-reasoning.ts
+   (or create a variant in prompts/)
+
+5. TEST HYPOTHESIS
+   node scripts/test-hypothesis.js --gap=SOCIAL_DYNAMICS --verbose
+   → See if scores improve
+
+6. IF SUCCESSFUL: VALIDATE
+   node scripts/quick-iterate.js --count=20
+   → Ensure no regression on other types
+
+7. TRACK PROGRESS
+   node scripts/track-progress.js
+   → Create new benchmark snapshot
+```
+
+---
+
 ## 🔬 Advanced: A/B Testing Prompts
 
 For major changes, test side-by-side:
 
 ```bash
-# 1. Backup current prompt
-cp src/lib/services/video/deep-reasoning.ts src/lib/services/video/deep-reasoning.backup.ts
-
-# 2. Create variant
+# 1. Create prompt variant
+cp prompts/v4.0_humor_deep_reasoning.md prompts/v4.1_experimental.md
 # ... make your changes ...
 
-# 3. Test both versions
-node scripts/reanalyze-with-deep-reasoning.js --limit=30
-# (outputs to datasets/deep_reasoning_comparison.json)
+# 2. Test on a specific gap
+node scripts/test-hypothesis.js --prompt=v4.1_experimental.md --limit=15
 
-# 4. Compare
-node scripts/compare-prompt-versions.js  # TODO: create this
+# 3. Compare results
+cat datasets/hypothesis_test_results.json | jq '.summary'
 ```
 
 ---
