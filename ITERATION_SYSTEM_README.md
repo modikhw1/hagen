@@ -58,12 +58,36 @@ node scripts/add-teaching-example.js
 node scripts/add-teaching-example.js --video-id=abc123
 ```
 
+#### Question Battery & Hypothesis Testing (NEW)
+```bash
+# Generate gap analysis document
+node scripts/generate-question-battery.js --categorize --hypotheses
+
+# Output: datasets/question_battery.md (readable with video links)
+# Output: datasets/question_battery.json (structured data)
+
+# Test a specific prompt modification
+node scripts/test-hypothesis.js --gap=SOCIAL_DYNAMICS --verbose
+node scripts/test-hypothesis.js --gap=VISUAL_REVEAL --limit=15
+```
+
+**Gap categories identified:**
+- `CULTURAL_CONTEXT` - AI missed cultural references, tropes, generational humor
+- `VISUAL_REVEAL` - Punchline was visual, AI focused on words
+- `SOCIAL_DYNAMICS` - Mean humor, embarrassment, rejection not named
+- `QUALITY_MISJUDGED` - AI said funny when human said weak/relatable
+- `MECHANISM_WRONG` - AI identified completely different type of humor
+- `SUBTLE_ELEMENTS` - Between-the-lines meaning, tone, delivery missed
+- `FORMAT_SUBVERSION` - Video structure/format was part of the joke
+
 ### Existing Analysis Scripts
 
 - `compute-understanding-scores.js` - Semantic similarity scoring
 - `llm-judge-comparison.js` - LLM-as-judge evaluation  
 - `reanalyze-with-deep-reasoning.js` - Full re-analysis with new prompts
 - `backfill-learning-with-gemini-analysis.js` - Populate RAG system
+- `generate-question-battery.js` - Create gap analysis document (NEW)
+- `test-hypothesis.js` - Test prompt modifications on specific gaps (NEW)
 
 ---
 

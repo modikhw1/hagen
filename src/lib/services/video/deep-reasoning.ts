@@ -19,6 +19,24 @@
  */
 export const DEEP_REASONING_CHAIN = `
 ═══════════════════════════════════════════════════════════════════════════════
+YOUR PERSPECTIVE
+═══════════════════════════════════════════════════════════════════════════════
+
+Imagine you're a 23-year-old college student scrolling through TikTok. You have a 
+genuine appreciation for comedy and find yourself drawn to marketing clips, trying 
+to figure out how different businesses create visual content that is both humorous 
+and somehow creates an engaging piece of content representing a brand.
+
+You notice when something is actually funny vs. when it's trying too hard. You can 
+tell when a joke lands because you've seen thousands of videos. You understand the 
+references, the trends, the formats. When a hospitality worker makes dark humor 
+about their job, you get it - you've worked service jobs, you know the exhaustion 
+behind the smile.
+
+Analyze this video from that perspective. What would make you stop scrolling? What 
+would make you share this with friends? What's the actual joke here?
+
+═══════════════════════════════════════════════════════════════════════════════
 DEEP HUMOR REASONING CHAIN (Complete BEFORE labeling humor type)
 ═══════════════════════════════════════════════════════════════════════════════
 
@@ -235,6 +253,48 @@ For EVERY video with humor, answer these questions IN ORDER before assigning lab
 └─────────────────────────────────────────────────────────────────────────────
 
 ┌─────────────────────────────────────────────────────────────────────────────
+│ STEP 6.3: DARK HUMOR & HIDDEN DISTRESS
+├─────────────────────────────────────────────────────────────────────────────
+│ Dark humor often hides in plain sight. The surface looks normal, but something
+│ deeply uncomfortable is being communicated through contrast.
+│
+│ Ask: "Is there darkness hiding behind a cheerful surface?"
+│
+│ DARK HUMOR PATTERNS:
+│ • Smiling through pain: Character performs happiness while implying suffering
+│ • Casual mention of disturbing things: Said in upbeat tone or matter-of-factly
+│ • Service worker "dead inside": Maintains customer service face while dying
+│ • Implied self-harm/violence: Gestures, glances, or actions that suggest harm
+│ • "This is fine" energy: Chaos happening while someone acts like it's normal
+│ • Cheerful nihilism: Upbeat delivery of bleak content
+│ • Facade vs reality: Extreme gap between presented emotion and implied emotion
+│
+│ CRITICAL DETECTION SIGNALS:
+│ • Inappropriate affect: Happy face + negative context = RED FLAG
+│ • Dramatic contrast: Upbeat music + depressing situation
+│ • Gestures that suggest: Looking at knives, ovens, rope, exits while smiling
+│ • "Jokes" about quitting, dying, escaping, giving up
+│ • Eye contact that communicates suffering while maintaining smile
+│
+│ HOSPITALITY-SPECIFIC DARK HUMOR:
+│ • Server smiling at camera while making self-harm gestures
+│ • Kitchen worker maintaining composure while eyes suggest murder
+│ • Holiday season content where "festive" masks desperation
+│ • "Day in my life" that implies this life is unbearable
+│
+│ THE JUXTAPOSITION IS THE JOKE:
+│ • If the audio says "I love my job" but the visual says "kill me"
+│ • If the face is smiling but the context is horrifying
+│ • If the energy is upbeat but the message is bleak
+│ • THAT GAP between surface and truth IS the humor
+│
+│ NEVER describe these as "observational" or "relatable" - they are DARK.
+│ The humor comes from the horror of recognition, not just recognition.
+│
+│ OUTPUT: dark_humor_signals field (describe the darkness hiding under the surface, or 'none')
+└─────────────────────────────────────────────────────────────────────────────
+
+┌─────────────────────────────────────────────────────────────────────────────
 │ STEP 6.5: CULTURAL CONTEXT & TROPES
 ├─────────────────────────────────────────────────────────────────────────────
 │ Humor often relies on shared cultural knowledge that may not be stated.
@@ -367,6 +427,7 @@ NOW output your deep reasoning analysis in this format:
   "audience_surrogate": "<which character represents viewer feelings, and what experience this taps into, or 'none'>",
   "wordplay_misunderstanding": "<if relevant: word/phrase with two meanings - state BOTH interpretations explicitly, or 'none'>",
   "social_dynamic": "<if relevant: who is embarrassed/rejected/put down and how, or 'none'>",
+  "dark_humor_signals": "<CRITICAL: if cheerful surface hides disturbing subtext, describe the darkness. Smiling + self-harm gestures, fake happiness + despair, upbeat + bleak. Or 'none'>",
   "cultural_context": "<what cultural knowledge, tropes, or shared experiences does this joke require, or 'none'>",
   "content_type": "<Comedy/Wholesome/Relatable/Charming/Clever/Chaotic/Bait - what is this TRYING to be?>",
   "quality_assessment": "<tier (Exceptional/Good/Average/Weak/Poor) + honest 1-sentence assessment>",
@@ -435,7 +496,13 @@ export interface DeepReasoningExample {
     underlying_tension: string
     format_participation: string
     editing_contribution: string
+    visual_punchline?: string
+    tone_delivery?: string
     audience_surrogate: string
+    wordplay_misunderstanding?: string
+    social_dynamic?: string
+    dark_humor_signals?: string
+    cultural_context?: string
   }
   
   // The complete interpretation (result of deep reasoning)
