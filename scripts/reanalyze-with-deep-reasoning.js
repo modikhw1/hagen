@@ -33,9 +33,18 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const OUTPUT_FILE = path.join(__dirname, '..', 'datasets', 'deep_reasoning_comparison.json');
 
 /**
- * The Deep Reasoning Chain - forces structured thinking before labeling
+ * Import the Deep Reasoning Chain from source so we always test the latest prompt
  */
-const DEEP_REASONING_CHAIN = `
+let DEEP_REASONING_CHAIN;
+try {
+  // Try to load from compiled TypeScript (requires ts-node or build)
+  const deepReasoning = require('../src/lib/services/video/deep-reasoning.ts');
+  DEEP_REASONING_CHAIN = deepReasoning.DEEP_REASONING_CHAIN;
+  console.log('✓ Loaded deep reasoning chain from source\n');
+} catch (e) {
+  // Fallback to inline version
+  console.log('⚠ Using fallback deep reasoning chain (consider using ts-node)\n');
+  DEEP_REASONING_CHAIN = `
 ═══════════════════════════════════════════════════════════════
 DEEP REASONING CHAIN - REQUIRED BEFORE ANY HUMOR CLASSIFICATION
 ═══════════════════════════════════════════════════════════════
@@ -67,28 +76,63 @@ Before assigning ANY humor type or mechanism, you MUST work through these questi
    → Mid-word cuts, held shots, reaction timing
    → What is the EDITING saying that dialogue isn't?
 
-6. THE REAL MECHANISM
+6. CULTURAL CONTEXT
+   "What cultural knowledge, tropes, or shared experiences does this joke require?"
+   → Generational humor codes, industry tropes, social rituals
+
+7. THE REAL MECHANISM
    "Now that I've analyzed the above, what ACTUALLY explains why this is funny?"
    → Don't just label (subversion, wordplay, etc.)
    → Explain the SPECIFIC mechanism at work
 
-ONLY AFTER completing steps 1-6 should you assign:
+ONLY AFTER completing steps 1-7 should you assign:
 - humorType (which should REFLECT your reasoning above)
 - humorMechanism (a sentence explaining the specific dynamic)
 `;
+}
 
 /**
  * Build the analysis prompt with deep reasoning
+ * Uses all available context from the example and original analysis
  */
-function buildPrompt(example) {
+function buildPrompt(example, originalAnalysis = null) {
+  // Build rich context from available sources
+  const contextParts = [];
+  
+  // Video summary (always available)
+  contextParts.push(`VIDEO SUMMARY: ${example.video_summary || 'No summary available'}`);
+  
+  // Try to get transcript from various sources
+  const transcript = example.transcript || 
+    example.humor_type_correction?.transcript ||
+    originalAnalysis?.script?.transcript;
+  if (transcript) {
+    contextParts.push(`\nTRANSCRIPT:\n${transcript}`);
+  }
+  
+  // Try to get scene breakdown from original analysis
+  if (originalAnalysis?.scenes?.sceneBreakdown) {
+    const scenes = originalAnalysis.scenes.sceneBreakdown.map(s => 
+      `Scene ${s.sceneNumber} (${s.timestamp}): ${s.visualContent}${s.audioContent ? ` [Audio: ${s.audioContent}]` : ''}`
+    ).join('\n');
+    contextParts.push(`\nSCENE BREAKDOWN:\n${scenes}`);
+  } else if (example.scene_breakdown) {
+    contextParts.push(`\nSCENE BREAKDOWN:\n${example.scene_breakdown}`);
+  }
+  
+  // Include original humor mechanism if available (for comparison/improvement)
+  if (originalAnalysis?.script?.humor?.humorMechanism) {
+    contextParts.push(`\nORIGINAL AI ANALYSIS (may be shallow - your goal is to improve on this):\n${originalAnalysis.script.humor.humorMechanism}`);
+  }
+  
+  // Include visual description if available
+  if (originalAnalysis?.script?.visualTranscript) {
+    contextParts.push(`\nVISUAL DESCRIPTION:\n${originalAnalysis.script.visualTranscript}`);
+  }
+
   return `${DEEP_REASONING_CHAIN}
 
-VIDEO CONTEXT:
-${example.video_summary || 'No summary available'}
-
-${example.transcript ? `TRANSCRIPT:\n${example.transcript}` : ''}
-
-${example.scene_breakdown ? `SCENE BREAKDOWN:\n${example.scene_breakdown}` : ''}
+${contextParts.join('\n')}
 
 TASK: Analyze this video's humor using the Deep Reasoning Chain above.
 
@@ -96,11 +140,15 @@ Respond with JSON in this format:
 {
   "deep_reasoning": {
     "character_dynamic": "...",
-    "underlying_expectation": "...",
-    "the_violation": "...",
+    "underlying_tension": "...",
     "format_participation": "...",
-    "editing_as_comedy": "...",
-    "the_real_mechanism": "..."
+    "editing_contribution": "...",
+    "audience_surrogate": "...",
+    "social_dynamic": "...",
+    "cultural_context": "...",
+    "quality_assessment": "...",
+    "why_this_is_funny": "...",
+    "what_makes_it_work": "..."
   },
   "humorType": "...",
   "humorMechanism": "...",
@@ -108,7 +156,7 @@ Respond with JSON in this format:
 }
 
 The humorType and humorMechanism should REFLECT and be DERIVED FROM your deep_reasoning.
-Do not just label - explain the specific dynamic at work.`;
+Do not just label - explain the SPECIFIC dynamic at work in THIS video.`;
 }
 
 /**
@@ -174,8 +222,8 @@ function buildHumanText(example) {
 /**
  * Analyze a video with Gemini using deep reasoning prompt
  */
-async function analyzeWithDeepReasoning(example) {
-  const prompt = buildPrompt(example);
+async function analyzeWithDeepReasoning(example, originalAnalysis = null) {
+  const prompt = buildPrompt(example, originalAnalysis);
   
   const model = genAI.getGenerativeModel({ 
     model: 'gemini-2.0-flash-exp',
@@ -201,6 +249,22 @@ async function analyzeWithDeepReasoning(example) {
 }
 
 /**
+ * Fetch original analysis from analyzed_videos table
+ */
+async function getOriginalAnalysis(videoId) {
+  if (!videoId) return null;
+  
+  const { data, error } = await supabase
+    .from('analyzed_videos')
+    .select('visual_analysis')
+    .eq('id', videoId)
+    .single();
+  
+  if (error || !data) return null;
+  return data.visual_analysis;
+}
+
+/**
  * Compute understanding score for new analysis
  */
 async function computeScore(newAnalysis, example) {
@@ -210,11 +274,16 @@ async function computeScore(newAnalysis, example) {
   if (newAnalysis.deep_reasoning) {
     const dr = newAnalysis.deep_reasoning;
     if (dr.character_dynamic) parts.push(`Character dynamic: ${dr.character_dynamic}`);
-    if (dr.underlying_expectation) parts.push(`Underlying expectation: ${dr.underlying_expectation}`);
-    if (dr.the_violation) parts.push(`The violation: ${dr.the_violation}`);
+    if (dr.underlying_tension) parts.push(`Underlying tension: ${dr.underlying_tension}`);
     if (dr.format_participation) parts.push(`Format: ${dr.format_participation}`);
-    if (dr.editing_as_comedy) parts.push(`Editing: ${dr.editing_as_comedy}`);
-    if (dr.the_real_mechanism) parts.push(`Mechanism: ${dr.the_real_mechanism}`);
+    if (dr.editing_contribution) parts.push(`Editing: ${dr.editing_contribution}`);
+    if (dr.visual_punchline && dr.visual_punchline !== 'none') parts.push(`Visual punchline: ${dr.visual_punchline}`);
+    if (dr.audience_surrogate) parts.push(`Audience: ${dr.audience_surrogate}`);
+    if (dr.social_dynamic && dr.social_dynamic !== 'none') parts.push(`Social dynamic: ${dr.social_dynamic}`);
+    if (dr.cultural_context && dr.cultural_context !== 'none') parts.push(`Cultural context: ${dr.cultural_context}`);
+    if (dr.quality_assessment) parts.push(`Quality: ${dr.quality_assessment}`);
+    if (dr.why_this_is_funny) parts.push(`Why funny: ${dr.why_this_is_funny}`);
+    if (dr.what_makes_it_work) parts.push(`What makes it work: ${dr.what_makes_it_work}`);
   }
   
   if (newAnalysis.humorMechanism) {
@@ -295,8 +364,14 @@ async function main() {
       console.log(`\n[${processed + 1}/${examples.length}] ${example.video_summary?.substring(0, 50)}...`);
       console.log(`  Old score: ${oldScore || 'N/A'}%`);
       
+      // Fetch original analysis for richer context
+      const originalAnalysis = await getOriginalAnalysis(example.video_id);
+      if (originalAnalysis) {
+        console.log(`  (Using original analysis for context)`);
+      }
+      
       // Re-analyze with deep reasoning
-      const newAnalysis = await analyzeWithDeepReasoning(example);
+      const newAnalysis = await analyzeWithDeepReasoning(example, originalAnalysis);
       
       // Compute new score
       const newScore = await computeScore(newAnalysis, example);

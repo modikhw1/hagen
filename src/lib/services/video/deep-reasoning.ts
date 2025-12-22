@@ -93,6 +93,35 @@ For EVERY video with humor, answer these questions IN ORDER before assigning lab
 └─────────────────────────────────────────────────────────────────────────────
 
 ┌─────────────────────────────────────────────────────────────────────────────
+│ STEP 4.5: VISUAL PUNCHLINE DETECTION
+├─────────────────────────────────────────────────────────────────────────────
+│ Many video jokes have punchlines that are VISUAL, not spoken.
+│
+│ Ask: "Is the punchline shown rather than said?"
+│
+│ Visual punchline types:
+│ • Reveal: Camera shows something unexpected (text on screen, object, person)
+│ • Expression: Someone's face is the joke (disgust, dead inside, cringe)
+│ • Action without words: Someone walks away, hangs up, or does something
+│ • Text on screen: The words ARE the joke (no dialogue needed)
+│ • Absence of people: Video is just images/text (no performance, just concept)
+│ • Physical comedy: Something happens visually that words can't capture
+│
+│ CRITICAL: If the video works WITHOUT dialogue, the punchline is visual.
+│ If you remove the images and just read the script, would it still be funny?
+│ If NO - the visual IS the humor. Document what you SEE, not what is said.
+│
+│ Common visual-only formats:
+│ • Questions posed to camera with no answer (engagement bait)
+│ • Reaction faces that carry the whole joke
+│ • Text overlays that are funnier than the audio
+│ • Before/after reveals
+│ • Object reveals (uniform, price tag, empty plate)
+│
+│ OUTPUT: visual_punchline field (describe what visual element delivers the joke, or 'none')
+└─────────────────────────────────────────────────────────────────────────────
+
+┌─────────────────────────────────────────────────────────────────────────────
 │ STEP 5: AUDIENCE SURROGATE
 ├─────────────────────────────────────────────────────────────────────────────
 │ Often one character represents what the audience feels.
@@ -129,23 +158,70 @@ For EVERY video with humor, answer these questions IN ORDER before assigning lab
 └─────────────────────────────────────────────────────────────────────────────
 
 ┌─────────────────────────────────────────────────────────────────────────────
-│ STEP 7: CONTENT QUALITY ASSESSMENT
+│ STEP 6.5: CULTURAL CONTEXT & TROPES
 ├─────────────────────────────────────────────────────────────────────────────
-│ Not all content works. Be honest about quality.
+│ Humor often relies on shared cultural knowledge that may not be stated.
 │
-│ Ask: "Does this joke actually land? Is the premise strong or weak?"
+│ Ask: "What cultural context, tropes, or shared experiences does this require?"
 │
-│ Quality indicators:
-│ • Strong premise: The core idea is inherently funny/interesting
-│ • Weak premise: Relies entirely on delivery/energy to carry thin concept
-│ • Recognizable but not funny: Relatable moment without actual humor payoff
-│ • Broken logic: The joke doesn't quite make sense on examination
-│ • Execution-dependent: Good idea that needs perfect timing to work
+│ Common service industry tropes:
+│ • The "clueless young worker" - forgetful, unfocused, but endearing
+│ • The "demanding kitchen staff" - everyone jumps when the chef speaks
+│ • The "generosity game" - social ritual of insisting to pay the bill
+│ • The "dead inside" service worker - professional smile hiding exhaustion
+│ • The "entitled customer" - unreasonable demands treated as normal
 │
-│ Be willing to say: "This is more relatable than funny" or 
-│ "The premise is weak but the delivery saves it"
+│ Generational humor codes:
+│ • Gen Z irony: Deadpan, understated, nihilistic undertones
+│ • Millennial relatability: "Adulting is hard" shared exhaustion
+│ • Parent/child dynamics: Authority vs. naive worldview
 │
-│ OUTPUT: quality_assessment field
+│ Social rituals that drive humor:
+│ • Tipping anxiety (US-specific cultural tension)
+│ • Bill-paying dance (who offers, who insists, who caves)
+│ • Interview politeness (masks vs. true feelings)
+│ • Customer-is-always-right (vs. worker revenge fantasies)
+│
+│ Ask yourself: "What does the audience need to ALREADY KNOW to find this funny?"
+│ If you can't articulate the shared context, you may be missing the joke.
+│
+│ OUTPUT: cultural_context field (or 'none' if culturally neutral)
+└─────────────────────────────────────────────────────────────────────────────
+
+┌─────────────────────────────────────────────────────────────────────────────
+│ STEP 7: CONTENT QUALITY ASSESSMENT (BE BRUTALLY HONEST)
+├─────────────────────────────────────────────────────────────────────────────
+│ Not all content works. Be honest - many videos are not actually funny.
+│
+│ Ask: "Is this GENUINELY funny, or just recognizable/relatable?"
+│
+│ DISTINGUISH BETWEEN:
+│ • Humor: Makes you laugh or smile
+│ • Relatability: You recognize the situation (but it's not funny)
+│ • Engagement bait: Designed to get comments, not laughs
+│ • Clever: Smart concept but not actually funny
+│ • Cute/Charming: Pleasant but not comedic
+│
+│ BE CRITICAL - Don't inflate quality. Many videos are:
+│ • "Premise is obvious, execution is average"
+│ • "Relatable but not actually funny"
+│ • "Trying too hard / overexplained"
+│ • "Format is tired / seen this 100 times"
+│ • "The idea is better than the execution"
+│
+│ QUALITY TIERS:
+│ • Exceptional: Genuinely clever, surprising, well-executed. Would share.
+│ • Good: Solid humor with good execution. Worth watching.
+│ • Average: Does what it sets out to do, nothing special. Forgettable.
+│ • Weak: Relatable but not funny, or poorly executed good idea.
+│ • Poor: Doesn't work. Concept is broken or humor doesn't land.
+│
+│ Common mistakes:
+│ ❌ Calling something "funny" because you understand what they're going for
+│ ❌ Rating based on effort rather than outcome
+│ ❌ Assuming observational = funny (observing something isn't inherently humor)
+│ 
+│ OUTPUT: quality_assessment field (tier + honest 1-sentence assessment)
 └─────────────────────────────────────────────────────────────────────────────
 
 ┌─────────────────────────────────────────────────────────────────────────────
@@ -172,9 +248,11 @@ NOW output your deep reasoning analysis in this format:
   "underlying_tension": "<what gap or conflict creates the humor>",
   "format_participation": "<how does structure/format participate in the joke, or 'none'>",
   "editing_contribution": "<what editing choices add to humor, or 'none'>",
+  "visual_punchline": "<if punchline is visual: describe what visual element delivers the joke, or 'none'>",
   "audience_surrogate": "<which character represents viewer feelings, and what experience this taps into, or 'none'>",
   "social_dynamic": "<if relevant: who is embarrassed/rejected/put down and how, or 'none'>",
-  "quality_assessment": "<honest assessment: strong premise, weak premise needing delivery, relatable but not funny, etc.>",
+  "cultural_context": "<what cultural knowledge, tropes, or shared experiences does this joke require, or 'none'>",
+  "quality_assessment": "<tier (Exceptional/Good/Average/Weak/Poor) + honest 1-sentence assessment>",
   "why_this_is_funny": "<2-3 sentences explaining the MECHANISM, not just describing what happens>",
   "what_makes_it_work": "<the core insight that makes this joke land>"
 }
@@ -194,7 +272,11 @@ export interface DeepHumorAnalysis {
     underlying_tension: string
     format_participation: string
     editing_contribution: string
+    visual_punchline: string  // NEW: What visual element delivers the punchline?
     audience_surrogate: string
+    social_dynamic: string
+    cultural_context: string  // What shared knowledge does this joke require?
+    quality_assessment: string
     why_this_is_funny: string
     what_makes_it_work: string
   }
