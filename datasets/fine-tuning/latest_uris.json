@@ -1,0 +1,11 @@
+{
+  "trainUri": "gs://hagen-video-analysis/fine-tuning/humor-analysis/train_v2_2025-12-22.jsonl",
+  "validationUri": "gs://hagen-video-analysis/fine-tuning/humor-analysis/validation_v2_2025-12-22.jsonl",
+  "timestamp": "2025-12-22",
+  "stats": {
+    "totalExamples": 51,
+    "trainCount": 40,
+    "validationCount": 11,
+    "source": "gold_standard.jsonl"
+  }
+}

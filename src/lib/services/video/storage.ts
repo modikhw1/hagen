@@ -49,6 +49,35 @@ export class VideoStorageService {
   }
 
   /**
+   * Generic upload to GCS
+   */
+  async upload(localFilePath: string, destinationPath: string): Promise<string> {
+    if (!this.useGCS || !this.bucket) {
+      throw new Error('Google Cloud Storage not configured');
+    }
+
+    try {
+      console.log(`☁️ Uploading to GCS: ${localFilePath} -> ${destinationPath}`)
+
+      await this.bucket.upload(localFilePath, {
+        destination: destinationPath,
+        metadata: {
+          contentType: 'video/mp4'
+        }
+      })
+
+      const gsUrl = `gs://${this.bucketName}/${destinationPath}`
+      console.log(`✅ Uploaded to GCS: ${gsUrl}`)
+
+      return gsUrl
+
+    } catch (error) {
+      console.error('❌ Upload to GCS failed:', error)
+      throw error
+    }
+  }
+
+  /**
    * Upload video file to Google Cloud Storage
    */
   async uploadVideo(localFilePath: string, videoId: string): Promise<UploadResult> {
