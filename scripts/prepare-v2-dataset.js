@@ -33,7 +33,7 @@ Fokusera på:
 Var specifik och undvik generiska beskrivningar.`;
 
 async function main() {
-  console.log('📊 Preparing V2 training data from Gold Standard...\n');
+  console.log('📊 Preparing V3 training data from Gold Standard...\n');
 
   // Initialize Services
   const supabase = createClient(
@@ -227,8 +227,8 @@ async function main() {
 
   // 6. Save Locally
   const timestamp = new Date().toISOString().split('T')[0];
-  const trainFilename = `train_v2_${timestamp}.jsonl`;
-  const validationFilename = `validation_v2_${timestamp}.jsonl`;
+  const trainFilename = `train_v3_${timestamp}.jsonl`;
+  const validationFilename = `validation_v3_${timestamp}.jsonl`;
   
   fs.writeFileSync(path.join(CONFIG.outputPath, trainFilename), trainJsonl);
   fs.writeFileSync(path.join(CONFIG.outputPath, validationFilename), validationJsonl);

@@ -1,17 +1,17 @@
 {
-  "name": "projects/1061681256498/locations/us-central1/tuningJobs/2914990919360970752",
-  "displayName": "humor-analysis-2025-12-22",
-  "submittedAt": "2025-12-22T23:17:28.245Z",
+  "name": "projects/1061681256498/locations/us-central1/tuningJobs/3074675192086134784",
+  "displayName": "humor-analysis-v4-2025-12-23T13-12-07-829Z",
+  "submittedAt": "2025-12-23T13:12:09.063Z",
   "config": {
     "baseModel": "gemini-2.5-flash",
     "supervisedTuningSpec": {
-      "trainingDatasetUri": "gs://hagen-video-analysis/fine-tuning/humor-analysis/train_v2_2025-12-22.jsonl",
-      "validationDatasetUri": "gs://hagen-video-analysis/fine-tuning/humor-analysis/validation_v2_2025-12-22.jsonl",
+      "trainingDatasetUri": "gs://hagen-video-analysis/fine-tuning/humor-analysis/train_v3_2025-12-23.jsonl",
+      "validationDatasetUri": "gs://hagen-video-analysis/fine-tuning/humor-analysis/validation_v3_2025-12-23.jsonl",
       "hyperParameters": {
         "epochCount": 4,
         "learningRateMultiplier": 1
       }
     },
-    "tunedModelDisplayName": "humor-analysis-2025-12-22"
+    "tunedModelDisplayName": "humor-analysis-v4-2025-12-23T13-12-07-829Z"
   }
 }

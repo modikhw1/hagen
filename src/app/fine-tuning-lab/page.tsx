@@ -98,7 +98,7 @@ export default function FineTuningLab() {
         <div className="text-right">
           <div className="text-xs font-mono text-gray-400">Current Model</div>
           <div className="text-sm font-medium text-green-600">
-            {modelId ? `v2 (${modelId.slice(-4)})` : 'Ready'}
+            {modelId ? `v4 (${modelId.slice(-4)})` : 'Ready'}
           </div>
         </div>
       </header>

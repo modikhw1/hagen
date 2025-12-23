@@ -281,7 +281,8 @@ class GeminiFinetuner {
     console.log('Training data:', trainUri);
     console.log('Validation data:', validationUri);
     
-    const displayName = `humor-analysis-${new Date().toISOString().split('T')[0]}`;
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const displayName = `humor-analysis-v4-${timestamp}`;
     
     const endpoint = `${this.apiEndpoint}/projects/${CONFIG.projectId}/locations/${CONFIG.location}/tuningJobs`;
     

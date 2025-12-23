@@ -1,11 +1,11 @@
 {
-  "trainUri": "gs://hagen-video-analysis/fine-tuning/humor-analysis/train_v2_2025-12-22.jsonl",
-  "validationUri": "gs://hagen-video-analysis/fine-tuning/humor-analysis/validation_v2_2025-12-22.jsonl",
-  "timestamp": "2025-12-22",
+  "trainUri": "gs://hagen-video-analysis/fine-tuning/humor-analysis/train_v3_2025-12-23.jsonl",
+  "validationUri": "gs://hagen-video-analysis/fine-tuning/humor-analysis/validation_v3_2025-12-23.jsonl",
+  "timestamp": "2025-12-23",
   "stats": {
-    "totalExamples": 51,
-    "trainCount": 40,
-    "validationCount": 11,
+    "totalExamples": 197,
+    "trainCount": 157,
+    "validationCount": 40,
     "source": "gold_standard.jsonl"
   }
 }
