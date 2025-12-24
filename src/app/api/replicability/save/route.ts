@@ -17,6 +17,7 @@ export async function POST(request: Request) {
 
     if (index !== -1) {
       replicabilityData[index].replicability_analysis = new_analysis;
+      replicabilityData[index].translation_status = 'verified'; // Mark as manually verified/saved
       fs.writeFileSync(DATASET_PATH, JSON.stringify(replicabilityData, null, 2));
       return NextResponse.json({ success: true });
     } else {

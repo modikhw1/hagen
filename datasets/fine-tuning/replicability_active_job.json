@@ -1,0 +1,17 @@
+{
+  "name": "projects/1061681256498/locations/us-central1/tuningJobs/5647624760058707968",
+  "tunedModelDisplayName": "replicability-v1-multimodal-2025-12-24",
+  "baseModel": "gemini-2.5-flash",
+  "supervisedTuningSpec": {
+    "trainingDatasetUri": "gs://hagen-video-analysis/fine-tuning/replicability/replicability_train_v1-multimodal.jsonl",
+    "validationDatasetUri": "gs://hagen-video-analysis/fine-tuning/replicability/replicability_validation_v1-multimodal.jsonl",
+    "hyperParameters": {
+      "epochCount": "4",
+      "learningRateMultiplier": 1
+    }
+  },
+  "state": "JOB_STATE_PENDING",
+  "createTime": "2025-12-24T17:11:21.260171Z",
+  "updateTime": "2025-12-24T17:11:21.260171Z",
+  "submittedAt": "2025-12-24T17:11:20.588Z"
+}

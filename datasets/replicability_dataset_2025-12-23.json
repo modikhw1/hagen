@@ -10,7 +10,8 @@
       "execution": {},
       "schema": 1
     },
-    "replicability_analysis": "The video's premise relies on a simple, accessible scenario of a worker interrupted during a break, which is easily replicable. The core concept requires minimal resources, acting skills, or complex editing, beyond adding a black-and-white filter and text for the end credits. The absurdist humor stemming from the \"end of movie credits\" visual (\"directed by Dream on Productions,\" \"Starring a very hungry employee\") is also straightforward to reproduce. Given the simple execution, replication should not present significant challenges."
+    "replicability_analysis": "Videon är relativt lätt att replikera av liknande verksamheter, möjligen caféer och restauranger mer än barer. Grundidé bygger på ett enkelt och lättillgängligt scenario där en arbetare blir avbruten under en paus.\n\nKonceptet i grunden kräver minimala resurser, skådespelarfärdigheter eller komplex redigering, utöver att lägga till ett svartvitt filter och en animerad text som rör sig över skärmen för \"sluttexterna\". Med tanke på den enkla utförandet bör replikering inte innebära några betydande utmaningar.",
+    "translation_status": "verified"
   },
   {
     "video_id": "f3ed3256-6f54-4d16-9cab-480d69cd5ebe",
@@ -23,7 +24,9 @@
       "execution": {},
       "schema": 1
     },
-    "replicability_analysis": "The replicability of this video concept depends on the business owner's ability to adapt the core scenario to their specific setting. Recreating the video would require some creativity to tailor the dream sequence and \"bite\" action to be relevant. There are no noted technical barriers based on available data."
+    "replicability_analysis": "Replikationen av detta videokoncept är beroende av företagarens förmåga att anpassa kärnscenariot till sin specifika miljö. För att återskapa videon krävs en viss kreativitet för att skräddarsy drömsekvensen och \"bit\"-aktionen så att den blir relevant. Det finns inga noterade tekniska hinder baserat på tillgängliga data.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "fe313a6a-844d-4136-be7b-54387eca3b8f",
@@ -36,7 +39,9 @@
       "execution": {},
       "schema": 1
     },
-    "replicability_analysis": "The video's replicability hinges on its short, simple, and to-the-point execution. The core concept, built around intentionally failing at a game, is easily understood. However, without structured replicability data, it is difficult to assess specific resource requirements or potential barriers to duplication. The general note suggests no particular skill sets or equipment are required, but further analysis would be needed to confirm this."
+    "replicability_analysis": "Videons replikerbarhet bygger på dess korta, enkla och kärnfulla utförande. Grundkonceptet, som kretsar kring att avsiktligt misslyckas i ett spel, är lätt att förstå. Utan strukturerad replikerbarhetsdata är det dock svårt att bedöma specifika resursbehov eller potentiella hinder för återskapande. Den allmänna kommentaren antyder att inga speciella färdigheter eller utrustning krävs, men ytterligare analys skulle behövas för att bekräfta detta.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "1cd1e012-c906-45a6-b5cd-c78125dd3b79",
@@ -49,7 +54,8 @@
       "execution": {},
       "schema": 1
     },
-    "replicability_analysis": "Konceptet för den här videon är relativt enkelt att återskapa men kräver vissa resurser som grundläggande rekvisita, som exempelvis tryckta bilder. En framgångsrik återskapning förutsätter att visuella uttryck är tydliga och som ger premissen liv och engagemang. En brist \"animation\" kan göra sketchen mindre framgångsrik."
+    "replicability_analysis": "Konceptet för den här videon är relativt med en enda inspelning som utgör videon (en scen). Klippet är enkelt att återskapa men kräver viss förberedelse i form av att ta fram rekvisita, i detta fall tryckta bilder av medarbetarna som ler. En framgångsrik återskapning förutsätter att medarbetarna har rika och målande ansiktsuttryck som gör deras reaktioner engagerande för tittarna. \n\nEn oengagerad eller icke-animerad insats av medarbetarna kan göra sketchen mindre tilltalande.",
+    "translation_status": "verified"
   },
   {
     "video_id": "7012ae51-16a9-46c0-9392-4ae41a998c7b",
@@ -62,7 +68,9 @@
       "execution": {},
       "schema": 1
     },
-    "replicability_analysis": "The video concept appears relatively simple to replicate. The original video consists of three shots and a premise that involves two people attempting to outsmart each other with a distraction. Replicating this video would primarily require finding two actors and securing a plate of sweets. The \"Technical Signals\" data is empty, suggesting the production value is not a significant barrier to replication."
+    "replicability_analysis": "Konceptet i videon verkar relativt enkelt att replikera. Originalvideon består av tre tagningar och en premiss som involverar två personer som försöker överlista varandra genom distraktion. För att återskapa videon krävs i första hand två skådespelare och att man ordnar en tallrik med godsaker. Att \"Technical Signals\"-datan är tom indikerar att produktionsvärdet inte är ett betydande hinder för replikering.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "5bca070f-bece-4627-a88a-7bab3035c604",
@@ -75,7 +83,9 @@
       "execution": {},
       "schema": 1
     },
-    "replicability_analysis": "The video's concept centers on a relatable scenario of service workers masking their true feelings about customers, suggesting the core idea is readily transferable. The simple humor and broad accessibility indicate a low barrier to entry. Replicating the video would largely depend on finding actors capable of conveying the contrast between outward politeness and inner thoughts through facial expressions. Based on the lack of data for \"Structured Replicability Data\" and the absence of quality or execution signals implying high production costs, no significant equipment or resource investments should be necessary."
+    "replicability_analysis": "Konceptet för videon kretsar kring ett igenkännbart scenario där servicepersonal döljer sina sanna känslor gentemot kunder, vilket antyder att grundidén är lätt att överföra. Den enkla humorn och breda tillgängligheten indikerar en låg tröskel för att replikera. Att återskapa videon skulle till stor del bero på att hitta skådespelare som kan förmedla kontrasten mellan yttre artighet och inre tankar genom ansiktsuttryck. Baserat på avsaknaden av data för \"Structured Replicability Data\" och frånvaron av kvalitets- eller exekveringssignaler som antyder höga produktionskostnader, bör inga betydande investeringar i utrustning eller resurser vara nödvändiga.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "f1bf750c-669f-4b05-9929-005c74bc55e1",
@@ -135,7 +145,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept presents moderate replicability challenges. While the equipment needs are minimal and brand equity is not crucial, successful replication hinges on several factors. The setting is somewhat location-dependent, ideally suited for a bar, restaurant, or café-like environment. The concept's success depends on capturing nuanced coworker relationships, demanding moderate talent who possess on-camera presence and can convey unspoken communication. Execution requires attention to coordinated movements and timing, reflected in the pacing metrics, and some editing skills are necessary although post-production involves mostly simple cuts. Although the sibling dynamic is universally known, the specific trope may be more culturally relatable to an American audience."
+    "replicability_analysis": "Konceptet är inte allt för svårt att replikera. Det kräver två skådespelare med någorlunda bra talang och kan porträttera en syskondynamik. Premissen lutar mycket på fysisk humor, och hur vissa rörelser och aktioner för att irritera den andra kan nyttjas för att skapa en intressant och humoristisk video.\n\nMiljön är delvis platsberoende och lämpar sig bäst för en bar-, restaurang- eller kaféliknande miljö. Förmodligen en bar, om premissen ska kunna replikeras rakt av. Konceptets framgång är beroende av förmågan att fånga nyanserade relationer mellan kollegor, vilket kräver en viss talang med närvaro framför kameran och förmåga att förmedla icke-verbal kommunikation. \n\nGenomförandet kräver noggrannhet gällande koordinerade rörelser och timing, vilket återspeglas i mätningar av tempo, och viss redigeringskompetens är nödvändig, även om efterproduktionen mestadels består av enkla klipp. Även om syskondynamiken är universellt igenkännbar, kan den specifika tropen vara mer kulturellt relevant för en amerikansk publik.",
+    "translation_status": "verified"
   },
   {
     "video_id": "eb5b9e93-ab95-4767-ba2d-38b1235a8402",
@@ -195,7 +206,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The replicability of this video concept is moderate, with an overall score of 3.4. The concept presents some difficulty, requiring creativity to adapt the absurdist, workplace-based scenario to the business's specific context. The execution, while seemingly simple, relies on performers being comfortable on camera and capable of expressive, physical comedy; talent requirements are a key consideration. The video also depends on a specific environment, requiring a location such as a bar or restaurant, ideally with a light and clean aesthetic. Post-production involves a moderate level of editing. Finally, due to the potentially sensitive nature of the premise (a romantic entanglement between two men), businesses should consider their brand's openness to such themes before attempting to replicate this video."
+    "replicability_analysis": "Konceptets replikerbarhet är måttlig, med ett totalt betyg på 3.4. Konceptet innebär en viss svårighet och kräver kreativitet för att anpassa det absurda, arbetsplatsbaserade scenariot till verksamhetens specifika sammanhang. Utförandet, som vid första anblick verkar enkelt, förlitar sig på att skådespelarna är bekväma framför kameran och kan leverera uttrycksfull, fysisk komedi; talangkrav är en viktig faktor att beakta. Videon är även beroende av en specifik miljö, vilket kräver en plats som en bar eller restaurang, helst med en ljus och ren estetik. Efterproduktionen involverar en måttlig nivå av redigering. Slutligen, med tanke på den potentiellt känsliga karaktären av premissen (en romantisk relation mellan två män), bör företag överväga sitt varumärkes öppenhet för sådana teman innan de försöker replikera den här videon.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "967f5700-83f6-43c8-aa6e-138cf962c80b",
@@ -255,7 +268,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This concept presents moderate replicability challenges. The success hinges on specific dialogue delivery to create the intended juxtaposition and twist, requiring careful execution and timing. Replicating the scene necessitates access to a car and a willing participant to portray being bound, potentially increasing logistical complexity. While the post-production is relatively simple, involving cuts and text overlays, securing a suitable outdoor location and talent capable of conveying the necessary tone is crucial. The \"significant\" social risk level may pose a barrier for brands less comfortable with edgy content. The overall replicability score is 5."
+    "replicability_analysis": "Konceptet innebär måttliga utmaningar vad gäller replikerbarhet. Framgången vilar på ett specifikt utförande av dialogen för att skapa den avsedda kontrasten, vilket kräver noggrannhet och timing. Att återskapa scenen kräver tillgång till en bil och en villig deltagare för att porträttera någon som är bunden, vilket potentiellt ökar den logistiska komplexiteten. Medan efterproduktionen är relativt enkel, med klipp och textöverlagringar, är det avgörande att säkra en lämplig utomhusplats och talang som kan förmedla rätt ton. Den \"betydande\" nivån av social risk kan utgöra ett hinder för varumärken som är mindre bekväma med vågat innehåll. Den övergripande replikerbarhetspoängen är 5.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "a860739f-9e5b-475c-bca3-b54f98f04188",
@@ -315,7 +330,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The replicability of this video concept is moderately high, with some considerations. While the core concept of a manager assigning random tasks is straightforward, successfully replicating the video will depend on the availability of a suitable venue that appears busy and functional. The performer needs to subtly convey frustration, which requires some acting skill. The video's reliance on well-thought-out video shots and good pacing also necessitates attention to detail during production. While the concept itself doesn't present a major barrier, finding fitting examples of \"small\" or random tasks, combined with post-production needs, introduces a medium level of execution complexity."
+    "replicability_analysis": "Videon har sannolikt medel till medel-svår repliceringsgrad. Även om kärnkonceptet med en chef som tilldelar slumpmässiga uppgifter, som visas genom fyra scener, är okomplicerat, kommer en framgångsrik replikering av videon att bero på hur tilltalande och engagerande scenerna är. Scenerna kan kopieras rakt av, men kan möjligen kräva förändringar eller att scenenarna skrivs om för att passa verksamheten och scenarier som kan återfinnas där.\n\nSkådespelaren behöver subtilt förmedla frustration, vilket kräver en viss förmåga och vilja att spela den \"rollen\". Videons beroende av väl genomtänkta videoscener och bra tempo nödvändiggör också noggrannhet under produktionen. Även om konceptet i sig inte utgör något större hinder, så medför sökandet efter passande exempel på \"små\" eller slumpmässiga uppgifter, i kombination med behovet av efterproduktion (klippning av fyra scener, integrering av TikTok-ljud), en medelhög nivå av komplexitet i utförandet.",
+    "translation_status": "verified"
   },
   {
     "video_id": "82f839c7-4d0b-4943-8365-7f6bc18b3d47",
@@ -375,7 +391,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The video concept is moderately replicable, requiring a team of 2-4 people and some planning due to the need for 8 distinct set locations. While minimal equipment and acting skill are needed, the concept's current execution necessitates a restaurant environment, which could limit accessibility. The post-production level is moderate, suggesting some editing experience is required. The original video leverages a trending sound, but the core concept is not heavily reliant on it, offering flexibility in replication."
+    "replicability_analysis": "Videokonceptet är inte det svåraste att replikera, men kräver sannolikt en hel del tid och planering för att utföra rätt. En huvudperson, en assisterande person och en kameraman behövs.\n\nVideon behöver planering då det förutsätter 8 distinkta inspelningsplatser. Även om minimal inspelningsutrustning behövs, samt att själva skådespelet inte kräver allt för mycket från individen (ett aningen frustrerat ansiktsuttryck) förutsätter konceptets nuvarande utförande en restaurangmiljö, vilket kan begränsa tillgängligheten. \n\nI efterproduktionen klipps de olika scenerna till att synkas med det trendiga ljudet, vilket av rimlighet gör att en verksamhet som vill replikera bör inneha en viss redigeringsvana. Originalvideon använder sig av ett trendigt ljud, och kärnkonceptet är relativt starkt beroende av det, vilket gör att replikering bör använda ljudet för att öka chansen för framgång.\n\nFör en restaurang med samma lokaler och förutsättningar som i klippet kan samtliga scener återskapas, men det är möjligt att vissa scener behöver ändras eller kompletteras för att passa in verksamheten som avser att replikera innehållet. Om det är en annan slags verksamhet, café eller bar, behövs potentiellt kreativa kompromisser eller lösningar för att samma typ av effekt ska inträffa.",
+    "translation_status": "verified",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "1928d709-9563-4096-8d6a-d99f9f540651",
@@ -435,7 +453,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The replicability of this video concept, which features a manager delivering absurd ultimatums to employees, is moderate. The concept itself is relatively common, but its success hinges on the specific lines and delivery of the ultimatum, requiring performers with comfortable on-camera presence and good delivery timing as suggested by a delivery timing score of 8. While the video can be filmed in any restaurant or bar setting (high location dependency of 5), replicating the humor may require a degree of acting skill (talent requirement of 4). Post-production involves basic editing (cuts, text overlay) reflected by a post-production level of 4. While the video's editing isn't complex, the cuts per minute of 8 suggests it requires precise timing (timing complexity of 4) and good equipment. The concept difficulty is rated at 5. Replicating the video with fewer staff is possible, though additional staff enhances the variety of content."
+    "replicability_analysis": "Replikerbarheten för detta videokoncept, som visar en chef som levererar absurda ultimatum till anställda, är måttlig. En lyckad återskapning beror sannolikt på de specifika replikerna replikerna som används (antingen direkt kopierade eller förändrade) och hur rolig dynamiken anses av tittaren, när ultimatumen presenteras.\n\nFör en lyckad process av att replikera konceptet krävs skådespelare som är bekväma framför kameran och förstår timing och vad som gör en social dynamik rolig/annorlunda. \n\nÄven om videon kan filmas i vilken restaurang- eller barmiljö som helst kan det krävas en viss skådespelartalang för att replikera humorn. Med fem skådespelare totalt skapar det även en tröskel för verksamheter som vill återskapa videon.\n\nPostproduktionen involverar grundläggande redigering (klipp, textöverlägg). Det är möjligt att replikera videon med färre medarbetare, men ytterligare personal ökar innehållets variation.",
+    "translation_status": "verified"
   },
   {
     "video_id": "540a7d2a-3916-4f6f-b3e0-9d06db021a0d",
@@ -495,7 +514,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept presents moderate replicability. It features a common scenario with a service worker reacting to a late order. Replicating it requires some on-camera presence and timing coordination, particularly in syncing the text and sound design for comedic effect. While minimal equipment is needed and any restaurant setting can suffice, successful replication relies on creative scripting and average acting skills. The relatively low brand equity needed suggests this is replicable even for smaller, unknown brands. The pacing felt rushed, which is important to keep in mind as this is a timing sensitive concept."
+    "replicability_analysis": "Konceptet är relativt lätt att replikera. I videon kommer vissa humoristiska inslag från hur medarbetaren skuttar (lite sött) in i kamerans vy, där det syns att hon är redo att hugga in, vara viktiga att få rätt. Det behövs viss närvaro framför kameran och koordinering av timing, särskilt för att synkronisera text och ljuddesign för komisk effekt.",
+    "translation_status": "verified",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "d5404185-d6c5-4cb2-a660-87e1efe4de49",
@@ -555,7 +576,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept demonstrates moderate replicability, requiring a restaurant setting and actors capable of portraying contrasting emotional states. The concept relies on a single-shot scene, basic editing including color grading, and text overlay for post-production. Achieving the desired comedic effect depends on precise timing and nuanced performance to sell the shift in mood, which can be challenging. Cultural sensitivity may also affect replicability, as the humor's effectiveness might vary across different audiences. The single-location requirement reduces location dependency."
+    "replicability_analysis": "Detta videokoncept uppvisar måttlig replikerbarhet, och kräver en restaurangmiljö samt skådespelare som kan porträttera kontrasterande känslolägen. Konceptet bygger på en tagning, grundläggande redigering inklusive färgkorrigering och textöverlagring i efterproduktionen. För att uppnå önskad komisk effekt krävs exakt timing och ett nyanserat framförande för att sälja stämningsskiftet, vilket kan vara utmanande. Kulturell känslighet kan också påverka replikerbarheten, eftersom humorns genomslagskraft kan variera beroende på publik. Kravet på en enda inspelningsplats minskar platsberoendet.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "24305b54-0b71-4a66-a71e-d5e91eaeb54e",
@@ -615,7 +638,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This concept, depicting a relatable dining scenario, is generally replicable for restaurants or food businesses. It requires two individuals and a setting where food is present, allowing for adaptation across various establishments. Replicating the pacing relies on good editing skills and benefits from strong production value, given the importance of the visual payoff; this aligns with the video's observed attention retention and pacing. Note that some post-production will be needed for speed changes. While the brand equity needed is moderate, the concept doesn't inherently connect the brand or staff, which may require adjustments depending on the marketing goals."
+    "replicability_analysis": "Videon visar två personer som äter en snabbmatsmåltid på en restaurang. Klippen växlar mellan de två personerna för att illustrera en humoristisk kontrast i deras ätbeteende:\n\nMedan kvinnan fortfarande är i början av sin måltid har den andra personen hunnit ätit färdigt. En melankolisk pianomusik spelar i bakgrunden, vilket förstärker den komiska kontrasten.\n\nVideon är inte den svåraste att replikera, men kan kräva lite planering och klippning. En restaurang eller ett kafé är nödvändigt, gärna med naturligt ljus, och ren och inbjudande miljö. Ett bord för två personer, två tillagade måltider, och en naturlig bakgrund med kunder som ger videon liv. För att spela in med kunder i bakgrunden kan tillstånd eller lite planering underlätta, om videon spelas in i verksamhetens egna lokaler. \n\nEn smartphone och kamera behövs, och i detta fall verkar stativ användas. Ingen dialog spelas in, så en enkel bakgrundsmusik kan läggas till i efterhand. Rekvisitan är två identiska måltider, som kan bytas ut mot en annan måltid för restaurangen som avser att återskapa konceptet.\n\nTvå individer är nödvändiga som är bekväma framför kameran och kan agera ut de kontrasterande ätstilarna på ett övertygande sätt. En kameraman (kan vara deltagarna) kan ansvara för att alla nödvändiga klipp fångas. I postproduktion kan en person som klipper ihop materialet, lägger till text, musik och eventuella färgjusteringar bidra.\n\nRedigeringen är inte den svåraste, men bra klippning hjälper att maximera den komiska effekten av hastighetsskillnaden. Humorn kommer från den oväntade och helt orealistiska klippningen av att mannen hinner äta på 1 sekund. Med slapp klippning kan en stor del höjdpunkten landa mindre starkt.",
+    "translation_status": "verified",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "57705dac-347e-41a6-92c3-127cb3fb956e",
@@ -675,7 +700,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video's concept, depicting a chef humorously fulfilling a complex dietary restriction, has moderate replicability. It requires a restaurant setting, competent on-camera talent, and equipment necessary for achieving satisfactory visual clarity. The core challenge in replicating this video lies in devising similarly humorous scenarios involving specific dietary requests and unexpected, visually interesting results. Post-production involves standard cuts and potential text overlays. Successful replication depends on creating a similar hook and payoff using pacing that feels appropriate to the narrative, and performers with good on-screen presence and delivery."
+    "replicability_analysis": "Konceptet i den här videon, som skildrar en kock som humoristiskt uppfyller en komplex kostrestriktion, har måttlig replikerbarhet. Det kräver en restaurangmiljö, kompetent talang framför kameran och utrustning som är nödvändig för att uppnå tillfredsställande visuell klarhet. Den största utmaningen med att replikera den här videon ligger i att skapa liknande humoristiska scenarier som involverar specifika kostförfrågningar och oväntade, visuellt intressanta resultat. Efterproduktionen involverar standardklipp och potentiella textöverlägg. Framgångsrik replikering beror på att skapa en liknande krok och utdelning med hjälp av ett tempo som känns lämpligt för berättelsen, och skådespelare med bra närvaro och leverans framför kameran.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "7b585825-ad83-4893-9e89-3cf360d3a129",
@@ -735,7 +762,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The video concept, centered around a dynamic between a stern manager and a nervous worker, is relatively simple and adaptable to various workplace scenarios. Replicating the video requires talent capable of portraying the two roles effectively, with some consideration given to aligning the scenario to the specific business. The pacing and humor rely on non-verbal cues and timing, which may present a moderate execution challenge. Minimal adjustments are needed, and it does not heavily rely on audio or specific location. Post-production is needed for the text overlay and background music. Overall, consider slight adaptations depending on the target audience's cultural context."
+    "replicability_analysis": "Videokonceptet, som bygger på dynamiken mellan en sträng chef och en nervös medarbetare, är relativt enkel att återskapa och anpassningsbart till olika arbetsplatssituationer.\n\nFör att återskapa videon krävs skådespelare som kan porträttera de två rollerna effektivt, med hänsyn tagen till att anpassa scenariot till den specifika verksamhetens utformning. I denna video visas en handfull scenarion där medarbetaren, chefen, och ett misstag sker, men då kopplat till caféer och vad som kan ské där. Att råka spilla vid servering av kaffé, använda kaffemaskinen fel, misslyckas vid kortterminalen etc. För att replikera klippet i dess nuvarande utformning bör verksamheten som återskapar vara café. Om det är en bar eller restarurang kan anpassningar ske som använder samma premiss/humor, men nu i ett annat scenaro (t.ex. bränna mat, spilla drinkar).\n\nTempot och humorn bygger på icke-verbala signaler och timing, vilket kan innebära en måttlig utmaning i utförandet. Minimala justeringar krävs, och den förlitar sig inte i hög grad på ljud eller specifik plats. Efterbearbetning är inte allt för avancerad.",
+    "translation_status": "verified"
   },
   {
     "video_id": "db6b874c-795e-46a0-8131-77dfaa3956f4",
@@ -795,7 +823,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video presents a replicable concept centered around a customer service worker's forgetfulness. Replicating the video requires a restaurant setting and a burger prop. The primary challenge lies in securing a performer capable of believably portraying confusion and embodying the trope of an unfocused young person, demanding moderate talent. While the concept is relatively simple, successful execution relies on the performer's delivery timing as the humor is somewhat absurdist and relies on appropriate pacing as rated in the technical signals. Post-production is straightforward, with simple edits and a modest level of equipment required. The overall replicability is moderate."
+    "replicability_analysis": "Det här videokonceptet, som kretsar kring en glömsk kundservicemedarbetare, är relativt enkelt att replikera. För att återskapa videon behövs en restaurangmiljö och en hamburgerrekvisita. Den största utmaningen är att hitta en skådespelare som trovärdigt kan porträttera förvirring och förkroppsliga tropen av en tankspridd ungdom, vilket kräver en viss talang. Även om konceptet är relativt enkelt, bygger ett lyckat genomförande på skådespelarens timing, eftersom humorn är något absurd och förlitar sig på lämpligt tempo, vilket återspeglas i de tekniska signalerna. Efterproduktionen är okomplicerad, med enkla klipp och en beskedlig utrustningsnivå. Den övergripande replikerbarheten bedöms som måttlig.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "252ccda3-6b4c-4a83-9ac1-d30a587a2cd4",
@@ -808,7 +838,8 @@
       "execution": {},
       "schema": "unknown"
     },
-    "replicability_analysis": "Videons involverar anställda som komiskt feltolkar en chefs instruktioner, är inte allt för svårt att replikera men kan kräva anpassning för andra verksamheter som vill kopiera konceptet. Moppning och torkning går sannolikt att översätta relativt enkelt till liknande verksamheter. Då det handlar om fysisk humor kan ett koncept som denna hänga på kreativitet och roliga inspelningar som illustrerar missförstånden. Framgång kan bero på vilka scenarier som väljs och om teamet kan spela in dem på ett underhållande sätt."
+    "replicability_analysis": "Videons involverar anställda som komiskt feltolkar en chefs instruktioner, är inte allt för svårt att replikera men kan kräva anpassning för andra verksamheter som vill kopiera konceptet. Moppning och torkning går sannolikt att översätta relativt enkelt till liknande verksamheter. Då det handlar om fysisk humor kan ett koncept som denna hänga på kreativitet och roliga inspelningar som illustrerar missförstånden. Framgång kan bero på vilka scenarier som väljs och om teamet kan spela in dem på ett underhållande sätt.",
+    "translation_status": "verified"
   },
   {
     "video_id": "c00b024d-f3a5-4200-92ce-b5a15a2c42a3",
@@ -868,7 +899,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This concept presents moderate replicability challenges. While the core idea—an exaggerated reaction to a positive review—is simple, successful replication depends on several factors. The location necessitates a restaurant or similar business setting. Minimal equipment is needed beyond a phone, though improved lighting and sound design would elevate production polish. Talent requirements are moderate, demanding performers who can convincingly convey pride and amusement, and colleagues that can play along in an animated fashion. Furthermore, post-production requires a moderate level of effort. The concept's specificity—relying on a particular positive review—adds another layer of complexity, as it may be difficult to orchestrate or consistently recreate."
+    "replicability_analysis": "Konceptet innebär måttliga utmaningar gällande replikerbarhet. Medan grundidén – en överdriven reaktion på en positiv recension – är enkel, beror en framgångsrik återskapning på flera faktorer. Platsen kräver en restaurang eller liknande verksamhetsmiljö. Minimal utrustning behövs utöver en telefon, även om förbättrad ljussättning och ljuddesign skulle höja produktionskvaliteten. Talentkraven är måttliga och kräver skådespelare som övertygande kan förmedla stolthet och munterhet, och kollegor som kan spela med på ett animerat sätt. Dessutom kräver efterproduktionen en måttlig ansträngningsnivå. Konceptets specificitet – som bygger på en viss positiv recension – lägger till ytterligare ett lager av komplexitet, eftersom det kan vara svårt att iscensätta eller konsekvent återskapa.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "ad8b25b2-3c22-4cd9-a667-17624c3e56bc",
@@ -928,7 +961,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept, centered on a humorous interaction with a customer near closing time, presents moderate replicability. While the core idea requires a restaurant setting, a few actors, and basic editing skills, it is adaptable to various establishments facing similar operational frustrations. Replicating the video's pacing is achievable, supported by a relatively high \"cuts per minute\" metric of 6. However, the reliance on a specific, pre-existing TikTok sound, though simplifying script creation and delivery, may limit creative control and potentially audience reach beyond Swedish-speaking viewers. The performers require decent presence and timing. The moderate post-production level, equipment needs, and talent requirements suggest that recreating the video's aesthetic polish will demand some dedicated resources."
+    "replicability_analysis": "Konceptet för den här videon, som kretsar kring en humoristisk interaktion med en kund nära stängningstid, har måttlig replikerbarhet. Kärnan i idén kräver en restaurangmiljö, några skådespelare och medelhöga redigeringskunskaper, men den är anpassningsbar till olika verksamheter som kan relatera till att kunder kan störa om de beställer för sent (t.ex. restauranger, som behöver städa utrustning innan stängning).\n\nAtt återskapa videons tempo kräver att inspelningarna görs med ett rappt tempo som matchar TikTok-ljudet som medarbetarna mimikerar. En hög klippningsfrekvens skapar förväntningar på förmåga i postproduktionen.",
+    "translation_status": "verified",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "7208c328-cade-41c1-85e7-7c993fb62724",
@@ -988,7 +1023,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The video's replicability is moderately challenging, primarily due to the concept's reliance on wordplay and specific physical comedy. Replicating the \"short-staffed\" pun may be difficult in other languages. The concept also requires a specific scenario where a staff member's height presents a challenge, potentially limiting broader application. While the equipment needs are minimal (phone camera), successful execution requires actors with good comedic timing and basic video editing skills, rated at a moderate skill level. The restaurant setting is also a location dependency. The overall replicability is therefore considered moderate, with a score of 4."
+    "replicability_analysis": "Videon är inte den svåraste att replikera, utan är en sammansättning av två scener och med ett simpelt koncept. Humorn lutar mot fysisk komedi, men manusets utformning (en visuell visning av ordvitsen) gör att många liknande verksamheter kan återskapa klippet till samma effekt.\n\nAtt replikera ordvitsen om \"underbemanning\" (short-staffed) kan hindra replikerbarheten för andra språk. Konceptet kräver även ett specifikt scenario där en anställds längd utgör en utmaning, vilket potentiellt begränsar bredare tillämpning. För verksamheter med barer blir det lätt, men det är t.ex. möjligt att byta ut barhyllan med en plats högt i restaurangen, eller något liknande. Förmodligen är humorn tydligare om det som arbetaren vill \"nå\" är enkelt att förstå eller något som alltid behövs, t.ex. att nå vissa drinkar (vanligt).\n\nÄven om utrustningsbehoven är minimala (telefonkamera) kräver ett framgångsrikt genomförande skådespelare med god komisk timing och grundläggande videoredigeringskunskaper, vilket bedöms vara relativt simpelt i detta sammanhang.",
+    "translation_status": "verified"
   },
   {
     "video_id": "4d9a4ccd-175f-427d-ba49-a6b89955a8c9",
@@ -1048,7 +1084,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The video concept, which involves a server tricking a chef to steal food, has moderate replicability. It necessitates a restaurant kitchen setting, a chef, and a server, with some acting ability required, especially from the chef. While the editing is described as minimal, the pacing and narrative flow are rated highly in clarity which suggests some post-production skill is necessary. The absence of spoken dialogue, replaced by on-screen text, simplifies language adaptation, but music is needed to carry the concept, though it is noted the current music is replaceable. Overall, the concept presents some barriers to replicability due to talent requirement and location dependency."
+    "replicability_analysis": "Konceptet i videon, där en servitör lurar en kock för att stjäla mat, har måttlig replikerbarhet. Det kräver en restaurangköksmiljö, en kock och en servitör, samt viss skådespelartalang, särskilt från kocken. Även om redigeringen beskrivs som minimal, bedöms tempot och berättelsens flöde vara tydliga, vilket antyder att viss efterproduktionskompetens är nödvändig. Avsaknaden av talad dialog, ersatt av text på skärmen, förenklar språkanpassningen, men musik behövs för att bära konceptet, även om den nuvarande musiken anses vara utbytbar. Sammantaget innebär konceptet vissa hinder för replikerbarhet på grund av krav på talang och platsberoende.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "6bdd73a2-69db-479d-a46a-cf23f896fb55",
@@ -1108,7 +1146,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video's concept presents moderate replicability. The sketch requires a restaurant setting, a waitress, and a customer, with relatively minimal equipment needs. However, the exaggerated acting style requires performers with some comedic timing and presence. The fast pacing and frequent edits, as indicated by the cuts-per-minute metric, increase the post-production effort needed for replication. While the core concept is simple, matching the video's pace and timing will require attention. The location dependency is moderate, requiring a restaurant or similar service environment."
+    "replicability_analysis": "Videons koncept uppvisar medelhög replikerbarhet. Sketchen kräver en restaurangmiljö, en servitris och en kund, med relativt minimal utrustningsbehov men förmåga till snabb klippning. \n\nSkådespelarstilen som används i klippet är relativt överdriven och absurd, vilket hjälper humorn komma igenom till tittaren. Därför krävs emellertid personal med viss komisk förmåga och närvaro, eller vilja att bjuda på sig själv. \n\nDet snabba tempot och de frekventa klippen, vilket indikeras av måttet klipp per minut, ökar den efterproduktion som krävs för replikering. Beroendet av plats är måttligt, men kommer förmodligen passa bäst för verksamheter som har servitriser som går i restaurangen och tar beställningar, vilket inte är normen i alla restauranger/barer. Om servitriser används i verksamheten ökar replikerbarheten.",
+    "translation_status": "verified"
   },
   {
     "video_id": "ed72bbb2-a01e-4ed1-86d8-6519b179b033",
@@ -1168,7 +1207,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept demonstrates moderate replicability. It requires a functional kitchen environment and a small cast capable of delivering a performance with precise comedic timing. The success of replication depends on aligning the video's pacing with the musical beat and achieving a similar level of post-production polish, as indicated by the solid sound design, color grading, and transitions. While the brand equity needed is low, replicating the video's emotional impact will require performers capable of subtle, expressive acting."
+    "replicability_analysis": "Det här videokonceptet uppvisar måttlig replikerbarhet. Det kräver en fungerande köksmiljö och en liten ensemble som kan leverera ett framträdande med precis komisk tajming. En framgångsrik replikering är beroende av att videons tempo synkroniseras med musikens rytm och att en liknande nivå av efterproduktionskvalitet uppnås, vilket indikeras av solid ljuddesign, färgkorrigering och övergångar. Även om det inte krävs starkt varumärkeskapital, kommer en replikering av videons emotionella effekt att kräva skådespelare som kan leverera subtila, uttrycksfulla prestationer.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "441efe36-4f11-4bae-b704-08c7e1c8bbf4",
@@ -1228,7 +1269,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept demonstrates high replicability. The core idea, depicting a waiter delivering food and creating a moment of anticipation and comedic misdirection, requires minimal equipment, post-production, or specialized skills. The primary requirements are access to a restaurant location and staff, with the most significant factor being the talent's ability to execute a simple performance. The video's continuous shot and lack of dialogue further contribute to its ease of replication."
+    "replicability_analysis": "En manlig servitör går leende från köket med en bricka mat som ska serveras. Kameran representerar en kund (POV) och servitören närmar sig med ett leende, som att maten äntligen ska serveras. Plötsligt ändras riktningen leendet försvinner. Han levererar maten till en annan kund och går snabbt tillbaka till köket. Humorn ligger i att servitören, antingen medvetet eller inte, gett kunden hopp om att få sin mat men sedan obrytt gått vidare. Detta är inte en vanlig klyscha, men humorn fungerar trots detta.\n\nFör att replikera konceptet fungerar någon typ av verksamhet där servitörer levererar mat, t.ex. snabbmatsrestaurang, diner eller liknande. Utan servitörer som levererar mat kan inte formatet replikeras i dess nuvarande form. Ett kök/serveringsdisk där servitören kommer ifrån, samt bord/stolar där kunden kan sitta. Mat som rekvisita är också nödvändig.\n\nUtrustning som är nödvändig är inspelningsutrustning (smartphone eller kamera), serveringsbricka/mat, eventuell belysningsutrustning eller lampor som är tända.\n\nPersonalen som behövs är en anställd som agerar \"servitör\" (bör vara bekväm framför kameran, leende och naturlig), en person som agerar kund (spelar ingen betydande roll), samt en kameraman som följer servitören och agerar \"POV\" (spelar en karaktär som sitter still och representerar en kund).\n\nRedigeringen är relativt enkel. Videon är en enda oklippt tagning som har en slow-motion effekt inledningsvis, som sedan övergår till en snabbspolningseffekt. Övergången sker i samband med att servitören slutar le/byter riktning mot den andra kunden. Skärmtext läggs även till i efterhand relativt smidigt, samt bakgrundsmusik/ljud.\n\nKonceptet är relativt enkelt att replikera för majoriteten av restauranger som har servis ute i restaurangen. Om beställningar sker vid kassan är det mindre sannolikt att konceptet kan transleras. För barer kan drinkar också fungera, men mat fungerar lite bättre. Kaffe eller fika har rimligen inte samma effekt. \n\nHumorn ligger i konceptet snarare än i den exakta visuella miljön.",
+    "translation_status": "verified",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "2325621d-0c39-43ee-9e4e-2e317337c4d1",
@@ -1288,7 +1331,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept, a humorous skit about restaurant staff performing absurd tasks when business is slow, has moderate replicability. It requires a restaurant setting and a script for four individuals (a manager and three staff members). The execution depends on basic acting skills and comedic timing. While the concept itself is simple, replicating the humor may require a \"tight crew\" dynamic and a brand willing to present a less polished, more \"human to a fault\" tone. Minimal location dependency. Post production and equipment needs are basic."
+    "replicability_analysis": "Detta videokoncept, en humoristisk sketch om restaurangpersonal som utför absurda uppgifter när det är lugnt, har måttlig replikerbarhet. Det kräver en restaurangmiljö och ett manus för fyra individer (en chef och tre anställda). Utförandet är beroende av grundläggande skådespelartalang och komisk timing. Konceptet i sig är enkelt, men att replikera humorn kan kräva en sammansvetsad grupp och ett varumärke som är villigt att presentera en mindre polerad, mer \"mänsklig om än bristfällig\" ton. Minimalt platsberoende. Behovet av efterproduktion och utrustning är grundläggande.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "4422d8e6-3580-4e4c-a3f7-345b13d667fa",
@@ -1348,7 +1393,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The replicability of this concept is moderately challenging, primarily due to talent requirements. The skit necessitates performers with strong comedic timing and the ability to deliver animated reactions, particularly the cashier's exaggerated laughter. While the setting is flexible and adaptable to any restaurant environment, successful execution depends on the charisma of both the server and customer. The concept's reliance on \"old timey\" jokes may encounter varying cultural relevance, potentially limiting its appeal in some regions. Finally, while post-production is not overly demanding, a moderate level of polish is needed."
+    "replicability_analysis": "Konceptet är måttligt utmanande att replikera, främst på grund av kraven på skådespelartalangen. Sketchen kräver artister med god komisk timing och förmågan att leverera animerade reaktioner, särskilt kassörens överdrivna skratt. Även om miljön är flexibel och anpassningsbar till vilken restaurangmiljö som helst, beror ett framgångsrikt genomförande på karisman hos både servitören och kunden. Konceptets beroende av \"gammaldags\" skämt kan möta varierande kulturell relevans, vilket potentiellt begränsar dess dragningskraft i vissa regioner. Slutligen, även om efterproduktionen inte är alltför krävande, behövs en viss grad av polering.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "307ac0c6-d7f4-44ba-9c34-74bc13475faa",
@@ -1408,7 +1455,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video's concept utilizes a trending sound and comedic skit format, making it relatively easy to replicate from a technical standpoint. The equipment needs are minimal, requiring only a phone for filming and basic editing skills, as supported by the overall replicability score and replicability notes. While the concept itself has a moderate difficulty score due to its reliance on a pre-existing trend, the execution is simple, with low requirements for talent, brand equity, and location. The reliance on a trend, as noted in the general notes, means replicability is highest when the trend is still actively popular."
+    "replicability_analysis": "Konceptet för den här videon använder ett trendigt ljud och ett komiskt sketchformat, vilket gör den relativt enkel att återskapa ur ett tekniskt perspektiv. Utrustningsbehoven är minimala och kräver endast en telefon för filmning samt grundläggande redigeringskunskaper för att addera ljud och placera ut skärmtexten under klippets gång.\n\nUtförandet är enkelt med låga krav på talang, varumärkesvärde och plats. Det är möjligt att manuset, i form av skämten som placeras ut på skärmen, kan anpassas för specifika verksamheter och deras processer. En i personalen som skär bröd kan bytas ut mot att skära något annat, eller hantera kassan, eller torka bord etc.",
+    "translation_status": "verified"
   },
   {
     "video_id": "a781b192-4c6a-4130-ae1e-915138972529",
@@ -1468,7 +1516,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "Denna video presenterar ett enkelt koncept som är lätt att efterlikna. Den kräver en restaurangmiljö med en servitör och en gäst. Minimal utrustning och talang krävs. Med enbart två klipp satta ihop är premissen enkel, och den lutar sig inte på hög produktionsvärde eller andra faktorer för att lyfta konceptet. Möjligen är premissen mindre replicerbar för verksamheter som inte serverar mat, då just kundens instinkt att \"nudda\" på tallriken, kommer behöva en dynamik där mat serveras."
+    "replicability_analysis": "Denna video presenterar ett enkelt koncept som är lätt att efterlikna. Den kräver en restaurangmiljö med en servitör och en gäst. Minimal utrustning och talang krävs. Med enbart två klipp satta ihop är premissen enkel, och den lutar sig inte på hög produktionsvärde eller andra faktorer för att lyfta konceptet. Möjligen är premissen mindre replicerbar för verksamheter som inte serverar mat, då just kundens instinkt att \"nudda\" på tallriken, kommer behöva en dynamik där mat serveras.",
+    "translation_status": "verified"
   },
   {
     "video_id": "8a0e1ce2-b375-4f6c-9d93-5db253d60b4c",
@@ -1528,7 +1577,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video's replicability is moderate, with an overall score of 4.375. The core concept of a back-and-forth interaction between a server and a demanding customer is relatively easy to replicate, requiring a restaurant location. However, the success of this video relies heavily on the actors' ability to deliver convincing performances, thus a high talent requirement is needed. The original video appears to be largely improvised, making direct script replication challenging; content creators would need to adapt the dialogue to their own style. While no specialized equipment is necessary, attention to audio and visual quality is important as the technical signals indicate good production polish."
+    "replicability_analysis": "Den här videons replikerbarhet är måttlig, med ett totalt betyg på 4,375. Grundkonceptet med en dialog mellan en servitör och en krävande kund är relativt enkelt att återskapa och kräver en restaurangmiljö. Videons framgång bygger dock i hög grad på skådespelarnas förmåga att leverera övertygande prestationer, vilket ställer höga krav på talang. Originalvideon verkar till stor del vara improviserad, vilket gör en direkt replikering av manuset utmanande; innehållsskapare skulle behöva anpassa dialogen till sin egen stil. Ingen specialutrustning är nödvändig, men noggrannhet gällande ljud- och bildkvalitet är viktigt eftersom de tekniska signalerna indikerar en hög produktionskvalitet.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "da6815da-5a1f-48bc-a3ad-69f0757377cc",
@@ -1588,7 +1639,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept, a skit about a stressed barista and oblivious customer, has moderate replicability. While the core idea of a frustrated service worker is common, the specific dialogue and escalating reactions introduce some complexity. Replication requires a location resembling a generic café, talent capable of conveying subtle exasperation through facial expressions and tone, and basic post-production skills for editing and text overlays. Brand equity is not a significant factor. The video's success hinges on the believability and comedic timing of the barista's performance, making talent selection crucial."
+    "replicability_analysis": "Detta videokoncept, en sketch om en stressad barista och en omedveten kund, har måttlig replikerbarhet. Medan kärnidén om en frustrerad servicearbetare är vanligt förekommande, introducerar den specifika dialogen och de eskalerande reaktionerna en viss komplexitet. Återskapning kräver en plats som liknar ett generiskt café, talang som kan förmedla subtil irritation genom ansiktsuttryck och tonfall, samt grundläggande efterproduktionskunskaper för redigering och textöverlagringar. Varumärkesvärde är inte en signifikant faktor. Videons framgång beror på trovärdigheten och den komiska tajmingen i baristans framträdande, vilket gör valet av talang avgörande.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "e8f32302-0ada-4c34-b1cc-60a4bd5b3604",
@@ -1648,7 +1701,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The video concept, while simple, requires access to a restaurant kitchen and basic performance skills. The execution depends on securing a suitable location, talent comfortable with on-screen presence and delivery, and post-production editing. While the core idea is not especially unique, replicating the video would be moderately challenging because it necessitates some brand recognition and a public location."
+    "replicability_analysis": "Konceptet för videon är enkelt men kräver tillgång till ett restaurangkök samt grundläggande skådespelarförmåga. Genomförandet förutsätter en lämplig inspelningsplats, skådespelare som är bekväma med att synas framför kameran och leverera repliker, samt efterföljande redigering. Även om grundidén inte är särskilt unik, är en replikering av videon måttligt utmanande eftersom det kräver ett visst varumärkeskännedom och en offentlig plats.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "1e4e4af4-2393-4483-8448-4b3bb6a1f7ab",
@@ -1708,7 +1763,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept presents moderate replicability challenges. While it utilizes simple equipment and location settings, successful replication requires some creativity in adapting the core scenario to different workplace contexts. The execution relies on strong on-camera presence and competent acting, particularly in comedic timing. The post-production level is moderately complex. The video's humor contains elements that may not be universally appropriate across diverse workplace cultures, potentially requiring careful consideration to ensure inclusivity and avoid unintended offense."
+    "replicability_analysis": "Konceptet för den här videon har måttliga replikerbarhetsutmaningar. Även om den använder enkel utrustning och platsinställningar, kräver en framgångsrik replikering en viss kreativitet för att anpassa kärnscenariot till olika arbetsplatskontexter. Genomförandet förlitar sig på en stark närvaro framför kameran och kompetent skådespeleri, särskilt i komisk timing. Efterproduktionen är av måttlig komplexitet. Videons humor innehåller element som kanske inte är universellt lämpliga i olika företagskulturer, vilket potentiellt kräver noggrant övervägande för att säkerställa inkludering och undvika oavsiktlig stötande humor.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "812b954d-4baf-482e-893c-31ce1460b702",
@@ -1768,7 +1825,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This concept presents moderate replicability. While the scenario – a customer recognized by a service worker after a negative review – is relatable across various service industries, successful execution requires careful attention to tonal balance; the performance must be comedic rather than confrontational. The actor needs strong performance skills to convey subtle emotions, increasing talent requirements. The location is not highly specific, but the video's effectiveness relies on capturing and conveying a nuanced emotional arc, demanding some degree of execution skill. Finally, a moderate level of post-production and equipment is needed to achieve the level of production polish indicated by the sound design and color grading."
+    "replicability_analysis": "Videon är sannolikt enkel att replicera för diverse företag inom service, då klippet är en oavbruten inspelning med en person som står bakom \"baren\", vilket antas finnas i café, bar eller restaurang.\n\nÄven om scenariot – en kund som blir igenkänd av en servicearbetare efter en negativ recension – är relaterbart inom flera servicebranscher, kräver ett framgångsrikt genomförande noggrann uppmärksamhet på tonal balans; framförandet måste vara komiskt snarare än konfrontativt. Att hitta denna balans är sannolikt inte det svåraste i denna kontext, då absurdismen av scenariot tydliggörs med musiken, samt att premissen redan är rätt osannolik/överdriven.",
+    "translation_status": "verified"
   },
   {
     "video_id": "427690e6-f70b-49af-9211-92f576b7dc93",
@@ -1828,7 +1886,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The replicability of this video concept, which portrays an overly affectionate relationship between coworkers, depends heavily on performer execution. While the core idea is simple – requiring only two actors in a cafe/restaurant setting – its success relies on the performers' ability to convincingly portray a slightly awkward yet friendly dynamic, which may require some comfort being on camera and a willingness to take on social risk. The concept also has some cultural limitations; the term \"playdate\" may not translate effectively. While the video doesn't require special equipment or complex post-production, lower execution skills or a lack of available talent comfortable with the portrayal of intimacy could cause the video to fall flat. Brands also need to be mindful of their brand equity when implementing a video that can be seen as a little risky, although the social risk level is considered mild."
+    "replicability_analysis": "Konceptets replikerbarhet, som skildrar en överdrivet tillgiven relation mellan kollegor, är starkt beroende av skådespelarnas utförande. Medan grundidén är enkel – den kräver endast två skådespelare i en kafé/restaurangmiljö – förlitar sig dess framgång på skådespelarnas förmåga att övertygande porträttera en lätt obekväm men vänlig dynamik, vilket kan kräva en viss bekvämlighet framför kameran och en villighet att ta en social risk. Konceptet har också vissa kulturella begränsningar; termen \"playdate\" kanske inte översätts effektivt. Även om videon inte kräver specialutrustning eller komplex efterproduktion, kan lägre utförandeförmåga eller brist på tillgänglig talang som är bekväm med skildringen av intimitet göra att videon faller platt. Varumärken måste också vara medvetna om sitt varumärkesvärde när de implementerar en video som kan ses som lite riskabel, även om den sociala risknivån anses vara mild.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "ae89564b-f026-4ffe-b54d-82992f84c6d6",
@@ -1888,7 +1948,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video's concept, while not entirely original, presents moderate replicability challenges. The core idea centers on a service worker avoiding a customer, requiring a specific setting like a clean kitchen environment, as noted. Execution demands a moderate level of skill from talent and careful timing. While filming and editing are relatively straightforward, the setup complexity and location dependency contribute to a moderate overall replicability score. Furthermore, replicating the humor relies on precise execution, considering the emotional arc is rated a 6, meaning the absurdity needs to land effectively. The video benefits from good visual clarity and audio quality, implying that replicating it necessitates similar equipment and post-production attention."
+    "replicability_analysis": "Konceptet i denna video, även om det inte är helt nytt, innebär måttliga utmaningar gällande replikerbarhet. Kärnan i idén kretsar kring en servicearbetare som undviker en kund, vilket kräver en specifik miljö som ett rent kök, vilket också noterats. Genomförandet kräver en viss skicklighet från skådespelarna och noggrann timing. Medan filmning och redigering är relativt okomplicerade, bidrar komplexiteten i upplägget och platsberoendet till en måttlig total replikerbarhetspoäng. Dessutom förlitar sig replikeringen av humorn på exakt utförande, med tanke på att den emotionella bågen är bedömd till en 6:a, vilket innebär att absurditeten måste landa effektivt. Videon gynnas av god visuell klarhet och ljudkvalitet, vilket antyder att en replikering kräver liknande utrustning och efterproduktionsfokus.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "dfda328b-985d-4eb8-ab6f-85add1f72d91",
@@ -1948,7 +2010,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The replicability of this video concept is moderate, requiring careful consideration of several factors. The core concept, involving a new employee's dynamic, presents some difficulty. Successful execution demands performers with strong on-camera presence and delivery timing, especially to land the punchline effectively. The setting is location-dependent, needing a bar-like environment. Furthermore, while post-production needs are moderate, achieving the video's audio and visual clarity (rated 8 and 9 respectively) necessitates decent equipment. The narrative pacing feels ideal, but replicating the emotional arc, even at a level of 5, requires specific acting ability."
+    "replicability_analysis": "Konceptets replikerbarhet är måttlig och kräver noggrann övervägning av flera faktorer. Kärnkonceptet, som involverar dynamiken hos en nyanställd, medför vissa svårigheter. Framgångsrikt genomförande kräver skådespelare med stark närvaro framför kameran och leverans i tajming, särskilt för att få punchlinen att landa effektivt. Miljön är platsberoende och behöver en barliknande miljö. Vidare, även om behoven av efterproduktion är måttliga, kräver uppnåendet av videons ljud- och bildkvalitet (graderad 8 respektive 9) anständig utrustning. Den narrativa takten känns idealisk, men att replikera den emotionella bågen, även på en nivå av 5, kräver specifik skådespelartalang.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "0630e54c-8e7b-4468-9fc6-18bb64e9b9a2",
@@ -2008,7 +2072,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "Det här videokonceptet uppvisar måttlig replikerbarhet. Det kräver en restaurangmiljö och medverkande personer som har animerade ansiktsuttryck för att tydliggöra missförståendet mellan de olika parterna. Klippningen antas vara relativt enkel, men en stor del av den komiska timingen kommer från hur effektivt och precist klippningen sker."
+    "replicability_analysis": "Det här videokonceptet uppvisar måttlig replikerbarhet. Det kräver en restaurangmiljö och medverkande personer som har animerade ansiktsuttryck för att tydliggöra missförståendet mellan de olika parterna. Klippningen antas vara relativt enkel, men en stor del av den komiska timingen kommer från hur effektivt och precist klippningen sker.",
+    "translation_status": "verified"
   },
   {
     "video_id": "cd2fb456-9a5c-424d-9c4c-5d87a97fd814",
@@ -2068,7 +2133,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept, depicting service workers expressing job dissatisfaction through symbolic actions, has moderate replicability. Replicating the video would require access to a restaurant location and the participation of employees willing to act. The execution demands some on-camera presence from the talent, but not at an exceptional level. Post-production needs are moderate, and the success of replicating the video is dependent on securing a restaurant that permits filming. While the concept itself is relatively straightforward, consideration should be given to the nuanced execution required to effectively convey the intended message."
+    "replicability_analysis": "Det här videokonceptet, som skildrar servicepersonal som uttrycker missnöje med jobbet genom symboliska handlingar, har måttlig replikerbarhet. För att replikera videon krävs tillgång till en restauranglokal och medverkan av anställda som är villiga att agera. Genomförandet kräver en viss närvaro framför kameran från talangerna, men inte på en exceptionell nivå. Behoven av efterproduktion är måttliga, och framgången med att replikera videon är beroende av att säkra en restaurang som tillåter filmning. Även om konceptet i sig är relativt okomplicerat bör man beakta den nyanserade exekveringen som krävs för att effektivt förmedla det avsedda budskapet.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "3642d765-61a8-4bb9-a93f-ac370a377a59",
@@ -2128,7 +2195,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video presents a concept that is generally easy to replicate, requiring minimal equipment, a readily available location like a café or ice cream shop, and basic post-production. The primary challenge lies in talent acquisition, as the extreme reaction and comedic timing, while not particularly sophisticated, necessitate performers who can deliver the absurdity effectively. While the narrative flow clarity is high, replicating the impact relies on the performer's presence and delivery timing. The core concept itself is not complex, but brands should consider whether the slightly unprofessional or potentially \"mean\" humor aligns with their desired image and target audience."
+    "replicability_analysis": "Konceptet som presenteras i videon är generellt sett enkelt att replikera och kräver minimal utrustning. En lättillgänglig plats som ett café eller en glassbutik lämpar sig väl, och grundläggande efterproduktion är tillräcklig. Den största utmaningen ligger i att hitta rätt talang, eftersom den överdrivna reaktionen och komiska timingen, även om den inte är särskilt sofistikerad, kräver skådespelare som effektivt kan leverera det absurda. Tydligheten i berättelsen är hög, men återskapandet av videons genomslagskraft förlitar sig på skådespelarens utstrålning och leverans. Själva grundidén är inte komplex, men varumärken bör överväga om den något oprofessionella eller potentiellt \"elaka\" humorn stämmer överens med deras önskade image och målgrupp.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "4b92e55d-f5e6-4e07-97d2-461f954d4379",
@@ -2188,7 +2257,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This concept has moderate replicability, requiring some creative thinking and planning. Replicating this video would necessitate a cafe-type location, basic on-camera presence, and simple editing skills. The execution depends on reasonably skilled actors able to portray the over-eager chef, as success depends on the delivery and timing of the performance. While minimal equipment is required, post-production will need some attention. The concept does not heavily rely on brand equity."
+    "replicability_analysis": "Detta koncept har måttlig replikerbarhet och kräver en del kreativt tänkande och planering. Att replikera den här videon kräver en cafélokal, grundläggande närvaro framför kameran och enkla redigeringskunskaper. Genomförandet beror på skådespelare med rimlig talang som kan porträttera den överivrige kocken, eftersom framgången hänger på leverans och timing i framförandet. Även om minimal utrustning krävs, kommer efterproduktionen att behöva viss uppmärksamhet. Konceptet är inte starkt beroende av varumärkeskapital.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "f20e327b-4508-48ec-a12e-07536c3df422",
@@ -2248,7 +2319,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video's concept, depicting a service worker searching for a manager during a busy period, has moderate replicability. Replicating the video will require access to a restaurant or similar service environment. The high cut rate (8 cuts per minute) and \"rushed\" pacing indicated in the technical signals suggests the need for light editing skills and equipment. Securing talent capable of conveying intentional comedic urgency and physical performance is important. Location dependency and timing complexity are moderately important factors to consider. The concept is relatable and doesn't require significant brand equity."
+    "replicability_analysis": "Konceptet i den här videon, som skildrar en serviceanställd som söker efter en chef under en hektisk period, har måttlig replikerbarhet. För att replikera videon krävs tillgång till en restaurang eller liknande serviceinrättning. Den höga klipphastigheten (8 klipp per minut) och det \"forcerade\" tempot som indikeras i de tekniska signalerna tyder på behovet av grundläggande redigeringskunskaper och utrustning. Att säkra talang som kan förmedla avsiktlig komisk brådska och fysisk prestation är viktigt. Platsberoende och timingkomplexitet är måttligt viktiga faktorer att beakta. Konceptet är relaterbart och kräver inget betydande varumärkeskapital.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "43dcb57c-9dda-4db9-8055-f7e074978bf3",
@@ -2308,7 +2381,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept demonstrates moderate replicability. It features a simple premise requiring minimal equipment and post-production. While the idea itself isn't complex, successful replication relies on competent acting to convey the contrast between a relaxed worker on break and a stressed colleague. The humor hinges on precise timing and the stressed colleague's expressions, potentially requiring skilled performers. The reliance on movement within a single shot, as well as the location dependency of a restaurant setting, also contribute to a slightly elevated execution skill requirement. Overall, the concept could be recreated by employees at virtually any restaurant, but achieving the same comedic effect depends on performers who can effectively portray the intended contrast."
+    "replicability_analysis": "Detta videokoncept uppvisar måttlig replikerbarhet. Det bygger på en enkel premiss som kräver minimal utrustning och efterproduktion. Medan själva idén inte är komplex, förlitar sig en framgångsrik återskapning på kompetent skådespeleri för att förmedla kontrasten mellan en avslappnad arbetare på rast och en stressad kollega. Humorn bygger på exakt timing och den stressade kollegans uttryck, vilket potentiellt kräver skickliga aktörer. Beroendet av rörelse inom en enda tagning, samt platsberoendet av en restaurangmiljö, bidrar också till ett något högre krav på utförandeskicklighet. Sammantaget skulle konceptet kunna återskapas av anställda på praktiskt taget vilken restaurang som helst, men att uppnå samma komiska effekt beror på skådespelare som effektivt kan porträttera den avsedda kontrasten.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "17adcf7a-012b-4add-8191-7f64d8385b80",
@@ -2368,7 +2443,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The replicability of this video concept is moderate, with an estimated overall score of 4.125. The concept requires a restaurant setting and three actors: two employees and a customer. Execution depends on charismatic acting from the performers to effectively deliver the humor, and the timing complexity is a factor. The need for talent is relatively high. While not technically demanding in terms of post-production (level 3), filming will require good equipment to maintain the observed visual clarity (rated 8/10)."
+    "replicability_analysis": "Replikabiliteten för detta videokoncept är måttlig, med en uppskattad totalpoäng på 4.125. Konceptet kräver en restaurangmiljö och tre skådespelare: två anställda och en kund. Genomförandet är beroende av karismatiskt skådespeleri för att effektivt leverera humorn, och timingens komplexitet är en faktor. Behovet av talang är relativt högt. Även om det inte är tekniskt krävande vad gäller efterproduktion (nivå 3), kommer filmningen att kräva bra utrustning för att bibehålla den observerade visuella klarheten (betygsatt 8/10).",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "32d9345a-40e4-4f2d-9067-42e665b75e90",
@@ -2428,7 +2505,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept, depicting a customer's internal debate over tipping culminating in a plot twist, presents moderate replicability challenges. While the equipment needs are basic, successful replication hinges on creative writing and strong on-camera presence from the talent. The execution skill and timing complexity are relatively high, requiring some editing and voiceover work. The location dependency is low, making it suitable for various businesses with a tipping function. Post-production demands are moderate."
+    "replicability_analysis": "Konceptet är måttligt svår att replikera, trots att det enbart är en lång scen. Det som gör konceptet enklare att replikera är att det är en enda scen, där hela konversationen spelar ut.\n\nManuset i sig är kreativt och skådespelarpresentationen från medarbetaren och kunden är inte den viktigaste. Det som gör konceptet lite svårare är att viss postproduktion behövs för att addera \"voiceovers\" som representerar kundens inre monolog (som är medarbetaren som talar). Beroendet av specifik plats är lågt, men kommer till fördel fungera för verksamheter som har en dricksfunktion och betalar framme i kassan.",
+    "translation_status": "verified"
   },
   {
     "video_id": "2b709fab-9196-4cee-9cc5-80cdd51425f0",
@@ -2488,7 +2566,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The video's replicability is moderate, with an estimated overall score of 3.25. While the concept itself, featuring a difficult customer returning and acting as if nothing happened, is not entirely unique, replicating the specific scenario requires careful consideration. It necessitates a food service environment and a performer capable of delivering a subtly awkward stare. The one-shot POV style and simple text overlay suggest low post-production needs and minimal equipment. However, achieving the right comedic timing and conveying the underlying tension effectively requires some acting skill and an understanding of the nuances of interpersonal dynamics. The effectiveness of the humor also depends on viewers recognizing the \"difficult customer\" trope, which might present a slight conceptual barrier."
+    "replicability_analysis": "Videon har en måttlig replikerbarhet, med en uppskattad totalpoäng på 3.25. Konceptet i sig, som visar en besvärlig kund som återvänder och agerar som om ingenting har hänt, är inte helt unikt. Att återskapa det specifika scenariot kräver dock noggrant övervägande. Det förutsätter en miljö inom livsmedelsbranschen och en skådespelare som kan leverera en subtilt obekväm blick. One-shot POV-stilen och enkla textöverlägg antyder låga krav på efterproduktion och minimal utrustning. För att uppnå rätt komisk timing och effektivt förmedla den underliggande spänningen krävs dock en viss skådespelartalang och förståelse för nyanserna i interpersonell dynamik. Humoristisk genomslagskraft är även beroende av att tittarna känner igen \"besvärlig kund\"-tropen, vilket kan utgöra ett mindre konceptuellt hinder.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "87fea727-e058-462a-8264-3e0e2605909d",
@@ -2548,7 +2628,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The video's concept, depicting a worker attempting to gain a favor from a colleague, is moderately replicable across service environments. Replicating the video requires a location similar to a restaurant setting and willing employees comfortable performing on camera. While minimal equipment is needed, successful execution hinges on the actors' ability to deliver lines with good timing, and post-production requires a moderate level of effort. The effectiveness may be impacted by cultural relevance."
+    "replicability_analysis": "Videon är enkel att repliecera i olika tjänstemiljöer. Temat att städa lokalen går att återskapa, och videon innehåller enbart en inspelning (scen). Klippet innehåller ingen dialog, utan utgår från att deltagarna kan få konceptet att fungera (irritation).",
+    "translation_status": "verified"
   },
   {
     "video_id": "5cfd152d-0eea-4207-a703-c5b4eb1fac7c",
@@ -2608,7 +2689,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The video concept has moderate replicability. It requires a restaurant-like setting, limiting location flexibility, although the underlying idea could be adapted to other service environments. Minimal equipment and basic acting skills are needed, but successful execution benefits from precise timing, suggesting moderate execution skill is necessary. The post-production level is low, but talent requirements are moderate. Brand equity is not a significant factor."
+    "replicability_analysis": "Videon är relativt enkel att replikera av liknande verksamheter inom service, då premissen centreras kring en underförstådd dialog mellan kollegor som skett innan videon börjar \"kolla på kunden, men gör det inte uppenbart\" (skärmtext).\n\nFör att replikera konceptet krävs en restaurang, café, pizzeria eller liknande matservering med en disk/kassa och synliga kundplatser i bakgrunden. Platsen bör vara relativt välbelyst.\n\nUtrustningen som behövs är en smartphone med god videokvalitet eller en enklare videokamera. Eventuellt en tripod/stativ för att hålla kameran stadig, men handhållet är också möjligt.\n\nPersonal som behövs är en \"anställd\" (skådespelare), en person som kan spela med i premissen av att lyssna in kollegans uppmaning att inte kolla så uppenbart på kunden bakom. Denne måste vara villig att spela en absurd roll som snart kräver att han står på bordet i restaurangen. Ålder och kön kan variera, men en ung person kan lämpa sig förstärka den humoristiska aspekten.\n\nEn \"kund\" (skådespelare) som sitter och äter naturligt i bakgrunden. Behöver inte agera aktivt, bara vara närvarande. Slutligen behövs en filmare, som kan bytas ut mot en tripod eller stativ. Möjligen även en redigerare som adderar textöverlagring och ljudeffekt (kan vara samma person som filmar).\n\nRedigeringen är inte den svåraste. Det viktiga är att filma videon tydligt och med kunden tydlig i bakgrunden, för att \"vändningen\" av att arbetaren står på bordet ska vara humoristisk. Editering som skärmtext kan adderas i TikTok eller andra videoredigeringsappar. Ljudeffekten kan också adderas relativt lätt.\n\nDet är relativt enkelt för ett företag att återskapa detta koncept. De primära utmaningarna ligger i att få till twisten som sker genom en \"hard cut\", där arbetaren går från att kolla in i kameran till att stå på kundens bord - en extrem motsägelse där medarbetaren gör det som kollegan helst inte ville skulle hända, att se på kunden på ett väldigt uppenbart sätt.\n\nKonceptet går att återskapa i andra sammanhang, och hänger inte på varken typen av verksamhet (restaurang vs bar/café) eller på varumärket specifikt.",
+    "translation_status": "verified",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "f530b678-6055-4d89-8775-39a3c6190d20",
@@ -2668,7 +2751,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video's concept, centered around an employee meticulously cleaning to avoid an impending conversation, demonstrates moderate replicability. The core idea can be adapted to various service environments or businesses with hierarchical staff dynamics. Replicating the video requires standard cleaning supplies and does not demand specialized acting talent. However, achieving a similar level of engagement may depend on accurately portraying the emotional avoidance aspect. The production polish signals indicate that good, but not great, equipment may be required."
+    "replicability_analysis": "Videons koncept är inte svårt att replikera. Det är en samling scener som visar hur medarbetaren undviker en svår konversation. \n\nScenerna är kreativa inslag som visar absurda arbetsuppgifter, där en verksamhet som vill replikera konceptet kan ta antingen premissen eller premissen och \"uppgifterna\" i scenerna. De specifika arbetsuppgifterna i videon kan fungera för barer, restauranger eller caféer. \n\nGrundidén kan anpassas till olika servicemiljöer eller företag med hierarkiska personalstrukturer. Att replikera just dessa scener kräver standardmässiga städmaterial och kräver inte specialiserade skådespelartalanger.",
+    "translation_status": "verified"
   },
   {
     "video_id": "e3afbbf9-8b98-4739-b900-5df406da1c1f",
@@ -2728,7 +2812,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept, centered around a service worker's exaggerated eagerness to help customers, presents moderate replicability. The core idea requires some creative thinking to develop a suitable scenario and employee reaction, although the underlying script is simple. Execution demands basic acting skills, and post-production is minimal, reflected in the production polish technical signal. Replicating this video necessitates a service location setting, but the location dependency is low. Equipment needs are also low, and timing complexity is straightforward."
+    "replicability_analysis": "Detta videokoncept, som kretsar kring en servicearbetares överdrivna iver att hjälpa kunder, har måttlig replikerbarhet. Kärnan i idén kräver visst kreativt tänkande för att utveckla ett lämpligt scenario och en passande reaktion från den anställde, även om manuset i grunden är enkelt. Genomförandet kräver grundläggande skådespelarkunskaper, och efterproduktionen är minimal, vilket återspeglas i den tekniska signalen för produktionskvalitet. För att replikera denna video krävs en servicemiljö, men platsberoendet är lågt. Utrustningsbehoven är också låga, och tidsplaneringen är okomplicerad.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "477e9367-23ad-41c3-be1c-036a8ce46578",
@@ -2788,7 +2874,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The video's concept, which involves employees comically eating part of a customer's order to compensate for a price discrepancy, has moderate replicability. It requires a restaurant setting and employees comfortable with acting and mild social risk. While the core idea is unique, successful replication is location dependent and requires appropriate casting. Minimal equipment, post-production and brand equity are needed; however, precise timing is important for the humor, with an elevated concept difficulty."
+    "replicability_analysis": "Premissen är inte speciellt svår att replikera av liknande verksamheter. Det förutsätter en restaurangmiljö samt två medarbetare, samt en kameraman. Videon har enbart en scen, vilket gör att klippning inte blir nödvändigt på samma sätt, och efterproduktionen är inte allt för svår (addera skärmtext). Dock är nonchalansen och medarbetarnas timing viktig för humoreffekten, vilket innebär en ökad konceptuell svårighetsgrad.",
+    "translation_status": "verified"
   },
   {
     "video_id": "5ebac5d3-aa7e-49f0-ac19-f64926830ba5",
@@ -2848,7 +2935,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video's concept, while somewhat unique, is reasonably replicable for similar businesses, particularly restaurants. Replicating the sketch requires a restaurant setting and some basic props. The acting is simple and doesn't necessitate experienced talent, but relies on clear comedic delivery. Execution can be achieved with minimal equipment and basic editing skills, implying low post-production needs. The concept difficulty is rated moderately high, suggesting some creative adaptation may be needed, while the moderate location dependency indicates the need for an appropriate restaurant environment."
+    "replicability_analysis": "Konceptet för den här videon är, trots att det är något unikt, relativt enkelt att replikera för liknande verksamheter, särskilt restauranger. För att återskapa sketchen krävs en restaurangmiljö och enklare rekvisita. Skådespeleriet är enkelt och kräver ingen erfaren talang, men förlitar sig på tydlig komisk leverans. Genomförandet kan uppnås med minimal utrustning och grundläggande redigeringskunskaper, vilket innebär låga behov av efterproduktion. Konceptets svårighetsgrad bedöms som medelhög, vilket antyder att viss kreativ anpassning kan behövas, medan det måttliga platsberoendet indikerar behovet av en lämplig restaurangmiljö.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "fa76f3de-8650-435f-92d6-fa7a37d8600d",
@@ -2908,7 +2997,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "Konceptet är relativt enkel att replicera. Premissen är enkel och spelas ut över en enda scen, vilket också gör klippning en icke-fråga. Videon kräver inte heller speciella skådespelarinsatser, utan spelar mest på premissens egna styrka. Det som kan bytas ut är rekvisitan för att \"täcka över\" medarbetaren, men detta är utbytbart och inte kopplat till verksamheten, även om det inte är direkt beroende till sketchens framgång eller verksamhetens typ."
+    "replicability_analysis": "Konceptet är relativt enkel att replicera. Premissen är enkel och spelas ut över en enda scen, vilket också gör klippning en icke-fråga. Videon kräver inte heller speciella skådespelarinsatser, utan spelar mest på premissens egna styrka. Det som kan bytas ut är rekvisitan för att \"täcka över\" medarbetaren, men detta är utbytbart och inte kopplat till verksamheten, även om det inte är direkt beroende till sketchens framgång eller verksamhetens typ.",
+    "translation_status": "verified"
   },
   {
     "video_id": "1ea5288b-5bc0-458b-b723-61e512de0206",
@@ -2968,7 +3058,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept presents moderate replicability challenges. The humor is derived from the unexpected interaction and timing, requiring skilled talent and precise execution, contributing to the overall replicability score of 4. Replicating the specific movements and timing of the characters, especially the interruption, poses a significant hurdle. The fast pacing and surreal elements, combined with the high cuts-per-minute, necessitate advanced editing and post-production capabilities. Furthermore, the location must feature an outdoor setting with a suitable wall or surface. The brand integration relies on the unusual situation of offering the food item in this specific scenario."
+    "replicability_analysis": "Detta videokoncept presenterar måttliga utmaningar gällande replikerbarhet. Humorn kommer från den oväntade interaktionen och tajmingen, vilket kräver skickliga aktörer och precis utförande, vilket bidrar till det övergripande replikerbarhetsvärdet på 4. Att replikera karaktärernas specifika rörelser och tajming, särskilt avbrottet, utgör ett betydande hinder. Det snabba tempot och de surrealistiska inslagen, kombinerat med det höga antalet klipp per minut, kräver avancerad redigering och efterproduktionskapacitet. Dessutom måste platsen vara utomhus med en lämplig vägg eller yta. Varumärkesintegrationen bygger på den ovanliga situationen att erbjuda matprodukten i just detta scenario.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "2d05eec7-7eaf-453f-88ed-942688e2c5cb",
@@ -3028,7 +3120,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The replicability of this video concept is moderately challenging. It requires a service counter environment and actors capable of delivering comedic timing to sell the core premise of a shy individual embarrassed to order a \"fruity\" drink. While post-production is minimal, the concept itself demands some creative ideation. The success hinges on the talent's delivery and timing, which are key to replicating the intended humor. The location dependency suggests finding or creating a similar restaurant setting. Overall, consider the availability of suitable talent and locations when assessing replicability."
+    "replicability_analysis": "Konceptet är inte allt för svårt att replikera, men kan behöva lite planering i förväg för att återskapa på ett bra sätt.En lokal, samt 3-4 skådespelare behövs.\n\nEn animerad och lekfull presentation behövs av medverkarna för att sälja kärnan i premissen: en blyg person som skäms över att beställa en \"fruktig\" drink. Framgången beror på skådespelarnas leverans och timing, vilket är nyckeln till att replikera den avsedda humorn.\n\nPost-produktionen är relativt enkel och kräver inte allt för mycket editering. För att anpassa konceptet till specifika verksamheter är det värdefullt att välja en dryck som kan upplevas \"pinsam\" - med andra ord kan viss rekvisita bytas ut (t.ex. en \"tjejig\" kaffedryck, eller annan söt dryck).",
+    "translation_status": "verified",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "42887f4b-7fb7-41be-bb7f-b1acba21ca5d",
@@ -3088,7 +3182,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This concept has moderate replicability. The video requires two performers comfortable acting in public, specifically simulating a proposal scenario. Securing permission to film inside a restaurant, ideally one with a similar layout to Steve's Poké Bar, is also necessary. While post-production is relatively simple, successful replication depends on capturing the emotional nuance of the premise, which requires good performer presence and delivery timing. The concept difficulty and talent requirement scores indicate that it's not a simple task, further emphasized by a potential need for a brand equity score to get the desired effect."
+    "replicability_analysis": "Konceptet är relativt enkelt att återskapa. Videon kräver två skådespelare som är bekväma med att agera offentligt, specifikt att simulera ett romantiskt scenario (frieri). \n\nAtt ha en rymlig miljö att spela in i, t.ex. i en restaurang, idealiskt en med liknande planlösning som Steve's Poké Bar (där andra syns i omgivningen) är också hjälpsamt om inte nödvändigt. Rimligen kommer en verksamhet som vill replikera klippet även byta ut rekvisitan till något som kan öppnas - i detta fall en behållare Poké.\n\nMedan postproduktionen inte kräver så mycket klippning (enbart en scen) är det nyttigt att sträva till att fånga den känslomässiga nyansen i premissen, vilket kräver inlevelserik skådespelarinsats och tajming.",
+    "translation_status": "verified"
   },
   {
     "video_id": "580e13cf-e861-4c47-a98c-ea2c65438637",
@@ -3148,7 +3243,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video's concept, a wordplay pun involving lowering the body instead of prices, presents moderate replicability. It requires minimal equipment, but necessitates a physical location similar to a poke bowl shop and a performer willing to execute a squat. The success of the pun relies on clear visual communication and timing, which will require some post-production effort. While the concept itself is not overly complex, replicating the comedic timing and physical performance may present challenges, contributing to a moderate overall replicability score."
+    "replicability_analysis": "Konceptet i den här videon, ett ordvitsbaserat skämt där en person sänker kroppen istället för priserna, har måttlig replikerbarhet. Det kräver minimal utrustning, men förutsätter en fysisk plats liknande en poké bowl-restaurang och en skådespelare som är villig att utföra en knäböjning. Vitsens framgång bygger på tydlig visuell kommunikation och timing, vilket kommer att kräva viss efterproduktion. Även om själva konceptet inte är överdrivet komplext, kan replikering av den komiska timingen och den fysiska prestationen innebära utmaningar, vilket bidrar till en måttlig total replikerbarhet.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "7ec8b07c-e712-4acb-9223-319160f6fb8b",
@@ -3208,7 +3305,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "Viden är måttligt replicerbar, och har en ordvits som kan appliceras till andra typer av verksamheter, då det inte är direkt kopplat till verksamhetens typ \"använd ditt huvud mer\". Utrustningsbehovet är minimalt (telefon, grundläggande belysning), men temat är relativt roligt och det är enkelt att \"bjuda på sig själv\" vilket gör att den sociala risken för personalen är mild, och inte heller kräver exakt komisk timing. \n\nAtt replikera videon kan kräva anpassning av den centrala rekvisitan (för närvarande en saltströare) för att fungera i andra kontexter. Platsen är beroende av tillgång till en restaurang- eller caféliknande miljö. Efterproduktionen involverar grundläggande redigering."
+    "replicability_analysis": "Viden är måttligt replicerbar, och har en ordvits som kan appliceras till andra typer av verksamheter, då det inte är direkt kopplat till verksamhetens typ \"använd ditt huvud mer\". Utrustningsbehovet är minimalt (telefon, grundläggande belysning), men temat är relativt roligt och det är enkelt att \"bjuda på sig själv\" vilket gör att den sociala risken för personalen är mild, och inte heller kräver exakt komisk timing. \n\nAtt replikera videon kan kräva anpassning av den centrala rekvisitan (för närvarande en saltströare) för att fungera i andra kontexter. Platsen är beroende av tillgång till en restaurang- eller caféliknande miljö. Efterproduktionen involverar grundläggande redigering.",
+    "translation_status": "verified"
   },
   {
     "video_id": "0c3565fa-9cc4-45f6-a868-4a2ce416b3ab",
@@ -3268,7 +3366,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept presents moderate replicability. It requires several actors to portray staff and a customer within a food service setting. While the core idea of escalating a customer's request to an absurd level is relatively simple, successful replication depends on the actors' ability to sell the humor through effective delivery and timing. The production can be achieved with minimal equipment, potentially even a phone and basic editing software, but better production polish might improve the result. Adaptability to various food service environments is high, as the scenario of customer impatience is common."
+    "replicability_analysis": "Detta koncept har måttlig replikerbarhet. Framförallt behöver premissen skådespelare som porträtterar personal och en kund i en restaurangmiljö. Att sammanställa fyra medarbetare för att spela personalen, samt en kameraman, kan vara lite tidskrävande eller svårplanerat.\n\nDet som gör klippet enkelt att replikera är att konceptet inte kräver nyanserad skådespel eller klippning i efterhand. Istället är manuset eller \"skämtet\" hängandes på humorn där flera i personalen på ett synkroniserat sätt eskalerar en kunds önskemål mot absurdism (klappar händerna för att air-fryern ska skynda på). Inlevelse hos personalen, och ett genuint ansiktsuttryck hos kunden (som ser vilsen ut) kan bidra till hur humorn förmedlas effektivt.\n\nProduktionen kan genomföras med minimal utrustning, men en bättre produktionsmässig putsning och kan förbättra resultatet. \n\nPremissen kan behöva anpassas till verksameter för att utförandet ska upplevas mer rimligt för publiken. Om en airfryer är vad personalen väntar på kan möjligen en ugn, eller annan utrustning, användas som substitut.",
+    "translation_status": "verified"
   },
   {
     "video_id": "695e6525-c41d-4152-96b4-931a3d75da29",
@@ -3328,7 +3427,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video's replicability is moderately challenging. The concept requires some comedic timing and awareness of relatable workplace issues to resonate with the target audience. Execution demands comfortable on-camera presence from the talent, who must effectively convey emotion without dialogue, relying instead on facial expressions synchronized with a TikTok sound. The restaurant setting introduces medium location dependency. Minimal equipment is needed, but the post-production level requires some skill. The reliance on a specific TikTok sound may present a future barrier."
+    "replicability_analysis": "Svårigheten att återskapa detta koncept är inte det svåraste, utan är en sammansättning av två klipp som är relativt enkla i dess utformande. Konceptet kräver en viss komisk timing och närvaro framför kameran från skådespelaren, som effektivt måste förmedla känslor utan dialog, och istället förlita sig på ansiktsuttryck synkroniserade med ett TikTok-ljud. \n\nSkärmtexten \"Du behöver kommunicera till köket att du gjorde ett misstag\" gör att konceptet får \"miljön\" köket, och videon blir där tittaren ser samspelet mellan servitrisen och kökspersonalen. Därför är konceptet beroende av specifik plats, för att manuset/konceptet ska kunna återskapas utan att göra stora ändringar. \n\nMinimal utrustning behövs, och efterproduktionen kräver att timingen av klippningen då kockens reaktion visas görs på ett bra sätt.",
+    "translation_status": "verified"
   },
   {
     "video_id": "7abe3bb9-aa31-4154-923a-4c54a42f12e6",
@@ -3388,7 +3488,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The replicability of this video concept is moderate. It requires minimal equipment and can be filmed in a restaurant kitchen or similar location. The core concept, posing an ethical dilemma to a colleague, is moderately difficult due to its reliance on relatable workplace dynamics. Replicating the video necessitates talent comfortable on camera with basic acting skills. Post-production and timing are relatively simple. While the video does not heavily depend on existing brand equity, replicating the specific humor may be challenging, as it hinges on precise delivery timing."
+    "replicability_analysis": "Replikationen av detta videokoncept är måttlig. Det kräver minimal utrustning och kan filmas i ett restaurangkök eller liknande miljö. Kärnkonceptet, att ställa ett etiskt dilemma till en kollega, är av moderat svårighetsgrad eftersom det förlitar sig på igenkännliga dynamiker på arbetsplatsen. Att replikera videon kräver talang som är bekväm framför kameran med grundläggande skådespelarkunskaper. Efterproduktion och timing är relativt enkla. Även om videon inte är starkt beroende av befintligt varumärkesvärde, kan replikering av den specifika humorn vara utmanande, eftersom den hänger på exakt leveranstiming.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "408c91fc-35fd-44e7-b6b1-a290d5dc7cba",
@@ -3448,7 +3550,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The replicability of this video concept, which uses the common trope of slacking at work, is moderate. While the core concept is relatively simple, it requires consideration of several factors. Execution necessitates basic acting and filming skills, and the timing of the sound effect paired with dialogue is important. The location is somewhat dependent on a storage-like room environment. The production polish relies on adequate sound design; however, it doesn't require substantial brand equity. Overall, the execution requires moderate levels of equipment, talent, and timing precision."
+    "replicability_analysis": "Replicerbarheten för detta videokoncept, som använder den vanliga tropen av att maska på jobbet, är måttlig. Även om kärnkonceptet är relativt enkelt, kräver det beaktande av flera faktorer. Genomförandet kräver grundläggande skådespelar- och filmkunskaper, och tajmingen av ljudeffekten i kombination med dialog är viktig. Platsen är något beroende av en lagerliknande rumsmiljö. Produktionskvaliteten förlitar sig på adekvat ljuddesign; men det kräver inte ett betydande varumärkesvärde. Sammantaget kräver genomförandet måttliga nivåer av utrustning, talang och precision i tajmingen.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "b91e414c-deb4-4f75-ae6c-f9ca2d1a21a7",
@@ -3508,7 +3612,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept, centered around workplace friendships, demonstrates high replicability. It requires minimal equipment, execution skill, or brand equity to produce. The scenario is generic and easily adaptable to diverse workplace settings. While the general notes mention that a \"nice framing/shot\" would improve views, it is the emotional connection between the actors, rather than complex editing (post-production level: 1) that would drive success. The talent requirement is moderate, as the authenticity of the performer's connection is important."
+    "replicability_analysis": "Detta videokoncept, som kretsar kring vänskapsrelationer på arbetsplatsen, uppvisar hög replikerbarhet. Det kräver minimal utrustning, utförandeförmåga eller varumärkeskapital för att produceras. Scenariot är generiskt och lätt att anpassa till varierande arbetsmiljöer. Även om de allmänna noterna nämner att en \"bra inramning/bild\" skulle förbättra visningarna, är det den emotionella kopplingen mellan skådespelarna, snarare än komplex redigering (efterproduktionsnivå: 1) som driver framgången. Talangkravet är måttligt, eftersom autenticiteten i utövarnas relation är viktig.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "610f7e10-34d7-445a-b1d8-7ff58bbda990",
@@ -3570,7 +3676,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept demonstrates high replicability, requiring minimal equipment, skill, or brand equity. The execution relies on a generic kitchen setting and a single performer, lowering location dependency and talent requirements. Post-production needs are also minimal. However, the hook effectiveness is reliant on the specific TikTok sound used, introducing a timing complexity element that might impact replicability if the sound's popularity decreases. While the performer's presence scored moderately, the social risk is low, suggesting no cultural barriers to replication."
+    "replicability_analysis": "Detta videokoncept uppvisar hög replikerbarhet och kräver minimal utrustning, kompetens eller varumärkeskapital. Genomförandet bygger på en allmängiltig köksmiljö och en enskild skådespelare, vilket minskar platsberoendet och kraven på talang. Efterproduktionsbehoven är också minimala. Hookens effektivitet är dock beroende av det specifika TikTok-ljudet som används, vilket introducerar ett tidskomplexitetselement som kan påverka replikerbarheten om ljudets popularitet minskar. Även om skådespelarens närvaro fick ett måttligt resultat är den sociala risken låg, vilket tyder på att det inte finns några kulturella hinder för replikering.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "db4d53a4-5b56-4be7-bb3f-447cd9cd759a",
@@ -3630,7 +3738,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The replicability of this video concept is moderately challenging. The video requires a coffee shop setting and a barista, introducing location dependency and the need for specific skills. While the acting doesn't require extensive training, the concept relies on expressive performers. The execution also relies on readily available pre-existing media. Post-production demands a moderate level of editing skill, and the concept has a high timing complexity, which can make it difficult to recreate the desired pacing. A moderate level of equipment is needed."
+    "replicability_analysis": "Konceptet av denna video är relativt enkel till måttligt enkel att replikera. \n\nVideon kräver en kafébar och en barista, vilket introducerar platsberoende och behovet av specifik kompetens. Att baristan syns bakom \"fotografiet\" blir en central punkt för att se baristans reaktion till att ett fotografi tas, vilket förklarar platsberoendet. \n\nSkådespeleriet kräver ingen omfattande träning, men konceptet bygger på hur väl rörelsen av baristan kan \"matchas\" med klippet av barnet som dansar. \n\nGenomförandet förlitar sig också på lättillgängligt, redan existerande media. Efterproduktionen kräver måttlig redigeringskompetens, och konceptet har en hög timingkomplexitet, vilket kan göra det svårt att återskapa den önskade effekten.",
+    "translation_status": "verified",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "464f01f2-659c-4b4a-9c00-e76b4cb6569f",
@@ -3690,7 +3800,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The replicability of this video concept is moderate, with an overall score of 4 out of 5. It requires a moderately difficult premise, a restaurant or cafe location, and talent capable of expressive acting. While equipment needs are relatively basic (phone and possibly a tripod), successful execution requires a good recording and attention to animated movements and sound design. The \"rushed\" pacing, noted in the narrative flow analysis, suggests that timing is critical and potentially challenging to replicate. Post-production is also moderately complex. Brand equity is not a significant factor in replicability."
+    "replicability_analysis": "Videon är sannolikt väldigt enkel att återskapa, då det är ett enda klipp av en kvinna som springer in mot kamerans synfält, med en skakig inspelningsmetod som är lätt att replikera. Konceptet lutar mot en rolig och avslappnad kultur, och den känslan kan sannolikt återskapas beroende på känslan som förmedlas i videon. Förmodligen behövs bara en person för att springa in, och en kameraman, och addering av ljud i postproduktion i TikTok.",
+    "translation_status": "verified"
   },
   {
     "video_id": "407ea6ae-24d9-420a-bcae-85f78c7befac",
@@ -3750,7 +3861,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept demonstrates moderate replicability, requiring a café or similar location and actors capable of delivering lines effectively. The script itself is relatively straightforward. However, replicating the specific humor may present a challenge, as it relies on a potentially divisive perspective on gossip. The \"Execution\" section indicates above-average performer execution, indicating that replicating the nuances of their acting will be difficult. While the video itself does not seem to have any exceptional barriers, the concept is not groundbreaking."
+    "replicability_analysis": "Detta videokoncept uppvisar måttlig replikerbarhet och kräver en caféliknande miljö samt skådespelare som kan leverera repliker effektivt. Själva manuset är relativt okomplicerat. Att återskapa den specifika humorn kan dock vara en utmaning, eftersom den bygger på ett potentiellt splittrande perspektiv på skvaller. Avsnittet \"Genomförande\" indikerar en skådespelarinsats över genomsnittet, vilket antyder att det blir svårt att replikera nyanserna i deras agerande. Även om videon i sig inte verkar ha några exceptionella hinder, är konceptet inte banbrytande.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "a612632a-8892-431d-872f-379ec32eadf0",
@@ -3810,7 +3923,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The replicability of this video concept is moderate, with an overall score of 4 out of 5. It involves a moderately difficult concept requiring some on-camera presence. The location is relatively generic (e.g., a food court). Minimal equipment is needed, but the timing is moderately complex and requires setup. Post-production involves simple text overlays and music, suggesting a moderate level of effort. The success of this concept relies on good execution and animation in the editing, implying that while the script itself is not particularly challenging, replicating the video's impact necessitates effective post-production skills, indicated by the sound design (8/10) and transition quality (8/10)."
+    "replicability_analysis": "Konceptets replikerbarhet är måttlig, med ett totalt betyg på 4 av 5. Det involverar ett koncept av medelsvårighetsgrad som kräver viss närvaro framför kameran. Platsen är relativt generisk (t.ex. en food court). Minimal utrustning krävs, men timingen är måttligt komplex och kräver förberedelser. Efterproduktionen består av enkla textöverlagringar och musik, vilket antyder en måttlig arbetsinsats. Konceptets framgång vilar på god utförande och animation i redigeringen, vilket innebär att även om manuset i sig inte är särskilt utmanande, kräver en replikering av videons effekt effektiva efterproduktionskunskaper, vilket indikeras av ljuddesignen (8/10) och övergångskvaliteten (8/10).",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "01b41059-d1e7-4261-acc3-fd33d9cf2c2a",
@@ -3870,7 +3985,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video's concept presents moderate replicability challenges. The core idea requires an understanding of common office dynamics and the ability to create a relatable, humorous scenario. Replicating the video would necessitate access to a casual dining location or a convincing set. The execution demands moderate skill across various factors, including equipment needs, talent requirements, timing complexity, and concept difficulty. Post-production demands are relatively simple, but the \"cheap\" payoff (as indicated in technical signals) suggests that replicating the humor relies on potentially difficult-to-achieve comedic timing. The effectiveness of the hook and overall attention retention are moderate."
+    "replicability_analysis": "Konceptet i den här videon innebär måttliga utmaningar gällande replikerbarhet. Kärnan i idén kräver en förståelse för vanliga kontorsdynamiker och förmågan att skapa ett relaterbart, humoristiskt scenario. Att replikera videon skulle kräva tillgång till en avslappnad restaurangmiljö eller en övertygande kuliss. Genomförandet kräver måttlig skicklighet inom olika faktorer, inklusive utrustningsbehov, talangkrav, timingkomplexitet och konceptets svårighetsgrad. Efterproduktionen är relativt enkel, men den \"billiga\" utdelningen (vilket indikeras i tekniska signaler) antyder att replikering av humorn förlitar sig på en potentiellt svåråtkomlig komisk timing. Effektiviteten av \"hooken\" och det övergripande bibehållandet av uppmärksamhet är måttligt.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "98737573-3e1c-483c-9477-0e49398b72af",
@@ -3930,7 +4047,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept, depicting a workplace scenario, demonstrates high replicability due to its universal theme. The primary requirements are a suitable location, ideally a food preparation area, minimal equipment (likely achievable with a smartphone), and only basic acting skills. Post-production is straightforward. The \"Technical Signals\" indicated good visual clarity and sound design, which suggest that while high-end equipment isn't mandatory, reasonable attention to production values will improve audience engagement."
+    "replicability_analysis": "Detta videokoncept, som skildrar ett scenario på en arbetsplats, uppvisar hög replikerbarhet tack vare dess universella tema. De primära kraven är en lämplig plats, helst ett område för matberedning, minimal utrustning (troligen uppnåeligt med en smartphone) och endast grundläggande skådespelartalang. Efterproduktionen är okomplicerad. \"Tekniska signaler\" indikerade god visuell klarhet och ljuddesign, vilket tyder på att även om avancerad utrustning inte är obligatorisk, kommer rimlig uppmärksamhet på produktionsvärden att öka publikens engagemang.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "77ea6fbb-a868-485c-b19d-e324cd5d74a1",
@@ -3990,7 +4109,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept, which depicts a staff member's exaggerated physical reactions contrasting with a diplomatic voiceover, has moderate replicability. It requires a restaurant or cafe setting and a performer capable of expressive, animated acting with good comedic timing. While the post-production level is low, the success of the concept hinges on the performer's ability to sell the contrast effectively. The concept itself isn't highly original, resulting in a moderate difficulty score, and location dependency is present due to the setting requirement."
+    "replicability_analysis": "Videon visar en kvinnlig anställd i ett kommersiellt kök eller ett café. Hon blir tillfrågad (via en röst utanför bild) hur hennes skift har gått. Hon svarar med en lugn och positiv röst (voiceover) att det har gått \"så, så bra\", att \"alla gjorde exakt vad de skulle\", att det var \"en smidig och enkel process\".\n\nSamtidigt som voiceovern spelas upp, agerar kvinnan på ett extremt överdrivet och hetsigt sätt. Hon rör sig snabbt, gestikulerar vilt med armarna, hanterar utrustning med stor brådska och verkar vara stressad trots voiceoverns lugna budskap. Kontrasten mellan den lugna, positiva voiceovern och hennes frenetiska kroppsspråk skapar en motsägande och komisk effekt.\n\nFör att replikera konceptet behövs sannolikt tillgång till ett kök, eller en liknande miljö där en medarbetare kan tänkas sig ha spenderat en stressig period under arbetstid. Ett kök och en serverare passar in i beskrivningen, men även en kock i ett kök, eller en bartender i en någorlunda omsluten bar-miljö kan passa.\n\nFör att replikera konceptet kan en miljö som ett kommersiellt kök, café eller liknande arbetsplats passa bra. Platsen behöver inte vara stor, men tillräckligt för att möjliggöra rolig (spretig och frustrerad) interaktion med olika personer, stationer, prylar, eller arbetsmoment (utrustning kan vara kaffemaskiner, diskbänkar, hyllor, tallrikar, brickor, städutrustning etc).\n\nPersonal som behövs är en central figur som kan leverera en överdriven och komisk fysisk prestation. Personen behöver ha komisk tajming för att förstå vilka rörelser som kontrasterar humoristiskt med voice-overn.\n\nEn röstskådespelare (voiceover) kan vara samma person eller en annan - men en separat röst kan möjligen skapa en tydligare \"distans\" och bidra till den komiska effekten. Rösten ska vara lugn, positiv och nästan naiv.\n\nSlutligen behövs en kameraman som följer guidar inspelningen. Olika bakgrundskaraktärer kan finnas med för att förhöja humorn, som nu handlar om att personen verkligen \"spårar ut\", även när kollegor delar arbetsplatsen (köket i detta fall).\n\nKlippningen i efterhand är inte den svåraste. Videon består av tre korta klipp som är sammansatta. En viss \"påskyndande\" specialeffekt (t.ex. 1.2x hastighet) är applicerad för att ge känslan av en hetsig och frustrerad inre värld. \n\nEn voice-over är inte svår att addera, men behöver synkas rätt med kvinnans rörelser. Det krävs viss tajming för att voiceovern ska ligga rätt i förhållande till de visuella scenerna och förstärka humorn.\n\nKonceptet är inte det svåraste att replikera. Det behövs tillgång och planering att reservera rätt bakgrund (kök/café), en anställd med naturlig komisk talang och två tre scener som redigeras lätt.\n\nSammanfattningsvis är detta ett koncept som är relativt enkelt att replikera för ett företag, särskilt inom servicebranschen. De tekniska kraven är låga, men det krävs en viss kreativitet och en skådespelare med känsla för komisk tajming för att resultatet ska bli lika effektivt som originalet.",
+    "translation_status": "verified",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "015bd7bf-b780-441c-996d-433e4f525825",
@@ -4050,7 +4171,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The video's concept of a server humorously misinterpreting a customer's polite response is replicable, requiring a restaurant setting and performers capable of subtle comedic acting. Successful replication depends on careful planning, skillful editing involving basic cuts and text overlays, and animated expressions to convey the humor. While post-production is moderately demanding, the main challenges lie in securing talent with strong delivery timing. The original video's description indicates use of a current trend, indicating possible time sensitivity."
+    "replicability_analysis": "Videons koncept, där en servitör humoristiskt feltolkar en kunds artiga svar, är replikerbart och kräver en restaurangmiljö samt skådespelare med förmåga till subtilt komiskt skådespeleri. En framgångsrik återskapning beror på noggrann planering, skicklig redigering med grundläggande klipp och textöverlagringar samt animerade uttryck för att förmedla humorn. Medan efterproduktionen är måttligt krävande ligger de största utmaningarna i att säkra talanger med stark leveranstajming. Den ursprungliga videons beskrivning indikerar användning av en aktuell trend, vilket antyder potentiell tidskänslighet.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "8e649975-f660-442c-8581-eabaa335a26d",
@@ -4110,7 +4233,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This concept presents moderate replicability. It requires a suitable café location and equipment such as a coffee machine and milk frother. Replicating the video would require a person comfortable performing on camera, and some cleverness to devise an engaging task. Post-production is basic, with easy cuts. While the original premise uses a coffee task, other businesses would need to identify a similarly creative and technical task specific to their industry. The success may also depend on the talent's delivery timing and on-camera presence."
+    "replicability_analysis": "Videon är inte den svåraste att replikera. Den har två scener och simpel klippning. Konceptet är anpassat för ett café, och därför begränsas miljöerna som kan vara lämpliga bakgrunder. Kaffeutrustning och förmåga att göra en latte behövs också. Att göra själva latten är det intressanta/engagerande i detta klipp, därför står inte manuset på sina egna fötter som något som kan kopieras, eller ändras på, rakt av.",
+    "translation_status": "verified"
   },
   {
     "video_id": "75b798c1-24c9-4c28-a92d-a24ffc351dc0",
@@ -4170,7 +4294,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video's concept has moderate replicability. The concept relies on staff and a restaurant setting, with some on-screen personality needed. The script is not dialogue-heavy, focusing on physical humor and visual representation, which allows for easier replication. However, some talent is required to deliver the dramatic effect and humor effectively. Timing complexity is moderate, which means the execution is not trivial. Post-production requires a moderate level of skill. The video utilizes a popular sound, which simplifies initial creation, but reliance on trending audio may affect long-term relevance and require adaptation."
+    "replicability_analysis": "Den här videons koncept har måttlig replikerbarhet. För att återskapa den krävs minst tre skådespelare och en kameraperson. Manuset är minimalistiskt med fokus på visuella element och fysisk humor. Även om det inte är dialogtungt, krävs viss skådespelartalang för att effektivt förmedla den avsedda komiska effekten. Efterproduktionen kräver en måttlig kompetensnivå. Användningen av ett populärt ljud förenklar den inledande produktionsprocessen. \n\nReplikerbarheten påverkas av den specifika miljön (restaurang eller bar) och behovet av att återskapa den visuella symboliken, särskilt scenen med den överfyllda drycken, för att förmedla den mentala stressen. Framgångsrik replikering beror på i vilken grad en annan verksamhet kan återskapa scenerna, anpassa konceptet till sin egen miljö, eller modifiera de kreativa elementen utan att förlora konceptets kärna. Svårighetsgraden ökar om signifikanta anpassningar krävs för att passa den nya verksamheten. Om den nya verksamheten är lik den ursprungliga är replikerbarheten enklare.",
+    "translation_status": "verified"
   },
   {
     "video_id": "e510f1b8-9c1b-412e-9965-29b82feb1b29",
@@ -4230,7 +4355,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "Videon har relativt enkel replicerbarhet, baserat på att klippet enbart är ett klipp med en \"POV\"-vinkel, där hela klippet inkluderas i en tagning. För att återskapa videon krävs en enkel miljö, till exempel ett kassaregisterområde, minimal rekvisita såsom en vattenflaska, och en person som är bekväm med att agera framför kameran. Konceptet förlitar sig på skådespelarens framförande och timing för att skapa den komiska effekten, men den relativt enkla \"twisten\" av att slå undan flaskan bidrar mycket till nöjet. Framgången bygger på att fånga den specifika absurda humorn, vilket kräver noggrann uppmärksamhet på timing och framförande under filmning och redigering."
+    "replicability_analysis": "Videon har relativt enkel replicerbarhet, baserat på att klippet enbart är ett klipp med en \"POV\"-vinkel, där hela klippet inkluderas i en tagning. För att återskapa videon krävs en enkel miljö, till exempel ett kassaregisterområde, minimal rekvisita såsom en vattenflaska, och en person som är bekväm med att agera framför kameran. Konceptet förlitar sig på skådespelarens framförande och timing för att skapa den komiska effekten, men den relativt enkla \"twisten\" av att slå undan flaskan bidrar mycket till nöjet. Framgången bygger på att fånga den specifika absurda humorn, vilket kräver noggrann uppmärksamhet på timing och framförande under filmning och redigering.",
+    "translation_status": "verified"
   },
   {
     "video_id": "e305f947-3b53-4c28-8b0a-70689aa99ff0",
@@ -4290,7 +4416,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video's concept, centered around a restaurant owner being mistaken for a new employee, has moderate replicability. While requiring only basic acting skills and equipment, success is dependent on securing a confident performer and access to a physical restaurant location. The humor relies on the owner's expressions and the overall timing, adding complexity to execution. With an overall replicability score of 3.375, achieving a similar level of audience engagement will depend on successfully replicating the video's cutaway/physical humor."
+    "replicability_analysis": "Konceptet i den här videon, som kretsar kring en restaurangägare som misstas för en nyanställd, har måttlig replikerbarhet. Även om det bara kräver grundläggande skådespelarkunskaper och utrustning, är framgången beroende av att säkra en självsäker skådespelare och tillgång till en fysisk restauranglokal. Humorn bygger på ägarens uttryck och den övergripande tajmingen, vilket ökar komplexiteten i genomförandet. Med en total replikerbarhetspoäng på 3.375, kommer uppnåendet av en liknande nivå av publikengagemang att bero på framgångsrik replikering av videons \"cutaway\"/fysiska humor.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "2d63b841-145c-45e8-94c9-c6a7286ab862",
@@ -4350,7 +4478,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video's concept has moderate replicability, scoring 3.5 overall. Replicating the video requires access to a restaurant setting and basic camera equipment. The success of the video relies on competent performers and basic editing skills to create a comedic \"flashback\" effect. The concept is somewhat reliant on current social media trends and habits, suggesting that its relevance may be time-sensitive. While the technical signals indicate good audio quality and visual clarity, the post-production level is moderate, implying no need for overly sophisticated tools. The narrative flow has high clarity and appropriate pacing, both important for replication. However, precise delivery timing is a key element of performer execution."
+    "replicability_analysis": "Konceptet för den här videon har måttlig replikerbarhet och får ett totalbetyg på 3,5. För att replikera videon krävs tillgång till en restaurangmiljö och grundläggande kamerautrustning. Videons framgång beror på kompetenta skådespelare och grundläggande redigeringskunskaper för att skapa en komisk \"flashback\"-effekt. Konceptet är något beroende av aktuella trender och vanor på sociala medier, vilket tyder på att dess relevans kan vara tidskänslig. Medan de tekniska signalerna indikerar god ljudkvalitet och visuell klarhet, är nivån på efterproduktionen måttlig, vilket innebär att det inte krävs alltför sofistikerade verktyg. Det narrativa flödet har hög tydlighet och lämpligt tempo, vilket båda är viktigt för replikering. Dock är exakt timing i utförandet en nyckelfaktor.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "f9ca4365-49e2-4e73-8f1e-db3649027322",
@@ -4410,7 +4540,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video presents a moderately replicable concept involving a comedic sketch about customer service. Replicating the video requires a basic understanding of comedic timing and a performer comfortable delivering the lines. The production requires at least a basic camera setup and some post-production work, though any similar establishment could easily serve as a location. The overall replicability is moderate, primarily affected by talent and concept difficulty."
+    "replicability_analysis": "Konceptet som presenteras i videon är måttligt replikerbart och involverar en komisk sketch om kundservice. För att replikera videon krävs en grundläggande förståelse för komisk timing samt en skådespelare som är bekväm med att leverera replikerna. Produktionen kräver åtminstone en grundläggande kamerautrustning och visst efterarbete, även om vilken liknande etablering som helst enkelt skulle kunna fungera som plats. Den övergripande replikerbarheten är måttlig, vilket främst påverkas av talang och konceptets svårighetsgrad.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "44bfe974-26f0-4956-8c8a-f7874357af1c",
@@ -4470,7 +4602,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video's concept, a humorous dialogue between two people regarding the shape of pizza, presents moderate replicability. It requires two actors capable of animated performances and relies on a restaurant setting, potentially increasing location dependency. Good acting and editing are necessary to execute the sketch effectively, and while the concept is simple, the overall replicability score is influenced by talent requirements and location constraints. The need for good equipment is moderate as well, given the visuals have to be clear. A pizza parlor is a business that could easily recreate this script."
+    "replicability_analysis": "Konceptet i denna video, en humoristisk dialog mellan två personer angående pizzans form, har måttlig replikerbarhet. Det kräver två skådespelare kapabla till animerade prestationer och bygger på en restaurangmiljö, vilket potentiellt ökar platsberoendet. Bra skådespeleri och redigering är nödvändigt för att utföra sketchen effektivt, och även om konceptet är enkelt påverkas den övergripande replikerbarheten av kraven på talang och platsbegränsningar. Behovet av bra utrustning är också måttligt, eftersom bilderna måste vara tydliga. En pizzeria är ett företag som enkelt skulle kunna återskapa detta manus.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "12266442-dd30-4d93-92bb-1e2a2b98d2a1",
@@ -4530,7 +4664,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept presents moderate replicability. It requires a setting resembling a pizzeria and 2-3 individuals with moderate acting ability. The dialogue is easily adaptable. The primary challenge lies in the concept difficulty, which scores a 5/10. This suggests some nuance may be needed to execute the \"silly\" humor effectively. The relatively low post-production level (3/10) and modest equipment needs indicate that high production value is not essential for replication. The talent requirement also scores a 4/10, suggesting that moderately expressive people will suffice to execute the humour."
+    "replicability_analysis": "Konceptet är sannolikt enkelt att återskapa, och kan möjligen behöva anpassning för verksamheter som inte säljer just pizza.\n\nFör att återskapa videon behövs 2-3 individer för att skapa en \"POV\" (point of view), där kunden kommer in i medarbetarens synvinkel och frågar om pizza säljs där. Därefter går kameran till maten, och sedan tillbaka till kunden.\n\nKonceptet lutar inte tungt på dialogen, som kan bytas ut. Även maten kan bytas ut mot en kaffe, ett bakverk, en dryck, eller en annan typ av mat. \n\nAtt utföra den aningen \"barnsliga\" humorn är förmodligen inte så svårt, men kan till fördel dra nytta av ungdomar för att centrera videon kring den typen av humor. De minimala utrustningsbehoven och förväntan till editering/efterproduktion, gör replikerbarheten mer överkomlig. Manuset lutar inte heller på högt produktionsvärde och talangkravet bedöms lågt - måttligt uttrycksfulla personer är nog för att genomföra humorn.",
+    "translation_status": "verified",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "20c4c5c0-d157-49a2-92f0-8b570bf123fe",
@@ -4590,7 +4726,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The video concept demonstrates moderate replicability, requiring a restaurant setting, actors capable of comedic timing and delivery, and basic editing skills for a fast-paced feel. While the core concept is straightforward, successfully recreating the \"bait and switch\" element of the joke will require careful planning. A potential logistical hurdle lies in sourcing a visually impressive, large bag of onions. Replicating the pacing and emotional arc, as highlighted by the narrative flow in the technical signals, is also important. The video's success is further dependent on replicating the performer's delivery timing."
+    "replicability_analysis": "Konceptet i videon har måttlig replikerbarhet och kräver en restaurangmiljö, skådespelare med känsla för komisk timing och leverans samt grundläggande redigeringskunskaper för att skapa ett snabbt tempo. Kärnan i konceptet är okomplicerat, men för att framgångsrikt återskapa \"bait and switch\"-elementet i skämtet krävs noggrann planering. En potentiell logistisk utmaning är att hitta en visuellt imponerande, stor påse lök. Att återskapa tempot och den emotionella bågen, vilket framgår av berättelsens flöde i de tekniska signalerna, är också viktigt. Videons framgång är också beroende av att återskapa artistens leveranstiming.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "e032dcf1-a6c4-4d4e-8723-0af055778253",
@@ -4650,7 +4788,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video's concept, involving a customer confusing a cashier to obtain a free item, has moderate replicability. While the core premise is a common scenario, replicating it effectively requires a point-of-sale system, trained staff to act, and actors with moderate talent. The video's post-production and equipment needs are moderate. The pacing is manageable, but replicating the timing and payoff requires careful planning."
+    "replicability_analysis": "Konceptet i den här videon, där en kund förvirrar en kassörska för att få en gratis vara, har måttlig replikerbarhet. Medan den centrala premissen är ett vanligt scenario, kräver en effektiv återskapning ett kassasystem, utbildad personal som kan agera, samt skådespelare med en viss talang. Videons efterproduktion och utrustningsbehov är måttliga. Tempot är hanterbart, men att återskapa tajmingen och utdelningen kräver noggrann planering.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "ca3f6e66-50fa-448d-9064-12ebf0c4c22e",
@@ -4710,7 +4850,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept has moderate replicability. It requires 2-3 actors comfortable on camera and some planning for setup, suggesting a need for moderate talent and execution skill. The video can be filmed at any restaurant or cafe, but the humor relies on a specific narrative flow, indicating timing complexity. Limited equipment is needed, and post-production demands are low. Brand equity is not a significant factor."
+    "replicability_analysis": "Detta videokoncept har måttlig replikerbarhet. Det kräver 2-3 skådespelare som är bekväma framför kameran och viss planering inför inspelningen, vilket tyder på ett behov av måttlig talang och exekveringsförmåga. Videon kan filmas på vilken restaurang eller café som helst, men humorn bygger på ett specifikt berättelseflöde, vilket indikerar komplexitet i timing. Begränsad utrustning behövs, och kraven på efterproduktion är låga. Varumärkeskapital är inte en betydande faktor.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "612db729-9478-4638-8642-b23d59261d75",
@@ -4770,7 +4912,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The replicability of this video concept presents moderate challenges. While the core premise of offering a choice and then subverting it is relatively simple, the humor relies heavily on the employee's lack of English proficiency, potentially limiting its direct translation to other languages without adaptation, such as dubbing. Replicating the video requires a restaurant setting and a performer capable of portraying a friendly and agreeable demeanor. The equipment and post-production needs are minimal, however the concept difficulty and talent requirements are moderately high, indicated by a score of 5 each, suggesting some creative interpretation or higher skill level may be required. The location dependency also adds a moderate challenge. Overall replicability score is 3.25."
+    "replicability_analysis": "Återskapbarheten av detta videoklippskoncept innebär måttliga utmaningar. \n\nÄven om kärnpremissen är relativt enkel, förlitar sig humorn starkt på medarbetarens bristande engelskkunskaper. Detta kan potentiellt begränsa en direkt replikering till andra språk, då samma koncept (av att en medarbetare inte kan språket och kan utnyttjas) inte fungerar fullt lika bra. Förmodligen kräver det en skådespelare som kan antas inte kunna språket.\n\nFör att återskapa videon krävs en restaurangmiljö och en skådespelare som kan förmedla en vänligt och tillmötesgående personlighet. \n\nUtrustnings- och efterproduktionsbehoven är minimala och behöver sammansättning av två klipp.",
+    "translation_status": "verified"
   },
   {
     "video_id": "60bd19a1-90fa-4f1d-8800-576d5633eb5b",
@@ -4830,7 +4973,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The video's concept, involving a humorous scenario of customers excessively trying to pay, presents moderate replicability challenges. It requires a cast of three, including staff members who need moderate acting skills. Execution necessitates an indoor setting, such as a café or restaurant, impacting location dependency. While the script is relatively simple, replicating the physical humor relies on precise timing, contributing to moderate execution skill and timing complexity. The video's replicability also depends on access to some equipment and moderate post-production capabilities. Finally, the concept difficulty requires the ability to create a situation where generosity becomes a comedic burden."
+    "replicability_analysis": "Videons koncept, som involverar ett humoristiskt scenario där kunder överdrivet försöker betala, presenterar låg-till-måttliga utmaningar gällande reproducerbarhet. \n\nDet kräver en rollbesättning på tre, inklusive en central figur som spelar den irriterade restaurangmedarbetaren. Genomförandet kräver en inomhusmiljö, exempelvis ett café eller en restaurang\n\nKonceptet saknar manus, i form av dialog eller annan \"rörelse\" (nya scener, eller utveckling av scenen) vilket gör reproduktionen relativt enkel, men humorn förlitar sig på en viss grad fysisk humor, i form av ansiktsuttryck och synlig irritation. Det skapar ett behov för måttlig komplexitet i framförande men framförallt förväntningar i arbetaren som ska spela ut rollen - att denne gör det med inlevelse och timing.\n\nPostproduktionen är simpel, då en skärmtext appliceras.",
+    "translation_status": "verified"
   },
   {
     "video_id": "ccdd28c8-f80a-4962-8951-7395ccd85b28",
@@ -4890,7 +5034,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept, while having an overall replicability score of 4.125, presents moderate challenges for broader adoption. The core idea is dependent on a coffee shop setting and requires a performer comfortable exaggerating their personality on camera, indicating high talent requirements (5/5) and location dependency (5/5). Replicating the video’s humor may require careful consideration to ensure it aligns with different brand tones. The video's success relies on the performer's \"larger than life\" personality. The post-production level (4/5) and use of music also increase the complexity of replication. Adjustments to the setting may be required based on individual business needs."
+    "replicability_analysis": "Detta koncept är inte allt för svårt att återskapa för en liknande verksamhet. Förmodligen kommer det gå lättare för caféer eller restauranger, där det antas serveras mat som ibland kan bli fotat för sociala medier (t.ex. Instagram).\n\nFör att återskapa videon behövs en kund i en miljö som ser relativt publik/öppen ut. Det behövs också ett godkännande från resten av gästerna att möjligen medverka i klippet, vilket skapar en liten tröskel.\n\nUtöver det behövs det inte alltför avancerad klippning. Videon är två scener ihopklippta. Konceptet kan dra nytta av en skådespelare som är bekväm med att överdriva sin personlighet framför kameran (spela cool/självsäker), vilket fungerar oberoende av kön eller ålder. Humorn spelar mycket på bygger på medarbetarens \"larger than life\"-personlighet. Användningen av musik skapar också lite av ett lager i komplexiteten i replikeringen. Justeringar av miljön kan krävas baserat på individuella verksamhetsbehov.",
+    "translation_status": "verified",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "185a486a-a923-4513-84cd-51b0bd0f8a5d",
@@ -4950,7 +5096,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video presents a fairly replicable sketch concept, indicated by an overall replicability score of 3.4. Replicating the video would require a café setting and two actors, with talent requirements rated a 4. While the concept itself is not highly original, the video's execution relies on coordinated timing, particularly concerning the reaching hands, which adds complexity. Production values are moderate, with decent visual clarity and sound design which will necessitate appropriate equipment. Timing complexity is another factor to consider as this is rated a 4."
+    "replicability_analysis": "Konceptet som presenteras i videon är relativt enkelt att replikera, vilket indikeras av det övergripande replikerbarhetsvärdet på 3.4. För att replikera videon krävs en cafémiljö och två skådespelare, där kraven på talang bedöms till 4. Även om konceptet i sig inte är särskilt originellt, bygger videons utförande på koordinerad timing, särskilt vad gäller de sträckande händerna, vilket ökar komplexiteten. Produktionsvärdet är medelhögt, med god visuell tydlighet och ljuddesign, vilket kräver lämplig utrustning. Timingkomplexiteten är också en faktor att beakta, då den är graderad till 4.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "50b7707b-1a29-4b35-af3c-10a5cc58a526",
@@ -5010,7 +5158,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept presents moderate replicability challenges. Replicating the video will necessitate a restaurant location and talent capable of comedic timing. The high cuts-per-minute suggest a need for advanced editing skills in post-production, including text overlays to match the dialogue. While the core concept is not overly complex, achieving a similar level of production polish, as suggested by the high audio quality and visual clarity scores, will require more sophisticated equipment than a basic phone camera setup."
+    "replicability_analysis": "Det här videokonceptet innebär måttliga utmaningar gällande replikerbarhet. Att återskapa videon kräver en restaurangmiljö och skådespelare med förmåga till komisk timing. Det höga antalet klipp per minut indikerar ett behov av avancerade redigeringskunskaper i efterproduktionen, inklusive textöverlagringar för att matcha dialogen. Även om kärnkonceptet inte är alltför komplext, kommer det att krävas mer sofistikerad utrustning än en grundläggande mobilkamera för att uppnå en liknande nivå av produktionskvalitet, vilket antyds av de höga poängen för ljudkvalitet och visuell tydlighet.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "575ad7b0-8f93-4ae8-9a0a-812493bc12b1",
@@ -5070,7 +5220,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video's concept presents moderate replicability challenges. While equipment needs are minimal, successful replication requires medium execution skill for the acting and charismatic performers. The concept is moderately difficult due to the need for a specific tone and good delivery timing. Post-production demands are relatively high. The reliance on a specific restaurant location and the need for two actors also contribute to the replicability score."
+    "replicability_analysis": "Konceptet för den här videon har måttliga utmaningar gällande replikerbarhet. Utrustningsbehoven är minimala, men en framgångsrik replikering kräver en viss skådespelartalang och karismatiska skådespelare. Konceptet är måttligt svårt eftersom det kräver en specifik ton och bra timing. Efterproduktionen ställer relativt höga krav. Beroendet av en specifik restaurangplats och behovet av två skådespelare bidrar också till replikerbarheten.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "a20973fd-80b4-4818-ad9f-1f47ce8fdeff",
@@ -5130,7 +5282,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The replicability of this video concept is moderate. It requires a group of approximately 3-4 people to portray a believable friend dynamic and restaurant staff. The concept difficulty is rated relatively high at 5/10, and talent requirements are present, as successful execution depends on the actors' on-camera presence to sell the absurdist humor. While the payoff is rated as \"earned,\" replicating this effect will depend on precise delivery timing. Production-wise, the post-production level is 4/5, suggesting basic editing skills are needed. Location dependency is a significant factor, necessitating access to a restaurant setting, including the kitchen. The high visual clarity (9/10) and adequate sound design (7/10) indicated in the technical signals suggest decent equipment is necessary to match the original's quality."
+    "replicability_analysis": "Konceptets replikerbarhet bedöms som måttlig. Det kräver en grupp på cirka 3-4 personer för att trovärdigt porträttera en vänskapsdynamik och restaurangpersonal. Konceptets svårighetsgrad är relativt hög, uppskattad till 5/10, och det ställs krav på skådespelartalanger eftersom framgångsrik genomförande beror på skådespelarnas närvaro framför kameran för att sälja den absurda humorn. Även om utdelningen bedöms som \"förtjänad\" kommer replikeringen av denna effekt att bero på exakt timing i leveransen. Produktionsmässigt ligger postproduktionsnivån på 4/5, vilket tyder på att grundläggande redigeringskunskaper krävs. Platsberoendet är en betydande faktor och kräver tillgång till en restaurangmiljö, inklusive köket. Den höga visuella klarheten (9/10) och adekvata ljuddesignen (7/10) som indikeras i de tekniska signalerna antyder att anständig utrustning är nödvändig för att matcha originalets kvalitet.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "7c3d0150-d2ca-40dc-8597-c10cdda9ec72",
@@ -5190,7 +5344,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The video concept, which involves asking people to guess the price of a menu item in exchange for a chance to win it, has moderate replicability. Replicating the video would require a suitable product and setting, a comfortable employee to conduct the interviews, and the willingness to offer the product as a prize. While the editing is described as simple, the number of shots suggests that time investment in post-production is needed. The talent requirement is rated as a 5, indicating the need for someone with on-screen presence and ability to engage with the public, which may introduce challenges. The concept is also location dependent, as it requires filming in a public space near the restaurant. The hook relies on a question and the payoff is a punchline, both of which must be carefully crafted to maintain audience attention, as indicated by the attention retention score of 8."
+    "replicability_analysis": "Konceptet för videon, som går ut fråga främlingar vad de tror en maträtt kostar i utbyte mot chansen att vinna den, har måttlig replikerbarhet. \n\nFör att replikera videon krävs en lämplig produkt och miljö, en bekväm medarbetare som kan genomföra intervjuerna, och viljan att hålla i tävlingar (vilket inte är uppskattat av alla typer av verksamheter). \n\nRedigeringen beskrivs som enkel, men antalet tagningar antyder att det krävs en viss tidsinvestering både filmning och efterproduktionen. \n\nFör att intervjua andra och göra videon engagerande är det sannolikt att någon med närvaro framför kameran och förmåga att interagera med allmänheten kan hjälpa mycket, vilket kan medför viss förväntan/utmaning för replikerbarhet. \n\nKonceptet är också platsberoende, eftersom det kräver filmning på en offentlig plats i närheten av restaurangen. Upplägget bygger på en fråga med utdelningen är höjdpunkten, som båda måste utformas noggrant för att behålla publikens uppmärksamhet.",
+    "translation_status": "verified",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "a1c1a481-4774-4840-9965-a35b6900a5e3",
@@ -5250,7 +5406,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The replicability of this video concept, which showcases a new product, is moderate overall. While the core concept of featuring a product with a fantastical element is relatively straightforward, successful replication depends on several factors. It requires moderate equipment for filming and post-production editing skills to achieve the desired dreamy aesthetic, which is rated at level 5. The need for a charismatic on-screen presence also adds to the complexity. Furthermore, the recognizability of the original brand contributes to the video's effectiveness; therefore, replicating the impact may be more challenging for brands with less established equity. The location is not highly specific which decreases the location dependency."
+    "replicability_analysis": "Konceptet för den här videon, som presenterar en ny produkt, har en måttlig replikerbarhet överlag. Medan grundkonceptet att visa upp en produkt med ett fantastiskt element är relativt okomplicerat, beror en framgångsrik replikering på flera faktorer. Det kräver viss utrustning för filmning och redigeringskunskaper för att uppnå den önskade drömlika estetiken, vilket uppskattas till nivå 5. Behovet av en karismatisk närvaro framför kameran bidrar också till komplexiteten. Dessutom bidrar igenkänningsfaktorn för det ursprungliga varumärket till videons effektivitet; därför kan det vara mer utmanande att replikera effekten för varumärken med mindre etablerat värde. Platsen är inte särskilt specifik, vilket minskar platsberoendet.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "361b244a-734b-48bf-98ce-c25bd0d0df98",
@@ -5310,7 +5468,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The video concept, involving writing a letter on food with sauce to prompt viewers to buy a friend a pizza, demonstrates moderate replicability. The execution depends on achieving a specific sauce consistency and requires a location similar to a Domino's environment. While the concept is relatively simple, replicating the video effectively necessitates a moderate level of equipment, acting skill, timing, brand equity, and location control. The post-production level is estimated as basic, and the overall replicability score is 4 out of 10, indicating some challenges in replicating the video for different brands or locations."
+    "replicability_analysis": "Konceptet i videon, som involverar att skriva ett meddelande på mat med sås för att uppmana tittarna att köpa en pizza till en vän, uppvisar måttlig replikerbarhet. Genomförandet är beroende av att uppnå en specifik såskonsistens och kräver en miljö som liknar en Domino's-restaurang. Även om konceptet är relativt enkelt, kräver en effektiv replikering av videon en måttlig nivå av utrustning, skådespelartalang, timing, varumärkeskapital och kontroll över platsen. Nivån på efterproduktionen uppskattas som grundläggande, och den totala replikerbarhetspoängen är 4 av 10, vilket indikerar vissa utmaningar med att replikera videon för olika varumärken eller platser.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "7c811df9-daf0-4221-8e75-3389a0557323",
@@ -5370,7 +5530,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "Videon är sannolikt relativt lätt att återskapa. Video använder tre skådespelare med relativt enkel klippnings mellan dialog och motparternas svar. Konceptet utgår till viss del till premissens styrka, samt manuset, och det är sannolikt inga större problem att spela ut scenariot. Att replikera videon kräver grundläggande video- och ljudutrustning. Framgången för denna videostil kommer att bero mycket på att få naturliga prestationer från skådespelarna."
+    "replicability_analysis": "Videon utspelar sig i en kafé- eller restaurangmiljö. En kvinnlig gäst närmar sig kassan för att betala. En manlig anställd reser sig snabbt och går fram till kassan för att betala för henne. Kvinnan nekar erbjudandet men det slutar med att kassören säger att hennes kort inte fungerar. Detta leder till att mannen nu får möjlighet att betala, vilket han gör på ett resignerat sätt, möjligen för att han enbart vill erbjuda symboliskt istället för på riktigt.\n\nFör att replikera konceptet är en kafé- eller restaurangmiljö med kassa och sitt/ståplatser lämpligt (i detta fall är det bord och stolar, men det är inte nödvändigt för att huvudscenen vid kassan ska fungera bra).\n\nFör att spela in behövs vanlig utrustning, smartphone eller kamera. Vid kassan behövs kassa-apparat och kort. För att spela ut scenen behövs en man och en kvinna, samt kassör. Sannolikt en filmare, men i dessa scener ser det inte ut att vara mer än 2 per inspelning, så det är möjligt att medarbetarna alternerar.\n\nRedigeringen är inte den mest avancerade, och inkluderar enkla klipp mellan olika vinklar. Videon har textöverlägg för dialogtext, och vissa överlägg som är valfria. Detta kan enkelt utföras med mobilappar eller redigeringsprogram.\n\nFör att replikera konceptet behövs inte anpassningar, och deltagarna förväntas inte leverera professionella prestationer. Med lite inlevelse kan de anställda agera ut scenen. Videon är kort och kan filmas och redigeras på kort tid.",
+    "translation_status": "verified"
   },
   {
     "video_id": "ff6e26f5-335e-456c-82c6-e77447d7c4bd",
@@ -5430,7 +5591,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept, which involves posing a question and visually displaying choices, demonstrates moderate replicability. Minimal equipment is needed (phone camera, potential light source), and no on-screen talent is required. Execution necessitates basic photography skills, and the location dependency is moderate, requiring a surface to display the items. Post-production involves adding numbers and text overlays. While the hook is a simple question to encourage engagement, replicating the video requires thoughtful visual presentation and clear textual prompts."
+    "replicability_analysis": "Detta videokoncept, som involverar att ställa en fråga och visuellt visa valmöjligheter, uppvisar måttlig replikerbarhet. Minimal utrustning krävs (telefonkamera, eventuell ljuskälla), och ingen talang framför kameran behövs. Genomförandet kräver grundläggande fotograferingskunskaper, och platsberoendet är måttligt, vilket kräver en yta för att visa föremålen. Efterproduktionen innebär att lägga till siffror och textöverlagringar. Medan kroken är en enkel fråga för att uppmuntra engagemang, kräver replikering av videon genomtänkt visuell presentation och tydliga textprompter.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "4e4f05e0-a0d8-4dbe-ba0b-7ec526895be5",
@@ -5490,7 +5653,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept presents moderate replicability challenges. It requires a minimum of three performers comfortable with comedic timing and mild social risk, and a restaurant setting. Post-production involves simple title cards. The script's humor depends on well-executed delivery timing which may prove difficult to replicate. The narrative flow showcases varied pacing, indicating that timing complexity is important for replicability. Overall, businesses should consider talent availability, location constraints, and the performers' ability to execute the timing-dependent humor."
+    "replicability_analysis": "Detta videokoncept innebär måttliga utmaningar gällande replikerbarhet. Det kräver minst tre skådespelare bekväma med komisk timing och en viss social risktagning, samt en restaurangmiljö. Efterproduktionen innefattar enkla textskyltar. Manuskriptets humor bygger på väl utförd leverans och timing, vilket kan visa sig svårt att återskapa. Det berättande flödet uppvisar varierande tempo, vilket indikerar att komplexiteten i timing är viktig för replikerbarheten. Sammanfattningsvis bör företag beakta tillgången till talang, begränsningar i platsval och skådespelarnas förmåga att utföra den timingberoende humorn.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "36912289-7df1-4da6-a4b0-eb07ab66af25",
@@ -5550,7 +5715,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video's replicability is moderate. The concept is relatable, but requires a restaurant or kitchen setting. The execution depends on an individual comfortable on camera to convincingly portray the initial relaxed state. While the fast pacing and physical humor are engaging, successful replication requires talent with precise comedic timing. The post-production level is moderately demanding, and the location dependency adds to the overall difficulty. Additionally, while not strictly required, the brand benefits from having a light tone."
+    "replicability_analysis": "Konceptet för den här videon är relativt med en enda inspelning som utgör videon (en scen). Klippet är enkelt att återskapa men kräver viss förberedelse i form av att ta fram rekvisita, i detta fall tryckta bilder av medarbetarna som ler. En framgångsrik återskapning förutsätter att medarbetarna har rika och målande ansiktsuttryck som gör deras reaktioner engagerande för tittarna. \n\nEn oengagerad eller icke-animerad insats av medarbetarna kan göra sketchen mindre tilltalande.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "ffbc9f08-7c9f-4031-bdd3-2f26e15266a0",
@@ -5610,7 +5777,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video's concept is relatively replicable, scoring a 4 out of 5 overall. It requires a moderate level of equipment and post-production polish. While the sketch is set in a cafe, the core idea could be adapted to other businesses with customer transactions. Successful execution relies on well-timed physical humor and acting, requiring a moderate level of talent, and the timing complexity is a consideration for replicability. The concept itself is straightforward, not demanding significant creative input, and doesn't necessitate a strong pre-existing brand."
+    "replicability_analysis": "Konceptet i den här videon är relativt enkelt att replikera och får ett helhetsbetyg på 4 av 5. Det kräver en måttlig nivå av utrustning och efterproduktionsarbete. Även om sketchen utspelar sig på ett café, kan kärnidén anpassas till andra verksamheter med kundtransaktioner. Framgångsrik genomförande bygger på väl tajmad fysisk humor och skådespeleri, vilket kräver en viss talang. Tajmingens komplexitet är en faktor att beakta vid replikering. Själva konceptet är okomplicerat, kräver inte betydande kreativt input, och förutsätter inte ett starkt redan existerande varumärke.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "59fd28df-beda-45de-b490-6ca050893333",
@@ -5670,7 +5839,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept, while having a replicable structure centered around a \"POV\" setup and attention-grabbing element, presents moderate replicability challenges overall. Adapting the concept to different service industries requires creativity. The execution necessitates comfortable on-camera presence and expressive storytelling from the talent. While equipment needs are relatively basic (phone, tripod, basic editing), post-production involves timed transitions and text overlays. Replicating the specific setting is not essential, as any venue can adapt the core idea. The video's hook and payoff are effective and the pacing is appropriate which improves replicability."
+    "replicability_analysis": "Detta videokoncept har en replikerbar struktur centrerad kring en \"POV\"-uppställning och uppmärksamhetsfångande element, men innebär måttliga replikeringsutmaningar totalt sett. Att anpassa konceptet till olika servicebranscher kräver kreativitet. Genomförandet kräver bekväm närvaro framför kameran och uttrycksfullt berättande från skådespelarna. Utrustningsbehoven är relativt grundläggande (telefon, stativ, grundläggande redigering), men efterproduktionen involverar tidsanpassade övergångar och textöverlagringar. Att replikera den specifika miljön är inte nödvändigt, eftersom vilken plats som helst kan anpassa kärnidén. Videons \"hook\" och \"payoff\" är effektiva och tempot är lämpligt, vilket förbättrar replikerbarheten.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "80425a1d-0774-48f3-bfa1-81b7f17dbab2",
@@ -5730,7 +5901,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept has moderate replicability, requiring a basic restaurant setting and individuals with some acting skills. The editing is relatively simple, contributing to its replicability. However, successful replication depends on precise execution, due to moderate timing complexity and concept difficulty. Although the video has good production value and clear visuals, replicating this polished look necessitates appropriate equipment and post-production capabilities."
+    "replicability_analysis": "Detta koncept är relativt enkelt att replikera, men passar nog bättre för restauranger för att mat är huvudrekvisitan. En enkel restaurangmiljö och individer med vilja att stå framför kameran behövs. Just denna video använder vissa tekniker under inspelning för att göra videon intressant (zoom ut), men det är inte nödvändigt. Även om videon har god produktionskvalitet kräver vilar inte konceptet på produktionen, utan fungerar utan det mest polerade utseendet.",
+    "translation_status": "verified"
   },
   {
     "video_id": "fc5a19ea-b360-4d1b-9671-1ffe0e8546a0",
@@ -5790,7 +5962,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video presents a replicable concept centered around an absurd customer interaction. Replicating this video requires standard filming equipment and minimal post-production, aligning with its short, sketch-like structure and moderate cut frequency. The concept involves an employee cleaning in a branded work fit being asked if they work at the establishment, with the humor derived from the blatant absurdity. The talent requirement is moderate as it requires some acting. The concept can be adapted to various restaurant or business environments with minimal brand equity needed. However, the success hinges on well-timed delivery and clarity of execution, indicating a moderate level of timing complexity."
+    "replicability_analysis": "Den här videon presenterar ett replikerbart koncept som kretsar kring en absurd kundinteraktion. För att replikera videon krävs vanlig filmningsutrustning och minimal efterproduktion, vilket stämmer överens med dess korta, sketch-liknande struktur och måttliga klippfrekvens. Konceptet bygger på en anställd i arbetskläder med logotyp som städar, och som får frågan om hen arbetar på stället, där humorn kommer från den uppenbara absurditeten. Talangkravet är måttligt eftersom det kräver en viss skådespelartalang. Konceptet kan anpassas till olika restaurang- eller företagsmiljöer med minimalt behov av varumärkeskapital. Framgången beror dock på väl tajmad leverans och tydlighet i utförandet, vilket indikerar en måttlig nivå av timingkomplexitet.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "7269df3d-3e8d-40cf-a919-b77f9387b724",
@@ -5850,7 +6024,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The video concept has an overall replicability score of 4.5, indicating moderate replicability. The concept itself requires some creative input, and successful execution relies on talent with comfortable on-camera presence. While equipment needs are minimal, replication is dependent on securing suitable talent and being filmed at a similar venue, such as a restaurant. The editing appears simple, but the relatively quick pacing, reflected in a moderate cuts-per-minute of 5, requires attention to timing during post-production. The current script is best suited for hamburger chains, limiting its flexibility for other restaurant types."
+    "replicability_analysis": "Videokonceptet har en replikerbarhetspoäng på 4.5, vilket indikerar måttlig replikerbarhet. Själva konceptet kräver en viss kreativ insats, och ett framgångsrikt genomförande förlitar sig på talang med bekväm närvaro framför kameran. Utrustningsbehoven är minimala, men replikering är beroende av att säkra lämplig talang och att filma på en liknande plats, som till exempel en restaurang. Redigeringen verkar enkel, men det relativt snabba tempot, vilket återspeglas i ett måttligt antal klipp per minut på 5, kräver uppmärksamhet på timing under efterproduktionen. Det nuvarande manuset passar bäst för hamburgerkedjor, vilket begränsar dess flexibilitet för andra typer av restauranger.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "af5f10fd-07bc-475f-a983-07d41c8b6d8e",
@@ -5910,7 +6086,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept achieves an overall replicability score of 3.375. It requires moderate equipment and post-production, and relies on employees mimicking a trending sound in a restaurant kitchen or similar setting. The concept itself has medium difficulty, mainly depending on the talent/reactions of the employees. Some attention to timing is required, but the execution appears relatively straightforward. While the core idea is simple, its reliance on staff performance may present a challenge for businesses with different workplace cultures or employee willingness to participate."
+    "replicability_analysis": "Detta videokoncept uppnår en replikerbarhetspoäng på 3.375. Det kräver måttlig utrustning och efterproduktion, och bygger på att anställda efterliknar ett trendigt ljud i ett restaurangkök eller liknande miljö. Konceptet i sig har en medelsvårighetsgrad, huvudsakligen beroende på anställdas talang och reaktioner. Viss uppmärksamhet på timing krävs, men utförandet verkar relativt okomplicerat. Medan kärnidén är enkel, kan beroendet av personalens prestation utgöra en utmaning för företag med olika arbetskulturer eller anställdas villighet att delta.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "ae4475cc-054a-4a39-9662-2ff4f668761f",
@@ -5970,7 +6148,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video presents a concept centered on a common relationship dynamic, specifically splitting the bill, and uses a short-story format. Replicating the video requires moderate resources: minimal equipment, potentially common locations, and average brand equity. However, it also calls for average execution skill, talent requirement, timing complexity, concept difficulty, and post-production level. The location dependency score is also average. While the core idea is broadly applicable, successful replication hinges on performers with appropriate presence and delivery, as well as clarity in the narrative flow, to capture audience attention."
+    "replicability_analysis": "Att replikera videon kräver minimal utrustning, potentiellt en tilltalande inspelningsplats. Viss redigering kan vara användbart i efterhand, men konceptet är inte allt för svårt att återskapa i en restaurang, bar eller café. \n\nAttraktiva eller modernt utklädda personer i klippet kan vara hjälpsamt, då temat handlar om dyr utemat och hur förväntningar skiljer sig mellan två personer.",
+    "translation_status": "verified"
   },
   {
     "video_id": "e1ad2e56-e110-4d9d-9f0e-b9df18ff8b75",
@@ -6030,7 +6209,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video's concept, centered around intense cravings leading to absurdist scenarios, presents moderate replicability. The core idea of exaggerated longing is adaptable to various products or desires, requiring moderate equipment and post-production skills. However, successful replication hinges on the performer's ability to convincingly portray craving and a willingness to address potentially sensitive topics like nicotine dependence. While the script is short, the \"execution skill\" rating is a 3 and the \"talent requirement\" is a 4 which means that the performer's timing and delivery are crucial to the comedic effect. The concept difficulty is rated a 6, so although the idea is easily stated, the execution might be harder than it seems."
+    "replicability_analysis": "Konceptet för den här videon, som kretsar kring ett intensivt begär som leder till absurda scenarier, har måttlig replikerbarhet. Kärnan i idén, överdrivet sug, kan anpassas till olika produkter eller önskemål, och kräver måttlig utrustning och efterproduktionskunskaper. En framgångsrik återskapning förutsätter dock att skådespelaren på ett övertygande sätt kan porträttera begäret, och en vilja att ta upp potentiellt känsliga ämnen som nikotinberoende. Manuset är kort, men \"execution skill\" är betygsatt med en 3 och \"talent requirement\" en 4, vilket betyder att skådespelarens timing och leverans är avgörande för den komiska effekten. Konceptets svårighetsgrad är en 6:a, så även om idén är lätt att formulera, kan utförandet vara svårare än det verkar.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "97e01077-4e0b-44a7-adf6-3220defbe60c",
@@ -6090,7 +6271,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept, involving an absurdist customer service interaction, has moderate replicability. The core idea is relatively difficult to conceive, requiring a clever twist on a common scenario. While minimal equipment is needed, successful execution relies on performers with some acting skill, specifically for comedic timing. The location is somewhat dependent on the setting, but adaptable. Post-production will require a moderate level of effort. Replicators should be aware that, while the brand equity needed is low, the humor's effectiveness hinges on precise delivery."
+    "replicability_analysis": "Konceptet kan replikeras i olika sammanhang där mat eller dryck serveras, där kundens feedback är synlig (restaurang- eller caféinteriör, eller bar som serverar mat).\n\nFör att replikera videon behövs enkel inspelningsutrustning, någons slags rätt/vara som serveras, samt\n    *   En skådespelare/medarbetare som spelar servitrisen.\n    *   En skådespelare/medarbetare som spelar kunden.\n    *   En person som filmar.\n\nFör målgruppen, som antas vara ett enkelt content-team eller en enskild företagsägare inom restaurangbranchen, anses redigeringen ha medelhög komplexitet.\n\nKlippningen inkluderar enkla klipp mellan scener med skärmtext för att förtydliga dialogen. Funktionen finns i de flesta videoredigeringsprogram (inklusive mobilappar) men behöver lite erfarenhet eller teknikintresse för att fixa. Tempot är snabbt och anpassat för sociala medier, vilket uppnås med enkla klipp och tydliga övergångar.\n\nSvårighetsgraden för replikering bedöms som låg till medel.\n\nPlats, utrustning och redigering är alla relativt enkla och kräver inga dyra resurser. Det som behövs göras korrekt är att få till skådespeleriet och timingen för att humorn ska landa rätt.  \n\nDe komiska pauserna och den oväntade twisten (sparken) är avgörande för effekten. Humorn är lite \"edgy\" och bygger på att bryta förväntningar på ett lättsamt sätt. Det passar inte alla varumärken. Ett företag med en mer formell profil kan ha svårt att implementera detta utan att det känns inautentiskt. Ett företag med en avslappnad och humoristisk varumärkespersonlighet skulle däremot kunna dra nytta av det.\n\nSammanfattningsvis är konceptet enkelt att återskapa rent tekniskt, men kräver viss finess i utförandet och en god förståelse för hur humorn passar företagets varumärke.",
+    "translation_status": "verified",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "ff57932e-7537-493d-8cba-187d36761263",
@@ -6150,7 +6333,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept presents moderate replicability for most restaurants. It requires two actors and a setting resembling a cafe or restaurant patio. While the script is relatively simple, successful execution hinges on comedic timing and engaging acting skills, potentially posing a barrier for businesses preferring single-actor videos or with limited access to talent. Post-production needs are minimal, involving simple editing. The concept avoids reliance on strong brand equity."
+    "replicability_analysis": "Det här videokonceptet erbjuder måttlig replikerbarhet för de flesta restauranger eller caféer. Det kräver två skådespelare och en miljö som liknar ett café eller en restaurangterrass. Även om manuset är relativt enkelt, är framgångsrik implementering beroende av komisk timing, bra produktion och bra editering i efterhand, då manuset får en skjuts av bra klippning.\n\nEngagerande skådespelartalanger hjälper också, vilket potentiellt kan utgöra ett hinder för företag som föredrar enklare koncept med manus som inte kräver flera klippningar fram och tillbaka för att illustrera en dialog. Manuset är lättsamt och därför bör vanlig personal finna det enkelt att delta. Behoven av postproduktion är inte det största, men bidrar till \"konversationens\" flöde med en rapp klippning. Ju fler scener som är korta, och klipps ihop med snabb hastighet, ju mer fokus och erfarenhet kan behövas i post-produktion.",
+    "translation_status": "verified"
   },
   {
     "video_id": "8e16cfa4-6e41-4ae1-ab81-12aa03d53f85",
@@ -6210,7 +6394,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept has moderate replicability, scoring 3.5 overall. The core concept, based on a restaurant setting with customer/employee interaction and dialogue, is easily adapted across various businesses beyond restaurants. Replicating the concept requires a basic set-up, but talent comfortable with interacting as a customer is needed. The post-production level is a 4, so editing is required. The script has been circulating, reducing originality if copied directly, but the concept is repurposable. The narrative flow is rated as rushed, so adjustments to pacing may be needed for optimal replication."
+    "replicability_analysis": "Detta videokoncept har måttlig replikerbarhet och får ett totalbetyg på 3.5. Kärnkonceptet, som bygger på en restaurangmiljö med interaktion och dialog mellan kund och anställd, kan enkelt anpassas till olika verksamheter utöver restauranger. För att replikera konceptet krävs en grundläggande uppsättning, men även skådespelartalang som är bekväm med att interagera som kund. Efterproduktionsnivån ligger på 4, vilket innebär att redigering krävs. Manuset har cirkulerat, vilket minskar originaliteten vid direkt kopiering, men konceptet kan återanvändas. Det narrativa flödet bedöms som forcerat, så justeringar av tempot kan behövas för optimal replikering.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "f977f002-fe3d-4efa-ad42-1e4161960f3c",
@@ -6270,7 +6456,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept, which stages a hostage negotiation scenario using menu items, has moderate replicability. While the core idea is relatively straightforward, successful replication depends on several factors. The concept difficulty is high, requiring a restaurant setting, some creativity to adapt the script to different menu items, and engaging acting with good comedic timing, presenting a notable talent requirement. While the editing is relatively simple, post-production is still a factor. The equipment needs are moderate, and the location dependency is present as a restaurant is needed to replicate the setting."
+    "replicability_analysis": "Konceptet i den här videon, som iscensätter ett gisslandrama med hjälp av menyalternativ, har måttlig replikerbarhet. Kärnidén är relativt okomplicerad, men en lyckad replikering beror på flera faktorer. Konceptets svårighetsgrad är hög och kräver en restaurangmiljö, en viss kreativitet för att anpassa manuset till olika menyalternativ och engagerat skådespeleri med god komisk timing, vilket ställer ett märkbart krav på talang. Redigeringen är relativt enkel, men efterproduktionen är fortfarande en faktor. Utrustningsbehoven är måttliga och platsberoendet är närvarande eftersom en restaurang behövs för att återskapa miljön.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "9d153139-740c-4ca3-8bcb-9c0a8a3e55dc",
@@ -6330,7 +6518,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The replicability of this video concept is moderate, with an overall score of 4 out of 5. The concept itself is relatively simple, requiring a restaurant setting, actors, and standard video equipment. However, the humor relies on a specific meme and the misinterpretation of a phrase, which presents potential challenges for adaptation across different languages and audiences. Furthermore, the reliance on a \"very beautiful young woman\" adds a talent requirement that may increase difficulty. The post-production level is moderate, and while the technical signals indicate good audio and visual clarity, achieving a similar level of polish may require some investment in equipment."
+    "replicability_analysis": "Själva konceptet är relativt enkelt och kräver en restaurangmiljö, en medarbetare och två barn/ungdomar. Humorn bygger emellertid på ett specifikt meme och interaktion med ungdomar, vilket kan innebära potentiella utmaningar vid anpassning till olika språk och målgrupper. \n\nKlippningen är inte alltför avancerad och manuset är relativt enkelt. Postproduktionsnivån är moderat, och även om de tekniska signalerna indikerar god ljud- och bildkvalitet, kan det krävas viss investering i utrustning för att uppnå en liknande nivå av kvalitet.",
+    "translation_status": "verified"
   },
   {
     "video_id": "2c8f0777-3fed-4ebc-a608-733613136bc1",
@@ -6390,7 +6579,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept presents moderate replicability challenges for other restauranteurs. While the core idea of an over-serious cashier focusing on condiment choice in a restaurant setting is simple, relying on a pre-existing inside joke may limit its broader appeal. Additionally, although the structured data suggests relatively straightforward acting and editing, the \"General Notes\" indicate that production value is important to the concept's success. The Technical Signals confirm decent production polish, including sound design and color grading, which would require comparable equipment and post-production skill. The structured replicability data highlights the need for a restaurant setting, customer, and basic prop."
+    "replicability_analysis": "Detta videokoncept är relativt enkelt att replicera men skapar en viss förväntan genom dess sketchutformning, att två karaktärer samspelar och att editeringen ger mycket av subtexten av vad som sägs under ytan.\n\nFör att återskapa videon behöver skådespelarna (personalen) ha en viss förmåga att tala med ansiktsuttyck, och klippningen bidrar också till den någorlunda seriösa och konfrontativa känslan som finns i videon. \n\nKärnidén av att en seriös kassör är bråkig med en kund, rörande medtagen ketchup som kunden vill lägga på sin mat, är absurdisk och är inte den svåraste att återskapa. En viss kulturell anpassningsbarhet är möjlig här, för verksamheter som vill återskapa klippet, är det relevant att förstå om rekvisitan som används är något som av rimlighet kan göra kassören upprörd - ett liknande exempel vore en barista som ser att en kund vill hälla i egenhämtad chokladmjölk i sin dyra espresso, eller en pizzeria som ser att kunden vill äta pizza med egenhämtad ananas (båda provocerande). \n\nReplicerbarhet i skådespeleri och redigering är måttlig. Klippet använder skärmtext för att beskriva kommunikationen mellan karaktärerna, och saknar dialog. Videon har inte så många scener, men drar nytta av bra klippning mellan scenerna. Produktionsvärde är viktigt för konceptets framgång. De tekniska signalerna bekräftar en hyfsad produktionsmässig finish, inklusive ljuddesign och färgkorrigering, och konceptet lutar någorlunda mycket på just dessa aspekter. Konceptet kan repliceras, men kan dra nytta av god editering, och även jämförbar utrustning och efterbearbetningskunskaper.",
+    "translation_status": "verified"
   },
   {
     "video_id": "c1fe47f6-0f2d-407e-8dd9-6504fd8cf861",
@@ -6450,7 +6640,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video concept presents moderate replicability challenges. It requires a restaurant or fast-food setting and at least one actor comfortable with on-camera presence. The script involves physical comedy and humor reliant on precise timing, which could be difficult to reproduce consistently. While the post-production level is moderate, the concept is location-dependent, requiring a physical space similar to the original. The success also relies on a specific type of talent, specifically a young, visually engaging person."
+    "replicability_analysis": "Detta videokoncept innebär måttliga utmaningar gällande replikerbarhet. Det kräver en restaurang- eller snabbmatsmiljö och minst en skådespelare som är bekväm med att agera framför kameran. Manuset innehåller fysisk komedi och humor som bygger på exakt timing, vilket kan vara svårt att återskapa konsekvent. Även om efterproduktionen är på en måttlig nivå, är konceptet platsberoende och kräver ett fysiskt utrymme som liknar originalet. Framgången är också beroende av en specifik typ av talang, särskilt en ung, visuellt engagerande person.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "6922f2e3-3d6d-4f8c-9c22-ec4638ebe8d7",
@@ -6510,7 +6702,9 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "The replicability of this video concept is moderate, primarily due to the restaurant setting and ingredient sourcing requirements. While the core concept of loaded fries is common, the specific toppings and presentation contribute to its uniqueness, potentially making exact replication challenging. Replicating the video would necessitate a commercial kitchen environment and the ability to source similar food ingredients. The video's execution demands at least basic cooking skills. While post-production is minimal, replicating the production value and editing to effectively sell the concept may require equipment to get the visual clarity of 8."
+    "replicability_analysis": "Konceptets replikerbarhet är måttlig, främst på grund av restaurangmiljön och kraven på ingredienser. Medan grundidén med \"loaded fries\" är vanligt förekommande, bidrar de specifika tillbehören och presentationen till dess unikhet, vilket potentiellt gör en exakt replikering utmanande. För att replikera videon krävs en kommersiell köksmiljö och möjligheten att anskaffa liknande råvaror. Videons genomförande kräver åtminstone grundläggande matlagningskunskaper. Efterproduktionen är minimal, men för att replikera produktionsvärdet och redigeringen för att effektivt sälja konceptet kan utrustning krävas för att uppnå en visuell klarhet motsvarande 8.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   },
   {
     "video_id": "cf783359-047d-4e6d-bf7e-8af7ef0d0f6a",
@@ -6570,6 +6764,8 @@
       },
       "schema": "v1.1-sigma"
     },
-    "replicability_analysis": "This video's concept has moderate replicability, requiring average levels of equipment, execution skill, and post-production effort. The primary challenge lies in securing talent capable of delivering a natural on-camera performance within a customer service environment, as a strong opening hook with a pattern interrupt is present. Although the concept is generally accessible to establishments with front-facing staff, the timing complexity involved may be a barrier. The original angle of the video concept, based on a trending topic, is highly dependent on the audience to catch the reference and may influence concept difficulty, brand equity, and location dependency."
+    "replicability_analysis": "Konceptet i den här videon har måttlig replikerbarhet och kräver genomsnittliga nivåer av utrustning, utförandeförmåga och efterproduktionsarbete. Den största utmaningen ligger i att säkra talanger som kan leverera ett naturligt framträdande framför kameran i en kundtjänstmiljö, eftersom det finns en stark inledande krok med ett mönsteravbrott. Även om konceptet i allmänhet är tillgängligt för verksamheter med personal som möter kunder, kan den timingkomplexitet som involveras vara ett hinder. Den ursprungliga vinkeln på videokonceptet, baserat på ett trendigt ämne, är starkt beroende av att publiken fångar referensen och kan påverka konceptets svårighetsgrad, varumärkesvärde och platsberoende.",
+    "translation_status": "auto-generated",
+    "translation_source_model": "gemini-2.0-flash"
   }
 ]

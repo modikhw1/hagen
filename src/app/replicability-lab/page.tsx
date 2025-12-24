@@ -6,6 +6,7 @@ export default function ReplicabilityLab() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [analysis, setAnalysis] = useState('');
+  const [originalAnalysis, setOriginalAnalysis] = useState('');
   const [feedback, setFeedback] = useState('');
   const [status, setStatus] = useState('');
 
@@ -16,9 +17,35 @@ export default function ReplicabilityLab() {
       const res = await fetch('/api/replicability/random');
       const json = await res.json();
       setData(json);
-      setAnalysis(json.replicability_analysis || '');
+      
+      const original = json.replicability_analysis || '';
+      setOriginalAnalysis(original);
+
+      // Fetch Model Prediction
+      setStatus('Kör modellen (Vertex AI)...');
+      try {
+        const predRes = await fetch('/api/replicability/predict', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ video_id: json.video_id })
+        });
+        
+        if (predRes.ok) {
+            const predJson = await predRes.json();
+            setAnalysis(predJson.analysis); // Set as default
+            setStatus('Modellens analys laddad.');
+        } else {
+            console.error("Prediction failed");
+            setAnalysis(original); // Fallback
+            setStatus('Kunde inte köra modellen. Visar original.');
+        }
+      } catch (predErr) {
+          console.error(predErr);
+          setAnalysis(original);
+          setStatus('Fel vid modellkörning.');
+      }
+
       setFeedback('');
-      setStatus('');
     } catch (e) {
       console.error(e);
       setStatus('Fel vid laddning av video.');
@@ -162,6 +189,15 @@ export default function ReplicabilityLab() {
                     <div className="flex justify-between items-center mb-2">
                         <h2 className="text-lg font-semibold text-blue-900">Nuvarande Analys</h2>
                         <div className="flex gap-2">
+                            {originalAnalysis && analysis !== originalAnalysis && (
+                                <button 
+                                    onClick={() => setAnalysis(originalAnalysis)}
+                                    className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded hover:bg-gray-200 transition-colors"
+                                    title="Återställ till sparad version"
+                                >
+                                    ↺ Original
+                                </button>
+                            )}
                             <button 
                                 onClick={handleTranslate}
                                 disabled={loading || !analysis}
@@ -169,7 +205,19 @@ export default function ReplicabilityLab() {
                             >
                                 🇸🇪 Översätt
                             </button>
-                            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Modellens utkast</span>
+                            {data.translation_status === 'verified' ? (
+                                <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full border border-green-200 flex items-center gap-1">
+                                    ✅ Verifierad
+                                </span>
+                            ) : data.translation_status === 'auto-generated' ? (
+                                <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full border border-purple-200 flex items-center gap-1">
+                                    🤖 Auto-genererad
+                                </span>
+                            ) : (
+                                <span className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded-full border border-gray-200">
+                                    Utkast
+                                </span>
+                            )}
                         </div>
                     </div>
                     <p className="text-xs text-gray-500 mb-4">Detta är vad modellen tror just nu. Redigera direkt eller använd feedback-loopen nedan.</p>
