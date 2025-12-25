@@ -36,7 +36,7 @@ const CONFIG = {
   outputPath: path.join(__dirname, '../datasets/fine-tuning'),
   
   // Versioning
-  version: 'v1-multimodal'
+  version: 'v2-multimodal'
 };
 
 const ANALYSIS_PROMPT = `Analysera denna video ur ett replikerbarhetsperspektiv.

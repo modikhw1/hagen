@@ -6,7 +6,7 @@ import { GoogleAuth } from 'google-auth-library';
 const CONFIG = {
   projectId: '1061681256498', // Project Number/ID
   location: 'us-central1',
-  endpointId: '5258813482559602688', // The deployed Endpoint ID
+  endpointId: '4053959844749639680', // The deployed Endpoint ID (v2 - Checkpoint 4)
 };
 
 const ANALYSIS_PROMPT = `Analysera denna video ur ett replikerbarhetsperspektiv.
