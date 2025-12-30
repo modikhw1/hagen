@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
       throw new Error(errorMessage);
     }
 
-    tempFilePath = downloadResult.filePath;
+    tempFilePath = downloadResult.filePath ?? null;
     
     if (!tempFilePath || !fs.existsSync(tempFilePath)) {
       throw new Error('Download appeared successful but file is missing');

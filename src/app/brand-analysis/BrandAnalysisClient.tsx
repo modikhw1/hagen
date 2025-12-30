@@ -393,7 +393,7 @@ export default function BrandAnalysisClient() {
     };
 
     // Merge into existing patch (user edits win after merge)
-    setSchemaV1HumanPatch((prev) => deepMerge(patch, prev));
+    setSchemaV1HumanPatch((prev) => deepMerge(patch, prev) as Record<string, unknown> | null);
   }, [selectedVideo]);
 
   const [uploadingGcs, setUploadingGcs] = useState(false);
@@ -771,11 +771,11 @@ export default function BrandAnalysisClient() {
   };
 
   const modelObservation = getModelObservation(schemaV1ModelAnalysis);
-  const effectiveObservation = deepMerge(modelObservation, schemaV1HumanPatch);
-  const effectiveSignals = effectiveObservation?.signals;
+  const effectiveObservation = deepMerge(modelObservation, schemaV1HumanPatch) as Record<string, unknown> | null;
+  const effectiveSignals = effectiveObservation?.signals as Record<string, any> | undefined;
   const effectiveEvidence: any[] = Array.isArray(effectiveObservation?.evidence) ? effectiveObservation.evidence : [];
   const effectiveUncertainties: string[] = Array.isArray(effectiveObservation?.uncertainties)
-    ? effectiveObservation.uncertainties
+    ? effectiveObservation.uncertainties as string[]
     : [];
 
   const addEvidenceItem = () => {

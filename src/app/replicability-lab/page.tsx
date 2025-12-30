@@ -273,7 +273,7 @@ export default function ReplicabilityLab() {
 
                 <div className="bg-yellow-50 p-6 rounded-xl border border-yellow-200">
                     <h2 className="text-lg font-semibold mb-2 text-yellow-900">Feedback Loop</h2>
-                    <p className="text-sm text-yellow-800 mb-3">Vad är fel med analysen ovan? (t.ex. "För vagt", "Missade ljudet", "För formellt")</p>
+                    <p className="text-sm text-yellow-800 mb-3">Vad är fel med analysen ovan? (t.ex. &quot;För vagt&quot;, &quot;Missade ljudet&quot;, &quot;För formellt&quot;)</p>
                     
                     <textarea 
                         value={feedback}
