@@ -38,6 +38,36 @@ export default function FineTuningLab() {
     recentAdditions: number;
   } | null>(null);
   const [showStats, setShowStats] = useState(false);
+  const [prefetchedAnalysis, setPrefetchedAnalysis] = useState<{ url: string; analysis: string } | null>(null);
+  const [prefetching, setPrefetching] = useState(false);
+
+  // Prefetch next video in background
+  const prefetchNext = async (nextIndex: number) => {
+    if (nextIndex >= queue.length) return;
+    const nextUrl = queue[nextIndex].url;
+
+    // Don't prefetch if already prefetched this URL
+    if (prefetchedAnalysis?.url === nextUrl) return;
+
+    console.log('Prefetching:', nextUrl);
+    setPrefetching(true);
+    try {
+      const res = await fetch('/api/fine-tuning/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: nextUrl })
+      });
+      const data = await res.json();
+      if (data.analysis) {
+        setPrefetchedAnalysis({ url: nextUrl, analysis: data.analysis });
+        console.log('Prefetched ready:', nextUrl);
+      }
+    } catch (e) {
+      console.error('Prefetch failed:', e);
+    } finally {
+      setPrefetching(false);
+    }
+  };
 
   // Fetch dataset stats on mount and after saves
   useEffect(() => {
@@ -131,28 +161,40 @@ export default function FineTuningLab() {
   };
 
   const handleSave = async () => {
-    if (!draft) return;
+    console.log('handleSave called. draft:', !!draft, 'url:', url);
+    if (!draft) {
+      console.log('No draft, returning early');
+      return;
+    }
     setLoading(true);
     setStatus('Saving to dataset...');
 
     try {
+      console.log('Fetching /api/fine-tuning/save...');
       const res = await fetch('/api/fine-tuning/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url, analysis: draft })
       });
 
+      console.log('Save response status:', res.status);
       if (!res.ok) throw new Error('Failed to save');
 
       setStatus('Saved successfully! Ready for next video.');
       setSavedCount(prev => prev + 1);
       clearLocalStorage();
-      setUrl('');
-      setDraft('');
 
-      // If in batch mode, move to next
+      // If in batch mode, mark as approved and move to next
+      console.log('Save complete. batchMode:', batchMode, 'queue.length:', queue.length, 'currentQueueIndex:', currentQueueIndex);
       if (batchMode && queue.length > 0) {
+        console.log('Advancing to next in queue...');
+        setQueue(prev => prev.map((item, i) =>
+          i === currentQueueIndex ? { ...item, status: 'approved' } : item
+        ));
         handleNextInQueue();
+      } else {
+        setUrl('');
+        setDraft('');
       }
     } catch (e: any) {
       setStatus(`Error saving: ${e.message}`);
@@ -190,11 +232,14 @@ export default function FineTuningLab() {
   };
 
   // Batch mode: parse URLs and start queue
-  const handleStartBatch = () => {
+  const handleStartBatch = async () => {
+    console.log('handleStartBatch called. batchUrls:', batchUrls);
     const urls = batchUrls
       .split('\n')
       .map(u => u.trim())
       .filter(u => u.startsWith('http'));
+
+    console.log('Parsed URLs:', urls);
 
     if (urls.length === 0) {
       setStatus('No valid URLs found. Paste TikTok URLs, one per line.');
@@ -207,19 +252,83 @@ export default function FineTuningLab() {
     setBatchMode(true);
     setBatchUrls('');
 
-    // Load first URL
-    setUrl(newQueue[0].url);
-    setStatus(`Batch mode: ${urls.length} videos queued. Starting with #1.`);
+    // Load first URL and auto-generate
+    const firstUrl = newQueue[0].url;
+    setUrl(firstUrl);
+    setStatus(`Batch mode: ${urls.length} videos queued. Generating #1...`);
+
+    // Auto-generate for first video too
+    setLoading(true);
+    try {
+      const res = await fetch('/api/fine-tuning/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: firstUrl })
+      });
+      const data = await res.json();
+      if (data.analysis) {
+        setDraft(data.analysis);
+        setStatus(`Batch mode: Video 1 of ${urls.length} - Ready to review`);
+        // Start prefetching next video
+        if (urls.length > 1) {
+          prefetchNext(1);
+        }
+      } else {
+        setStatus(`Batch mode: Video 1 of ${urls.length} - Error: ${data.error || 'Unknown'}`);
+      }
+    } catch (e: any) {
+      setStatus(`Batch mode: Error generating: ${e.message}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Move to next item in queue
-  const handleNextInQueue = () => {
+  const handleNextInQueue = async () => {
     const nextIndex = currentQueueIndex + 1;
     if (nextIndex < queue.length) {
       setCurrentQueueIndex(nextIndex);
-      setUrl(queue[nextIndex].url);
-      setDraft('');
-      setStatus(`Batch mode: Video ${nextIndex + 1} of ${queue.length}`);
+      const nextUrl = queue[nextIndex].url;
+      setUrl(nextUrl);
+
+      // Check if we have prefetched this URL
+      if (prefetchedAnalysis?.url === nextUrl) {
+        console.log('Using prefetched analysis for:', nextUrl);
+        setDraft(prefetchedAnalysis.analysis);
+        setPrefetchedAnalysis(null);
+        setStatus(`Batch mode: Video ${nextIndex + 1} of ${queue.length} - Ready to review (prefetched)`);
+        // Start prefetching the NEXT one
+        if (nextIndex + 1 < queue.length) {
+          prefetchNext(nextIndex + 1);
+        }
+      } else {
+        // No prefetch available, generate now
+        setDraft('');
+        setStatus(`Batch mode: Video ${nextIndex + 1} of ${queue.length} - Generating...`);
+        setLoading(true);
+        try {
+          const res = await fetch('/api/fine-tuning/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: nextUrl })
+          });
+          const data = await res.json();
+          if (data.analysis) {
+            setDraft(data.analysis);
+            setStatus(`Batch mode: Video ${nextIndex + 1} of ${queue.length} - Ready to review`);
+            // Start prefetching next
+            if (nextIndex + 1 < queue.length) {
+              prefetchNext(nextIndex + 1);
+            }
+          } else {
+            setStatus(`Batch mode: Video ${nextIndex + 1} of ${queue.length} - Error: ${data.error || 'Unknown'}`);
+          }
+        } catch (e: any) {
+          setStatus(`Batch mode: Video ${nextIndex + 1} of ${queue.length} - Error: ${e.message}`);
+        } finally {
+          setLoading(false);
+        }
+      }
     } else {
       // Queue complete
       const approved = queue.filter(q => q.status === 'approved').length;
@@ -362,6 +471,9 @@ export default function FineTuningLab() {
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm font-medium text-blue-800">
               Batch Progress: {currentQueueIndex + 1} of {queue.length}
+              {loading && <span className="ml-2 text-blue-600 animate-pulse">⏳ Processing...</span>}
+              {prefetching && !loading && <span className="ml-2 text-green-600 text-xs">🔄 Preloading next...</span>}
+              {prefetchedAnalysis && !loading && <span className="ml-2 text-green-600 text-xs">✓ Next ready</span>}
             </span>
             <button
               onClick={() => { setBatchMode(false); setQueue([]); }}
@@ -376,6 +488,16 @@ export default function FineTuningLab() {
               style={{ width: `${((currentQueueIndex + 1) / queue.length) * 100}%` }}
             />
           </div>
+          {/* Status message */}
+          <div className="mt-2 text-sm text-blue-700">{status}</div>
+        </div>
+      )}
+
+      {/* Loading overlay when processing */}
+      {loading && (
+        <div className="mb-4 p-4 bg-yellow-50 rounded-lg border border-yellow-300 flex items-center gap-3">
+          <div className="animate-spin h-5 w-5 border-2 border-yellow-600 border-t-transparent rounded-full"></div>
+          <span className="text-yellow-800 font-medium">{status || 'Processing...'}</span>
         </div>
       )}
 
