@@ -26,6 +26,58 @@ export interface TunedModelConfig {
   location?: string;
 }
 
+/**
+ * Technical signals from base model (complementary to humor analysis)
+ */
+export interface TechnicalSignals {
+  visual: {
+    hookStrength: number;
+    overallQuality: number;
+    colorDiversity: number;
+    compositionQuality: number;
+  };
+  audio: {
+    quality: number;
+    energyLevel: 'low' | 'medium' | 'high';
+    hasVoiceover: boolean;
+  };
+  technical: {
+    pacing: number;
+    editingStyle: string;
+    duration: number;
+  };
+}
+
+/**
+ * Combined analysis from tuned + base model
+ */
+export interface HybridAnalysis extends HumorAnalysis {
+  technical: TechnicalSignals;
+  usedTunedModel: boolean;
+}
+
+// Technical analysis prompt (compact, for base model)
+const TECHNICAL_PROMPT = `Analyze only the TECHNICAL aspects of this video. Return JSON:
+{
+  "visual": {
+    "hookStrength": <1-10>,
+    "overallQuality": <1-10>,
+    "colorDiversity": <1-10>,
+    "compositionQuality": <1-10>
+  },
+  "audio": {
+    "quality": <1-10>,
+    "energyLevel": "low|medium|high",
+    "hasVoiceover": true/false
+  },
+  "technical": {
+    "pacing": <1-10>,
+    "editingStyle": "quick cuts|slow|medium|mixed",
+    "duration": <seconds>
+  }
+}
+Only return JSON, no explanation.`;
+
 // Analysis prompt - matches what the model was trained on
 const ANALYSIS_PROMPT = `Analysera denna video. Förklara vad som händer och varför det är roligt eller effektivt.
 
@@ -358,11 +410,105 @@ export class TunedGeminiService {
 
   private inferReplicable(text: string): boolean {
     const lower = text.toLowerCase();
-    return lower.includes('replikerbar') || 
-           lower.includes('replicable') || 
+    return lower.includes('replikerbar') ||
+           lower.includes('replicable') ||
            lower.includes('kan upprepas') ||
            lower.includes('format') ||
            lower.includes('mall');
+  }
+
+  /**
+   * Get technical signals using base model
+   * Complements humor analysis with visual/audio/pacing metrics
+   */
+  async getTechnicalSignals(gcsUri: string): Promise<TechnicalSignals> {
+    const model = 'gemini-2.0-flash-001';
+    const endpoint = `${this.apiEndpoint}/projects/${this.projectId}/locations/${this.location}/publishers/google/models/${model}:generateContent`;
+
+    const token = await this.getAccessToken();
+
+    const requestBody = {
+      contents: [{
+        role: "user",
+        parts: [
+          { fileData: { mimeType: "video/mp4", fileUri: gcsUri } },
+          { text: TECHNICAL_PROMPT }
+        ]
+      }],
+      generationConfig: {
+        temperature: 0.1,
+        maxOutputTokens: 512
+      }
+    };
+
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+      });
+
+      if (!response.ok) {
+        throw new Error(`Technical analysis failed: ${await response.text()}`);
+      }
+
+      const result = await response.json();
+      const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+
+      // Parse JSON response
+      const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        return {
+          visual: {
+            hookStrength: parsed.visual?.hookStrength || 5,
+            overallQuality: parsed.visual?.overallQuality || 5,
+            colorDiversity: parsed.visual?.colorDiversity || 5,
+            compositionQuality: parsed.visual?.compositionQuality || 5
+          },
+          audio: {
+            quality: parsed.audio?.quality || 5,
+            energyLevel: parsed.audio?.energyLevel || 'medium',
+            hasVoiceover: parsed.audio?.hasVoiceover ?? false
+          },
+          technical: {
+            pacing: parsed.technical?.pacing || 5,
+            editingStyle: parsed.technical?.editingStyle || 'medium',
+            duration: parsed.technical?.duration || 0
+          }
+        };
+      }
+    } catch (error) {
+      console.error('Technical analysis failed:', error);
+    }
+
+    // Return defaults if analysis fails
+    return {
+      visual: { hookStrength: 5, overallQuality: 5, colorDiversity: 5, compositionQuality: 5 },
+      audio: { quality: 5, energyLevel: 'medium', hasVoiceover: false },
+      technical: { pacing: 5, editingStyle: 'medium', duration: 0 }
+    };
+  }
+
+  /**
+   * Hybrid analysis: Tuned model for humor + Base model for technical signals
+   * Runs both in parallel for efficiency
+   */
+  async analyzeHybrid(gcsUri: string): Promise<HybridAnalysis> {
+    // Run humor and technical analysis in parallel
+    const [humorAnalysis, technicalSignals] = await Promise.all([
+      this.analyze(gcsUri),
+      this.getTechnicalSignals(gcsUri)
+    ]);
+
+    return {
+      ...humorAnalysis,
+      technical: technicalSignals,
+      usedTunedModel: humorAnalysis.usedTunedModel
+    };
   }
 }
 

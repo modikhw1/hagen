@@ -1,8 +1,11 @@
 /**
  * Tuned Model Analysis API
- * 
+ *
  * Endpoint for analyzing videos using the fine-tuned Gemini model.
  * This is the simplified replacement for the 850-line prompt approach.
+ *
+ * Options:
+ *   hybrid: true  - Run both tuned (humor) and base (technical) models in parallel
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -17,7 +20,7 @@ const supabase = createClient(
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { videoId, gcsUri } = body;
+    const { videoId, gcsUri, hybrid = false } = body;
 
     if (!videoId && !gcsUri) {
       return NextResponse.json(
@@ -55,6 +58,39 @@ export async function POST(request: NextRequest) {
 
     // Analyze with tuned model
     const service = new TunedGeminiService();
+
+    // Use hybrid analysis if requested (combines tuned humor + base technical)
+    if (hybrid) {
+      const hybridAnalysis = await service.analyzeHybrid(targetGcsUri);
+
+      // Optionally save to database
+      if (videoId && body.save !== false) {
+        await saveAnalysis(videoId, hybridAnalysis);
+      }
+
+      return NextResponse.json({
+        success: true,
+        videoId,
+        gcsUri: targetGcsUri,
+        usedTunedModel: hybridAnalysis.usedTunedModel,
+        hybrid: true,
+        analysis: {
+          // Humor analysis from tuned model
+          summary: hybridAnalysis.summary,
+          mechanism: hybridAnalysis.mechanism,
+          why_it_works: hybridAnalysis.why_it_works,
+          audience: hybridAnalysis.audience,
+          category: hybridAnalysis.category,
+          quality: hybridAnalysis.quality,
+          replicable: hybridAnalysis.replicable,
+          // Technical signals from base model
+          technical: hybridAnalysis.technical
+        },
+        raw_response: hybridAnalysis.raw_response
+      });
+    }
+
+    // Standard analysis (humor only)
     const analysis = await service.analyze(targetGcsUri);
 
     // Optionally save to database
@@ -67,6 +103,7 @@ export async function POST(request: NextRequest) {
       videoId,
       gcsUri: targetGcsUri,
       usedTunedModel: analysis.usedTunedModel,
+      hybrid: false,
       analysis: {
         summary: analysis.summary,
         mechanism: analysis.mechanism,
