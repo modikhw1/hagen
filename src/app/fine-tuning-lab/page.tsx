@@ -29,7 +29,32 @@ export default function FineTuningLab() {
   const [quickApprovalMode, setQuickApprovalMode] = useState(true);
 
   // Dataset statistics
-  const [datasetStats, setDatasetStats] = useState<{ total: number; byMechanism: Record<string, number> } | null>(null);
+  const [datasetStats, setDatasetStats] = useState<{
+    total: number;
+    bySource: Record<string, number>;
+    byMechanism: Record<string, number>;
+    testSetSize: number;
+    stagingSize: number;
+    recentAdditions: number;
+  } | null>(null);
+  const [showStats, setShowStats] = useState(false);
+
+  // Fetch dataset stats on mount and after saves
+  useEffect(() => {
+    fetchStats();
+  }, [savedCount]);
+
+  const fetchStats = async () => {
+    try {
+      const res = await fetch('/api/fine-tuning/stats');
+      if (res.ok) {
+        const data = await res.json();
+        setDatasetStats(data);
+      }
+    } catch (e) {
+      console.error('Failed to fetch stats:', e);
+    }
+  };
 
   // Load draft from localStorage on mount
   useEffect(() => {
@@ -261,12 +286,75 @@ export default function FineTuningLab() {
       </header>
 
       {/* Keyboard Shortcuts Help */}
-      <div className="mb-4 p-3 bg-gray-50 rounded-lg border text-xs text-gray-600 flex gap-6">
-        <span><kbd className="px-1.5 py-0.5 bg-white border rounded text-gray-700">Ctrl+Enter</kbd> Generate</span>
-        <span><kbd className="px-1.5 py-0.5 bg-white border rounded text-gray-700">Ctrl+S</kbd> Save</span>
-        <span><kbd className="px-1.5 py-0.5 bg-white border rounded text-gray-700">Ctrl+N</kbd> Clear/Next</span>
-        <span><kbd className="px-1.5 py-0.5 bg-white border rounded text-gray-700">Ctrl+R</kbd> Rewrite</span>
+      <div className="mb-4 p-3 bg-gray-50 rounded-lg border text-xs text-gray-600 flex justify-between items-center">
+        <div className="flex gap-6">
+          <span><kbd className="px-1.5 py-0.5 bg-white border rounded text-gray-700">Ctrl+Enter</kbd> Generate</span>
+          <span><kbd className="px-1.5 py-0.5 bg-white border rounded text-gray-700">Ctrl+S</kbd> Save</span>
+          <span><kbd className="px-1.5 py-0.5 bg-white border rounded text-gray-700">Ctrl+N</kbd> Clear/Next</span>
+          <span><kbd className="px-1.5 py-0.5 bg-white border rounded text-gray-700">Ctrl+R</kbd> Rewrite</span>
+        </div>
+        <button
+          onClick={() => setShowStats(!showStats)}
+          className="text-blue-600 hover:text-blue-800 font-medium"
+        >
+          {showStats ? 'Hide Stats' : 'Show Stats'} {datasetStats && `(${datasetStats.total})`}
+        </button>
       </div>
+
+      {/* Dataset Statistics Panel */}
+      {showStats && datasetStats && (
+        <div className="mb-4 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border border-purple-200">
+          <div className="grid grid-cols-4 gap-4 mb-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-purple-700">{datasetStats.total}</div>
+              <div className="text-xs text-gray-600">Total Examples</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-600">+{datasetStats.recentAdditions}</div>
+              <div className="text-xs text-gray-600">Last 7 Days</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-600">{datasetStats.testSetSize}</div>
+              <div className="text-xs text-gray-600">Test Set</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-orange-600">{datasetStats.stagingSize}</div>
+              <div className="text-xs text-gray-600">Staging</div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 text-xs">
+            <div>
+              <div className="font-medium text-gray-700 mb-1">By Source</div>
+              {Object.entries(datasetStats.bySource).map(([source, count]) => (
+                <div key={source} className="flex justify-between text-gray-600">
+                  <span>{source}</span>
+                  <span className="font-mono">{count}</span>
+                </div>
+              ))}
+            </div>
+            <div>
+              <div className="font-medium text-gray-700 mb-1">Top Mechanisms</div>
+              {Object.entries(datasetStats.byMechanism).slice(0, 5).map(([mech, count]) => (
+                <div key={mech} className="flex justify-between text-gray-600">
+                  <span className="capitalize">{mech}</span>
+                  <span className="font-mono">{count}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-3 pt-3 border-t border-purple-200 text-xs text-gray-500">
+            Target: 500 examples for optimal fine-tuning | Progress: {Math.round((datasetStats.total / 500) * 100)}%
+            <div className="w-full bg-purple-200 rounded-full h-1.5 mt-1">
+              <div
+                className="bg-purple-600 h-1.5 rounded-full transition-all"
+                style={{ width: `${Math.min(100, (datasetStats.total / 500) * 100)}%` }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Batch Mode Queue Progress */}
       {batchMode && queue.length > 0 && (
