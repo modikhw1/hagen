@@ -9,25 +9,48 @@ import os from 'os';
 // Configuration
 const DATASET_DIR = path.join(process.cwd(), 'datasets/fine-tuning');
 const TUNED_MODEL_FILE = path.join(DATASET_DIR, 'tuned_model.json');
+const MODEL_VERSIONS_FILE = path.join(DATASET_DIR, 'model_versions.json');
+
+// Load model version config
+function getModelResource(version?: string): { resourceName: string; versionUsed: string } {
+  // Try new versioned config first
+  if (fs.existsSync(MODEL_VERSIONS_FILE)) {
+    const versions = JSON.parse(fs.readFileSync(MODEL_VERSIONS_FILE, 'utf-8'));
+    const targetVersion = version || versions.default || versions.latest;
+    const modelInfo = versions.versions?.[targetVersion];
+
+    if (modelInfo?.endpoint || modelInfo?.model) {
+      return {
+        resourceName: modelInfo.endpoint || modelInfo.model,
+        versionUsed: targetVersion
+      };
+    }
+  }
+
+  // Fallback to legacy single model file
+  if (fs.existsSync(TUNED_MODEL_FILE)) {
+    const modelInfo = JSON.parse(fs.readFileSync(TUNED_MODEL_FILE, 'utf-8'));
+    return {
+      resourceName: modelInfo.endpoint || modelInfo.model,
+      versionUsed: 'legacy'
+    };
+  }
+
+  throw new Error('No tuned model found. Please wait for training to complete.');
+}
 
 export async function POST(req: NextRequest) {
   let tempFilePath: string | null = null;
   let gcsUri: string | null = null;
 
   try {
-    const { url, mode = 'concise' } = await req.json();
+    const { url, mode = 'concise', version } = await req.json();
     if (!url) return NextResponse.json({ error: 'Missing URL' }, { status: 400 });
 
     // 1. Get Tuned Model ID
-    if (!fs.existsSync(TUNED_MODEL_FILE)) {
-      return NextResponse.json({ 
-        error: 'Tuned model not found. Please wait for training to complete.' 
-      }, { status: 503 });
-    }
-    const modelInfo = JSON.parse(fs.readFileSync(TUNED_MODEL_FILE, 'utf-8'));
-    // Use endpoint if available, otherwise fallback to model
-    const resourceName = modelInfo.endpoint || modelInfo.model; 
+    const { resourceName, versionUsed } = getModelResource(version); 
 
+    console.log(`🧪 Using model version: ${versionUsed}`);
     console.log(`🧪 Using Vertex AI resource: ${resourceName}`);
 
     // 2. Download Video
@@ -89,7 +112,18 @@ Format:
 
 Håll det extremt kort. Inget fluff.`;
 
-    const prompt = mode === 'detailed' ? PROMPT_DETAILED : PROMPT_CONCISE;
+    const PROMPT_BALANCED = `Analysera videon. Hitta den faktiska poängen - inte bara beskriv scenen.
+
+Format:
+**Observation:** [Vad i videon stödjer din tolkning? Specifika visuella/auditiva detaljer.]
+**Handling:** [Vad händer och varför det är poängen. Längden ska matcha innehållet - kort om det är enkelt, längre om detaljer är relevanta för förståelsen.]
+**Mekanism:** [Vilken humormekanism används]
+**Varför:** [Varför det fungerar. Om det finns nyanser värda att förklara, ta med dem.]
+**Målgrupp:** [Vem uppskattar detta]
+
+Fokusera på att fånga rätt tolkning. Om ordlek eller flertydighet finns, kontrollera visuella ledtrådar för att avgöra vilken tolkning som gäller.`;
+
+    const prompt = mode === 'detailed' ? PROMPT_DETAILED : mode === 'balanced' ? PROMPT_BALANCED : PROMPT_CONCISE;
 
     const response = await fetch(endpoint, {
       method: 'POST',
@@ -135,10 +169,11 @@ Håll det extremt kort. Inget fluff.`;
       fs.unlinkSync(tempFilePath);
     }
 
-    return NextResponse.json({ 
-      analysis, 
+    return NextResponse.json({
+      analysis,
       gcsUri,
-      model: resourceName.split('/').pop()?.split('@')[0] || 'unknown'
+      model: resourceName.split('/').pop()?.split('@')[0] || 'unknown',
+      version: versionUsed
     });
 
   } catch (error: any) {

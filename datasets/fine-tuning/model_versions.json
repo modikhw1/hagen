@@ -1,0 +1,20 @@
+{
+  "versions": {
+    "v5": {
+      "model": "projects/1061681256498/locations/us-central1/models/3842017983379537920@1",
+      "endpoint": "projects/1061681256498/locations/us-central1/endpoints/442002574854324224",
+      "description": "345 examples (246 TikTok video + 99 Simpsons text)",
+      "trainedAt": "2025-12-30T16:22:37.963Z",
+      "examples": 345
+    },
+    "v6": {
+      "model": "projects/1061681256498/locations/us-central1/models/8219516821183660032@1",
+      "endpoint": "projects/1061681256498/locations/us-central1/endpoints/1135556917469380608",
+      "description": "659 examples (246 TikTok video + 413 Simpsons text)",
+      "trainedAt": "2025-12-30T17:22:28.145Z",
+      "examples": 659
+    }
+  },
+  "default": "v6",
+  "latest": "v6"
+}

@@ -12,12 +12,13 @@ interface QueueItem {
 
 export default function FineTuningLab() {
   const [url, setUrl] = useState('');
-  const [analysisMode, setAnalysisMode] = useState<'concise' | 'detailed'>('concise');
+  const [analysisMode, setAnalysisMode] = useState<'concise' | 'balanced' | 'detailed'>('balanced');
   const [draft, setDraft] = useState('');
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState('');
   const [savedCount, setSavedCount] = useState(0);
   const [modelId, setModelId] = useState('');
+  const [modelVersion, setModelVersion] = useState<'v5' | 'v6'>('v6');
 
   // New state for batch mode
   const [batchMode, setBatchMode] = useState(false);
@@ -60,7 +61,7 @@ export default function FineTuningLab() {
       const res = await fetch('/api/fine-tuning/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: nextUrl })
+        body: JSON.stringify({ url: nextUrl, version: modelVersion })
       });
       const data = await res.json();
       if (data.analysis) {
@@ -125,7 +126,7 @@ export default function FineTuningLab() {
       const res = await fetch('/api/fine-tuning/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url, mode: analysisMode })
+        body: JSON.stringify({ url, mode: analysisMode, version: modelVersion })
       });
       
       const data = await res.json();
@@ -327,7 +328,7 @@ export default function FineTuningLab() {
       const res = await fetch('/api/fine-tuning/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: firstUrl })
+        body: JSON.stringify({ url: firstUrl, version: modelVersion })
       });
       const data = await res.json();
       if (data.analysis) {
@@ -380,7 +381,7 @@ export default function FineTuningLab() {
           const res = await fetch('/api/fine-tuning/generate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url: nextUrl })
+            body: JSON.stringify({ url: nextUrl, version: modelVersion })
           });
           const data = await res.json();
           if (data.analysis) {
@@ -454,10 +455,15 @@ export default function FineTuningLab() {
           </p>
         </div>
         <div className="text-right">
-          <div className="text-xs font-mono text-gray-400">Current Model</div>
-          <div className="text-sm font-medium text-green-600">
-            {modelId ? `v4 (${modelId.slice(-4)})` : 'Ready'}
-          </div>
+          <div className="text-xs font-mono text-gray-400 mb-1">Model Version</div>
+          <select
+            value={modelVersion}
+            onChange={(e) => setModelVersion(e.target.value as 'v5' | 'v6')}
+            className="text-sm font-medium border rounded px-2 py-1 bg-white"
+          >
+            <option value="v5">v5 (345 ex)</option>
+            <option value="v6">v6 (659 ex)</option>
+          </select>
           <div className="text-xs text-gray-400 mt-1">
             Session: {savedCount} saved
           </div>
@@ -618,10 +624,11 @@ export default function FineTuningLab() {
             )}
             <select
               value={analysisMode}
-              onChange={(e) => setAnalysisMode(e.target.value as 'concise' | 'detailed')}
+              onChange={(e) => setAnalysisMode(e.target.value as 'concise' | 'balanced' | 'detailed')}
               className="border rounded px-3 py-2 bg-white text-sm"
             >
               <option value="concise">Short & Sharp</option>
+              <option value="balanced">Balanced (recommended)</option>
               <option value="detailed">Detailed Analysis</option>
             </select>
             <button

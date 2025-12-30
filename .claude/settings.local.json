@@ -41,7 +41,15 @@
       "Bash(for f in datasets/fine-tuning/replicability*.jsonl)",
       "Bash(comm:*)",
       "Bash(node scripts/fine-tune-gemini.js:*)",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "Bash(curl:*)",
+      "WebSearch",
+      "WebFetch(domain:dn721601.ca.archive.org)",
+      "Bash(gunzip:*)",
+      "Bash(node scripts/download-simpsons-scripts.js:*)",
+      "Bash(node -e:*)",
+      "Bash(grep:*)",
+      "Bash(\"C:\\\\Users\\\\Ibnadmin\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\python.exe\" -m yt_dlp --no-cache-dir --no-playlist --format \"best[ext=mp4]/best\" --max-filesize 104857600 --output \"C:/Users/Ibnadmin/AppData/Local/Temp/video_manual_test.mp4\" --no-warnings \"https://www.tiktok.com/@melkersqueens/video/7586719632040398102\")"
     ]
   }
 }

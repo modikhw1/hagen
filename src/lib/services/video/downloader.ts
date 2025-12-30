@@ -5,12 +5,28 @@
  * Requires external tools since direct TikTok downloading is complex
  */
 
-import { exec } from 'child_process'
+import { exec, spawn } from 'child_process'
 import { promisify } from 'util'
 import fs from 'fs/promises'
 import path from 'path'
 
 const execAsync = promisify(exec)
+
+// Helper to run command with spawn (better for Windows)
+function spawnAsync(command: string, args: string[]): Promise<{ stdout: string; stderr: string }> {
+  return new Promise((resolve, reject) => {
+    const proc = spawn(command, args, { shell: true })
+    let stdout = ''
+    let stderr = ''
+    proc.stdout.on('data', (data) => { stdout += data.toString() })
+    proc.stderr.on('data', (data) => { stderr += data.toString() })
+    proc.on('close', (code) => {
+      if (code === 0) resolve({ stdout, stderr })
+      else reject(new Error(`Exit code ${code}: ${stderr || stdout}`))
+    })
+    proc.on('error', reject)
+  })
+}
 
 export interface DownloadOptions {
   outputDir?: string
@@ -67,28 +83,23 @@ export class VideoDownloader {
       console.log(`📥 Downloading video: ${url}`)
 
       // Use Python's yt-dlp (handles SSL/certificates better than system yt-dlp)
-      // Try multiple Python commands (python3, python, or full path on Windows)
-      const pythonCmd = process.platform === 'win32' 
-        ? `"${process.env.LOCALAPPDATA}\\Programs\\Python\\Python314\\python.exe"`
+      // Use spawn with args array (more reliable on Windows)
+      const pythonPath = process.platform === 'win32'
+        ? `${process.env.LOCALAPPDATA}\\Programs\\Python\\Python314\\python.exe`
         : 'python3'
-      
-      const command = [
-        pythonCmd,
-        '-m',
-        'yt_dlp',
+
+      const args = [
+        '-m', 'yt_dlp',
         '--no-cache-dir',
         '--no-playlist',
-        '--format', 'best[ext=mp4]/best', // Prefer mp4
+        '--format', 'best[ext=mp4]/best',
         '--max-filesize', `${this.maxFileSize}`,
         '--output', outputPath,
         '--no-warnings',
-        '--quiet',
-        `"${url}"`
-      ].join(' ')
+        url
+      ]
 
-      const { stdout, stderr } = await execAsync(command, {
-        timeout: 60000 // 60 second timeout
-      })
+      const { stdout, stderr } = await spawnAsync(pythonPath, args)
 
       // Check if file exists
       try {
