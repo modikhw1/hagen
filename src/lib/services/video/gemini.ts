@@ -297,6 +297,7 @@ TRANSCRIPT: [Key dialogue, abbreviated]` }
       "underlying_tension": "REQUIRED: What gap or conflict creates the humor? (e.g., 'Self-interest based on job role: profit-motivated want high numbers, labor-motivated want low')",
       "format_participation": "Does the structure/format participate in the joke? (e.g., 'Chef breaks established format by refusing to give a number')",
       "editing_contribution": "What editing choices add to humor? (e.g., 'Mid-word cut on profanity implies without stating')",
+      "dark_humor_signals": "CRITICAL: If cheerful surface hides darkness (smiling while making self-harm gestures, fake happiness masking despair, upbeat delivery of bleak content), describe what is being implied. This is NOT observational humor - it's dark humor hiding in plain sight. Or 'none'",
       "audience_surrogate": "Which character represents viewer feelings? (e.g., 'The chef - anyone who has worked service knows this frustration')",
       "why_this_is_funny": "REQUIRED: 2-3 sentences explaining the MECHANISM, not just describing what happens",
       "what_makes_it_work": "The core insight that makes this joke land"

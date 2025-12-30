@@ -36,6 +36,19 @@ export class VideoDownloader {
   }
 
   /**
+   * Main download method - tries best available strategy
+   */
+  async download(url: string, options?: { outputDir?: string }): Promise<DownloadResult> {
+    // Update output dir if provided
+    if (options?.outputDir) {
+      this.outputDir = options.outputDir
+    }
+
+    // Default to yt-dlp as it's the most robust for TikTok
+    return this.downloadWithYtDlp(url)
+  }
+
+  /**
    * Download video using yt-dlp (most reliable for TikTok)
    * 
    * Installation required:
@@ -63,13 +76,14 @@ export class VideoDownloader {
         pythonCmd,
         '-m',
         'yt_dlp',
+        '--no-cache-dir',
         '--no-playlist',
         '--format', 'best[ext=mp4]/best', // Prefer mp4
         '--max-filesize', `${this.maxFileSize}`,
         '--output', outputPath,
         '--no-warnings',
         '--quiet',
-        url
+        `"${url}"`
       ].join(' ')
 
       const { stdout, stderr } = await execAsync(command, {

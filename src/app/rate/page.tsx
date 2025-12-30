@@ -335,6 +335,7 @@ export default function RatePage() {
   };
 
   // Keyboard shortcuts
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- nextVideo and startAnalysisPipeline are stable
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;

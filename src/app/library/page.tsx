@@ -548,9 +548,10 @@ export default function LibraryPage() {
                         {/* Thumbnail */}
                         <div className="w-16 h-10 bg-gray-200 rounded overflow-hidden flex-shrink-0">
                           {video.metadata?.thumbnail_url ? (
-                            <img 
-                              src={video.metadata.thumbnail_url} 
-                              alt="" 
+                            // eslint-disable-next-line @next/next/no-img-element -- external thumbnails from various domains
+                            <img
+                              src={video.metadata.thumbnail_url}
+                              alt=""
                               className="w-full h-full object-cover"
                             />
                           ) : (

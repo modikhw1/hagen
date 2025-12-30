@@ -98,18 +98,45 @@ export async function POST(request: NextRequest) {
       exampleType = 'misdirection';
     }
 
-    // Extract humor types from the correction
+    // Extract humor types from the correction - expanded keyword list
     const humorTypes: string[] = [];
-    if (correction.humor_type) {
-      // Try to extract humor type keywords
-      const humorKeywords = ['wordplay', 'visual-reveal', 'subversion', 'absurdist', 'observational', 
-                             'physical', 'callback', 'contrast', 'deadpan', 'escalation', 'satire', 
-                             'parody', 'edit-punchline', 'exaggeration', 'self-deprecating'];
-      const correctionLower = correction.humor_type.toLowerCase();
-      for (const keyword of humorKeywords) {
-        if (correctionLower.includes(keyword)) {
-          humorTypes.push(keyword);
-        }
+    const allText = `${correction.humor_type || ''} ${notes || ''}`.toLowerCase();
+    
+    // Comprehensive humor type keywords
+    const humorKeywords = [
+      // Classic types
+      'wordplay', 'visual-reveal', 'subversion', 'absurdist', 'observational', 
+      'physical', 'callback', 'contrast', 'deadpan', 'escalation', 'satire', 
+      'parody', 'edit-punchline', 'exaggeration', 'self-deprecating',
+      // Dark/edge humor
+      'dark-humor', 'dark humor', 'morbid', 'gallows', 'self-harm', 'violent',
+      'fake-happiness', 'facade', 'mask',
+      // Structural types
+      'misdirection', 'reveal', 'twist', 'anti-humor', 'meta',
+      // Social dynamics
+      'cringe', 'awkward', 'relatable', 'insider', 'industry-joke',
+      // Visual types
+      'juxtaposition', 'montage', 'expression', 'reaction', 'silent',
+      // Format types
+      'format-subversion', 'pov-misdirection', 'fourth-wall'
+    ];
+    
+    for (const keyword of humorKeywords) {
+      if (allText.includes(keyword.replace('-', ' ')) || allText.includes(keyword)) {
+        humorTypes.push(keyword.replace(' ', '-'));
+      }
+    }
+
+    // Also extract tags from the notes
+    const tags: string[] = [];
+    const tagKeywords = [
+      'workplace', 'service', 'hospitality', 'restaurant', 'cafe', 'bar',
+      'customer', 'manager', 'worker', 'staff', 'christmas', 'holiday',
+      'implied', 'subtle', 'extreme', 'over-the-top'
+    ];
+    for (const keyword of tagKeywords) {
+      if (allText.includes(keyword)) {
+        tags.push(keyword);
       }
     }
 
@@ -127,6 +154,7 @@ export async function POST(request: NextRequest) {
         why: notes || 'User correction'
       } : undefined,
       humorTypes,
+      tags,
       industry: 'restaurant', // Default for hospitality focus
       qualityScore: 0.9  // Human corrections are high quality
     });
