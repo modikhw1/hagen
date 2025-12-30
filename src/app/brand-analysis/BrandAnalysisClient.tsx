@@ -228,6 +228,21 @@ function HelpTip({ text }: { text: string }) {
   );
 }
 
+// Helper function for deep merging objects (moved outside component to avoid dependency issues)
+const deepMerge = (base: unknown, patch: unknown): unknown => {
+  if (patch === null || patch === undefined) return base;
+  if (Array.isArray(patch)) return patch;
+  if (typeof patch !== 'object') return patch;
+  if (base === null || base === undefined) return patch;
+  if (Array.isArray(base)) return patch;
+
+  const result: Record<string, unknown> = { ...(base as Record<string, unknown>) };
+  for (const key of Object.keys(patch as Record<string, unknown>)) {
+    result[key] = deepMerge((base as Record<string, unknown>)[key], (patch as Record<string, unknown>)[key]);
+  }
+  return result;
+};
+
 export default function BrandAnalysisClient() {
   // Video list state
   const [videos, setVideos] = useState<Video[]>([]);
@@ -301,20 +316,6 @@ export default function BrandAnalysisClient() {
     // Expected VideoBrandAnalysis shape: { raw_output: VideoBrandObservationV1 }
     const raw = (analysis as any).raw_output;
     return isObject(raw) ? raw : null;
-  };
-
-  const deepMerge = (base: any, patch: any): any => {
-    if (patch === null || patch === undefined) return base;
-    if (Array.isArray(patch)) return patch;
-    if (typeof patch !== 'object') return patch;
-    if (base === null || base === undefined) return patch;
-    if (Array.isArray(base)) return patch;
-
-    const result: Record<string, any> = { ...(base as any) };
-    for (const key of Object.keys(patch)) {
-      result[key] = deepMerge((base as any)[key], (patch as any)[key]);
-    }
-    return result;
   };
 
   const setDeep = (obj: any, path: string[], value: any): any => {
