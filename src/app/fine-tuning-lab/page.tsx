@@ -28,6 +28,11 @@ export default function FineTuningLab() {
   // New state for quick approval mode
   const [quickApprovalMode, setQuickApprovalMode] = useState(true);
 
+  // Refinement controls - for when model gets concept but misses the punchline
+  const [showRefinement, setShowRefinement] = useState(false);
+  const [refinementNote, setRefinementNote] = useState('');
+  const [refinementType, setRefinementType] = useState<'focus' | 'layer' | 'context' | null>(null);
+
   // Dataset statistics
   const [datasetStats, setDatasetStats] = useState<{
     total: number;
@@ -208,6 +213,65 @@ export default function FineTuningLab() {
     await handleSave();
   };
 
+  // Apply refinement to the draft and save
+  const applyRefinement = async () => {
+    if (!refinementNote.trim()) return;
+
+    // Insert the refinement into the analysis naturally
+    // This teaches the model to identify the actual comedic payload
+    let refinedDraft = draft;
+
+    if (refinementType === 'focus') {
+      // The model got the scene but missed what's actually funny
+      refinedDraft = draft.replace(
+        /^(.+?)(\n|$)/,
+        `$1 Det som gör det roligt är specifikt: ${refinementNote}$2`
+      );
+    } else if (refinementType === 'layer') {
+      // The model got the obvious joke but missed the subtle layer
+      refinedDraft += `\n\nDet som verkligen får det att landa: ${refinementNote}`;
+    } else if (refinementType === 'context') {
+      // Missing context that makes it hit harder
+      refinedDraft += `\n\nViktig kontext: ${refinementNote}`;
+    }
+
+    // Update draft state
+    setDraft(refinedDraft);
+    setRefinementNote('');
+    setRefinementType(null);
+    setShowRefinement(false);
+
+    // Save immediately with the refined draft
+    setLoading(true);
+    setStatus('Saving refined analysis...');
+    try {
+      const res = await fetch('/api/fine-tuning/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url, analysis: refinedDraft })
+      });
+      if (!res.ok) throw new Error('Failed to save');
+
+      setStatus('Saved with refinement! Ready for next video.');
+      setSavedCount(prev => prev + 1);
+      clearLocalStorage();
+
+      if (batchMode && queue.length > 0) {
+        setQueue(prev => prev.map((item, i) =>
+          i === currentQueueIndex ? { ...item, status: 'approved' } : item
+        ));
+        handleNextInQueue();
+      } else {
+        setUrl('');
+        setDraft('');
+      }
+    } catch (e: any) {
+      setStatus(`Error saving: ${e.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Skip current video
   const handleSkip = () => {
     if (batchMode && queue.length > 0) {
@@ -286,6 +350,12 @@ export default function FineTuningLab() {
   // Move to next item in queue
   const handleNextInQueue = async () => {
     const nextIndex = currentQueueIndex + 1;
+
+    // Reset refinement state for new video
+    setShowRefinement(false);
+    setRefinementNote('');
+    setRefinementType(null);
+
     if (nextIndex < queue.length) {
       setCurrentQueueIndex(nextIndex);
       const nextUrl = queue[nextIndex].url;
@@ -617,6 +687,13 @@ export default function FineTuningLab() {
                   ✓ Approve & Save
                 </button>
                 <button
+                  onClick={() => setShowRefinement(!showRefinement)}
+                  disabled={loading}
+                  className={`flex-1 py-3 rounded-lg disabled:opacity-50 font-medium ${showRefinement ? 'bg-orange-600 text-white' : 'bg-orange-100 text-orange-800 hover:bg-orange-200'}`}
+                >
+                  🎯 Close, but...
+                </button>
+                <button
                   onClick={() => setQuickApprovalMode(false)}
                   disabled={loading}
                   className="flex-1 bg-yellow-500 text-white py-3 rounded-lg hover:bg-yellow-600 disabled:opacity-50 font-medium"
@@ -631,6 +708,65 @@ export default function FineTuningLab() {
                   ⏭ Skip
                 </button>
               </div>
+
+              {/* Refinement Panel - for when model is close but misses the punchline */}
+              {showRefinement && (
+                <div className="mt-4 p-4 bg-orange-50 rounded-lg border border-orange-300">
+                  <div className="text-sm text-orange-900 mb-3 font-medium">
+                    What did the model miss?
+                  </div>
+                  <div className="flex gap-2 mb-3">
+                    <button
+                      onClick={() => setRefinementType('focus')}
+                      className={`px-3 py-1.5 rounded text-sm ${refinementType === 'focus' ? 'bg-orange-600 text-white' : 'bg-white border border-orange-300 text-orange-800 hover:bg-orange-100'}`}
+                    >
+                      Wrong focus
+                    </button>
+                    <button
+                      onClick={() => setRefinementType('layer')}
+                      className={`px-3 py-1.5 rounded text-sm ${refinementType === 'layer' ? 'bg-orange-600 text-white' : 'bg-white border border-orange-300 text-orange-800 hover:bg-orange-100'}`}
+                    >
+                      Missed the layer
+                    </button>
+                    <button
+                      onClick={() => setRefinementType('context')}
+                      className={`px-3 py-1.5 rounded text-sm ${refinementType === 'context' ? 'bg-orange-600 text-white' : 'bg-white border border-orange-300 text-orange-800 hover:bg-orange-100'}`}
+                    >
+                      Missing context
+                    </button>
+                  </div>
+                  {refinementType && (
+                    <>
+                      <div className="text-xs text-orange-700 mb-2">
+                        {refinementType === 'focus' && 'Got the scene but missed what\'s actually funny. What should the focus be?'}
+                        {refinementType === 'layer' && 'Got the obvious joke but missed the subtle detail that makes it land. What is it?'}
+                        {refinementType === 'context' && 'What context makes this hit harder that the model missed?'}
+                      </div>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={refinementNote}
+                          onChange={(e) => setRefinementNote(e.target.value)}
+                          placeholder={
+                            refinementType === 'focus' ? 'The background staffer\'s visible annoyance...' :
+                            refinementType === 'layer' ? 'The timing of the eye-roll at 0:03...' :
+                            'This is a known format where...'
+                          }
+                          className="flex-1 p-2 border border-orange-300 rounded text-sm"
+                          onKeyDown={(e) => e.key === 'Enter' && applyRefinement()}
+                        />
+                        <button
+                          onClick={applyRefinement}
+                          disabled={!refinementNote.trim()}
+                          className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 disabled:opacity-50 text-sm font-medium"
+                        >
+                          Apply & Save
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
