@@ -44,7 +44,54 @@ export async function POST(req: NextRequest) {
   let gcsUri: string | null = null;
 
   try {
-    const { url, mode = 'concise', version } = await req.json();
+    const { url, mode = 'concise', version, temperature = 0.7, maxTokens = 8192, customPrompt, textOnly } = await req.json();
+
+    // Text-only mode: use base Gemini for text completion (no video)
+    if (textOnly && customPrompt) {
+      console.log('📝 Text-only mode: using base Gemini...');
+
+      const auth = new GoogleAuth({
+        scopes: ['https://www.googleapis.com/auth/cloud-platform']
+      });
+      const client = await auth.getClient();
+      const token = await client.getAccessToken();
+
+      // Use base Gemini model for text-only tasks
+      const endpoint = 'https://us-central1-aiplatform.googleapis.com/v1/projects/gen-lang-client-0853618366/locations/us-central1/publishers/google/models/gemini-2.0-flash-001:generateContent';
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token.token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          contents: [{
+            role: 'user',
+            parts: [{ text: customPrompt }]
+          }],
+          generationConfig: {
+            temperature: temperature,
+            maxOutputTokens: maxTokens
+          }
+        })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Gemini Error: ${response.status} - ${errorText}`);
+      }
+
+      const result = await response.json();
+      const analysis = result.candidates?.[0]?.content?.parts?.[0]?.text || 'No analysis generated';
+
+      return NextResponse.json({
+        analysis,
+        model: 'gemini-2.0-flash-001',
+        version: 'base-text-only'
+      });
+    }
+
     if (!url) return NextResponse.json({ error: 'Missing URL' }, { status: 400 });
 
     // 1. Get Tuned Model ID
@@ -123,7 +170,7 @@ Format:
 
 Fokusera på att fånga rätt tolkning. Om ordlek eller flertydighet finns, kontrollera visuella ledtrådar för att avgöra vilken tolkning som gäller.`;
 
-    const prompt = mode === 'detailed' ? PROMPT_DETAILED : mode === 'balanced' ? PROMPT_BALANCED : PROMPT_CONCISE;
+    const prompt = customPrompt || (mode === 'detailed' ? PROMPT_DETAILED : mode === 'balanced' ? PROMPT_BALANCED : PROMPT_CONCISE);
 
     const response = await fetch(endpoint, {
       method: 'POST',
@@ -140,8 +187,8 @@ Fokusera på att fånga rätt tolkning. Om ordlek eller flertydighet finns, kont
           ]
         }],
         generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 8192
+          temperature: temperature,
+          maxOutputTokens: maxTokens
         },
         safetySettings: [
           { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },

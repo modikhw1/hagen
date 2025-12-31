@@ -18,7 +18,7 @@ export default function FineTuningLab() {
   const [status, setStatus] = useState('');
   const [savedCount, setSavedCount] = useState(0);
   const [modelId, setModelId] = useState('');
-  const [modelVersion, setModelVersion] = useState<'v5' | 'v6'>('v6');
+  const [modelVersion, setModelVersion] = useState<'v5' | 'v6' | 'v7.B'>('v7.B');
 
   // New state for batch mode
   const [batchMode, setBatchMode] = useState(false);
@@ -458,11 +458,12 @@ export default function FineTuningLab() {
           <div className="text-xs font-mono text-gray-400 mb-1">Model Version</div>
           <select
             value={modelVersion}
-            onChange={(e) => setModelVersion(e.target.value as 'v5' | 'v6')}
+            onChange={(e) => setModelVersion(e.target.value as 'v5' | 'v6' | 'v7.B')}
             className="text-sm font-medium border rounded px-2 py-1 bg-white"
           >
             <option value="v5">v5 (345 ex)</option>
             <option value="v6">v6 (659 ex)</option>
+            <option value="v7.B">v7.B (675 ex)</option>
           </select>
           <div className="text-xs text-gray-400 mt-1">
             Session: {savedCount} saved
