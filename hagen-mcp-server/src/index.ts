@@ -46,11 +46,16 @@ function getTrainingStats() {
       try { return JSON.parse(l); } catch { return null; }
     }).filter(Boolean);
 
+    // Count TikTok videos: check URL or known video sources
     const tiktokCount = entries.filter((e: any) =>
-      e.source?.includes("fine-tuning") || e.source?.includes("TikTok")
+      e.url?.includes("tiktok.com") ||
+      e.source?.includes("fine-tuning") ||
+      e.source?.includes("legacy-review") ||
+      e.source?.includes("question-battery")
     ).length;
+    // Count Simpsons text entries
     const simpsonsCount = entries.filter((e: any) =>
-      e.source?.includes("simpsons")
+      e.source?.toLowerCase().includes("simpsons")
     ).length;
     const otherCount = entries.length - tiktokCount - simpsonsCount;
 
