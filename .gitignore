@@ -46,4 +46,3 @@ next-env.d.ts
 # Misc
 .turbo
 credentials/
-planning_docs/

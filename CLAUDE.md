@@ -2,6 +2,24 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## IMPORTANT: Project State & Context
+
+**Before making changes, read:** `planning_docs/hagen-ground-truth.md`
+
+This document contains:
+- What Hagen IS and IS NOT (no assumptions)
+- Current state of each component
+- Known gaps and limitations
+- The roadmap (Step 1 vs Step 2)
+- Founder-stated definitions and priorities
+
+**Current Phase:** Step 1 - Model Reliability
+- Focus: Humor model, Replicability model, Analyze-rate-v1
+- NOT building brand features yet
+- Goal: High reliability (matches human judgment, consistent, low edit rate)
+
+**Key Principle:** Hagen ANALYZES content, it does NOT generate creative content.
+
 ## Project Overview
 
 Hagen is an AI-powered video humor analysis platform that analyzes TikTok videos to understand comedic mechanisms, timing, and audience targeting. It uses fine-tuned Gemini 2.5 Flash models to detect and explain humor patterns.
