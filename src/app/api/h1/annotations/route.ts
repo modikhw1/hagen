@@ -22,9 +22,11 @@ const createAnnotationSchema = z.object({
   h1_type: z.enum(['quality_ranking', 'humor_similarity', 'replicability_similarity', 'audience_fit', 'custom']).optional(),
   h1_question: z.string().min(5).max(500).optional(),
 
-  // Clips
+  // Mode 1: Clip ↔ Clip (requires both clip_a_id and clip_b_id)
+  // Mode 2: Brand → Clip (requires clip_a_id and brand_id)
   clip_a_id: z.string().uuid(),
-  clip_b_id: z.string().uuid(),
+  clip_b_id: z.string().uuid().optional(),
+  brand_id: z.string().uuid().optional(),
 
   // Human annotation - the learning signal
   human_note: z.string().min(5).max(2000),
@@ -43,6 +45,8 @@ const createAnnotationSchema = z.object({
   annotation_quality: z.enum(['draft', 'silver', 'gold']).default('draft')
 }).refine(data => data.h1_type || data.h1_question, {
   message: 'Either h1_type or h1_question must be provided'
+}).refine(data => data.clip_b_id || data.brand_id, {
+  message: 'Either clip_b_id (clip mode) or brand_id (brand mode) must be provided'
 })
 
 const listQuerySchema = z.object({
@@ -59,12 +63,15 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const data = createAnnotationSchema.parse(body)
 
-    // Ensure consistent clip ordering (a < b)
+    // Determine mode: clip-to-clip or brand-to-clip
+    const isBrandMode = !!data.brand_id && !data.clip_b_id
+
     let clipA = data.clip_a_id
-    let clipB = data.clip_b_id
+    let clipB = data.clip_b_id || null
     let selection = data.selection
 
-    if (clipA > clipB) {
+    // Only do clip ordering in clip-to-clip mode
+    if (!isBrandMode && clipB && clipA > clipB) {
       // Swap clips and flip selection
       ;[clipA, clipB] = [clipB, clipA]
       if (selection === 'clip_a') selection = 'clip_b'
@@ -74,20 +81,27 @@ export async function POST(request: NextRequest) {
     // Determine h1_type
     const h1Type = data.h1_question ? 'custom' : data.h1_type
 
+    const insertData: Record<string, unknown> = {
+      h1_type: h1Type,
+      h1_question: data.h1_question || null,
+      clip_a_id: clipA,
+      clip_b_id: clipB,
+      human_note: data.human_note,
+      winner: selection || null,
+      winner_reasoning: data.selection_reasoning || null,
+      strength: data.strength || null,
+      confidence: data.confidence,
+      annotation_quality: data.annotation_quality
+    }
+
+    // Add brand_id for brand mode
+    if (isBrandMode) {
+      insertData.brand_id = data.brand_id
+    }
+
     const { data: result, error } = await supabase
       .from('h1_training_pairs')
-      .insert({
-        h1_type: h1Type,
-        h1_question: data.h1_question || null,
-        clip_a_id: clipA,
-        clip_b_id: clipB,
-        human_note: data.human_note,
-        winner: selection || null,
-        winner_reasoning: data.selection_reasoning || null,
-        strength: data.strength || null,
-        confidence: data.confidence,
-        annotation_quality: data.annotation_quality
-      })
+      .insert(insertData)
       .select('id')
       .single()
 
@@ -99,14 +113,16 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log(`Saved H1 annotation: ${h1Type} (${selection || 'no selection'})`)
+    const modeLabel = isBrandMode ? 'brand' : 'clip'
+    console.log(`Saved H1 annotation: ${h1Type} (${modeLabel} mode, ${selection || 'no selection'})`)
 
     return NextResponse.json({
       success: true,
       id: result.id,
       h1_type: h1Type,
       h1_question: data.h1_question,
-      selection
+      selection,
+      mode: modeLabel
     })
 
   } catch (error) {
