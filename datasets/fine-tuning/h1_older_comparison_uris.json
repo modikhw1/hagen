@@ -1,0 +1,11 @@
+{
+  "h1Name": "older_comparison",
+  "trainUri": "gs://hagen-video-analysis/fine-tuning/h1-models/older_comparison/train_2026-01-07.jsonl",
+  "validationUri": "gs://hagen-video-analysis/fine-tuning/h1-models/older_comparison/validation_2026-01-07.jsonl",
+  "timestamp": "2026-01-07",
+  "stats": {
+    "total": 61,
+    "train": 51,
+    "validation": 10
+  }
+}

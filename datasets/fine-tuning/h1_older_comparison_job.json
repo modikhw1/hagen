@@ -1,0 +1,71 @@
+{
+  "name": "projects/1061681256498/locations/us-central1/tuningJobs/5079092998420037632",
+  "tunedModelDisplayName": "h1-older_comparison-v1-2026-01-07T20-45-36-779Z",
+  "baseModel": "gemini-2.0-flash-001",
+  "supervisedTuningSpec": {
+    "trainingDatasetUri": "gs://hagen-video-analysis/fine-tuning/h1-models/older_comparison/train_2026-01-07.jsonl",
+    "validationDatasetUri": "gs://hagen-video-analysis/fine-tuning/h1-models/older_comparison/validation_2026-01-07.jsonl",
+    "hyperParameters": {
+      "epochCount": "6",
+      "learningRateMultiplier": 1
+    }
+  },
+  "state": "JOB_STATE_SUCCEEDED",
+  "createTime": "2026-01-07T20:45:38.195508Z",
+  "updateTime": "2026-01-07T20:45:38.195508Z",
+  "h1Name": "older_comparison",
+  "submittedAt": "2026-01-07T20:45:38.141Z",
+  "tunedModel": {
+    "model": "projects/1061681256498/locations/us-central1/models/7682392196875550720@1",
+    "endpoint": "projects/1061681256498/locations/us-central1/endpoints/719396164402675712",
+    "checkpoints": [
+      {
+        "checkpointId": "1",
+        "epoch": "2",
+        "step": "3",
+        "endpoint": "projects/1061681256498/locations/us-central1/endpoints/8586058813512089600"
+      },
+      {
+        "checkpointId": "2",
+        "epoch": "3",
+        "step": "6",
+        "endpoint": "projects/1061681256498/locations/us-central1/endpoints/5277038987301617664"
+      },
+      {
+        "checkpointId": "3",
+        "epoch": "5",
+        "step": "9",
+        "endpoint": "projects/1061681256498/locations/us-central1/endpoints/8213385944347181056"
+      },
+      {
+        "checkpointId": "4",
+        "epoch": "6",
+        "step": "12",
+        "endpoint": "projects/1061681256498/locations/us-central1/endpoints/1624619689504145408"
+      },
+      {
+        "checkpointId": "5",
+        "epoch": "6",
+        "step": "13",
+        "endpoint": "projects/1061681256498/locations/us-central1/endpoints/719396164402675712"
+      }
+    ]
+  },
+  "completedAt": "2026-01-07T21:11:46.116Z",
+  "recommendedCheckpoint": {
+    "checkpointId": "2",
+    "epoch": "3",
+    "step": "6",
+    "endpoint": "projects/1061681256498/locations/us-central1/endpoints/5277038987301617664",
+    "reason": "Final checkpoint (epoch 6) exhibits overfitting with repetition loops. Checkpoint 2 shows 100% agreement and consistency."
+  },
+  "evaluation": {
+    "date": "2026-01-07",
+    "verdict": "viable",
+    "checkpoint2_agreement": 1.0,
+    "checkpoint2_consistency": 1.0,
+    "checkpoint5_agreement": 0.2,
+    "checkpoint5_parse_errors": 0.87,
+    "notes": "Text-based fine-tuning successfully replicates human judgment using visual_analysis variables."
+  }
+}
