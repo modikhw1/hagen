@@ -18,7 +18,8 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Request validation schemas - flexible
 const createAnnotationSchema = z.object({
-  // H1 identification - either preset type or custom question
+  // H1 definition ID (preferred) or legacy h1_type/h1_question
+  h1_definition_id: z.string().uuid().optional(),
   h1_type: z.enum(['quality_ranking', 'humor_similarity', 'replicability_similarity', 'audience_fit', 'custom']).optional(),
   h1_question: z.string().min(5).max(500).optional(),
 
@@ -38,13 +39,13 @@ const createAnnotationSchema = z.object({
   selection_reasoning: z.string().optional(),
 
   // Edge strength (0.0-1.0)
-  strength: z.number().min(0).max(1).optional(),
+  strength: z.number().min(0).max(1).optional().nullable(),
 
   // Confidence and quality
   confidence: z.number().min(0).max(1).default(0.7),
   annotation_quality: z.enum(['draft', 'silver', 'gold']).default('draft')
-}).refine(data => data.h1_type || data.h1_question, {
-  message: 'Either h1_type or h1_question must be provided'
+}).refine(data => data.h1_definition_id || data.h1_type || data.h1_question, {
+  message: 'Either h1_definition_id, h1_type, or h1_question must be provided'
 }).refine(data => data.clip_b_id || data.brand_id, {
   message: 'Either clip_b_id (clip mode) or brand_id (brand mode) must be provided'
 })
@@ -84,12 +85,13 @@ export async function POST(request: NextRequest) {
     const insertData: Record<string, unknown> = {
       h1_type: h1Type,
       h1_question: data.h1_question || null,
+      h1_definition_id: data.h1_definition_id || null,
       clip_a_id: clipA,
       clip_b_id: clipB,
       human_note: data.human_note,
       winner: selection || null,
       winner_reasoning: data.selection_reasoning || null,
-      strength: data.strength || null,
+      strength: data.strength ?? null,
       confidence: data.confidence,
       annotation_quality: data.annotation_quality
     }
