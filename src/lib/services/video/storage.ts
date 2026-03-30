@@ -31,15 +31,20 @@ export class VideoStorageService {
   constructor(options: StorageOptions = {}) {
     const projectId = options.projectId || process.env.GOOGLE_CLOUD_PROJECT_ID
     const credentialsPath = options.credentialsPath || process.env.GOOGLE_APPLICATION_CREDENTIALS
+    const credentialsBase64 = process.env.GOOGLE_APPLICATION_CREDENTIALS_BASE64
     this.bucketName = options.bucketName || process.env.GOOGLE_CLOUD_STORAGE_BUCKET || 'hagen-video-analysis'
 
     // Only initialize GCS if credentials are provided
     this.useGCS = !!projectId
-    
+
     if (this.useGCS) {
       const storageConfig: any = { projectId }
-      
-      if (credentialsPath) {
+
+      if (credentialsBase64) {
+        // Railway / cloud deployment: credentials passed as base64-encoded JSON
+        storageConfig.credentials = JSON.parse(Buffer.from(credentialsBase64, 'base64').toString('utf-8'))
+      } else if (credentialsPath) {
+        // Local development: credentials file path
         storageConfig.keyFilename = credentialsPath
       }
 
