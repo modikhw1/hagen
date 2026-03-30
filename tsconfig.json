@@ -23,5 +23,5 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "hagen-mcp-server"]
+  "exclude": ["node_modules", "hagen-mcp-server", "planning_docs"]
 }
