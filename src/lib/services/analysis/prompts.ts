@@ -12,9 +12,14 @@ export interface AnalysisPass {
 }
 
 /**
- * Core analysis passes - run on every video
+ * Core analysis passes - previously ran 5 secondary inference passes on every video.
+ * Disabled: social_dynamics, tonal_journey, persuasion_mechanics, authenticity_detection,
+ * production_craft were speculative, slow, and not consumed by hagen-ui.
+ * Kept as empty array to preserve the interface contract with /api/discern.
  */
-export const coreAnalysisPasses: AnalysisPass[] = [
+export const coreAnalysisPasses: AnalysisPass[] = []
+
+const _disabledPasses: AnalysisPass[] = [
   {
     name: 'social_dynamics',
     description: 'Analyze power dynamics, authority signals, and audience relationship',
