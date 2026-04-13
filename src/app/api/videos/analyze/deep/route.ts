@@ -12,7 +12,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@supabase/supabase-js'
-import { createVideoDownloader } from '@/lib/services/video/downloader'
+import { createVideoDownloader, type DownloadResult } from '@/lib/services/video/downloader'
 import { createVideoStorageService } from '@/lib/services/video/storage'
 import { GeminiVideoAnalyzer } from '@/lib/services/video/gemini'
 import { BrandAnalyzer } from '@/lib/services/brand/brand-analyzer'
@@ -71,24 +71,36 @@ export async function POST(request: NextRequest) {
         console.log('📥 Downloading video...')
         const downloader = createVideoDownloader()
         
-        // Try yt-dlp first
-        const downloadResult = await downloader.downloadWithYtDlp(video.video_url)
-        
+        const rapidApiKey = process.env.RAPIDAPI_KEY?.trim()
+
+        // 1. Scraper7 (primary - reliable for TikTok, no IP blocking)
+        let downloadResult: DownloadResult = rapidApiKey
+          ? await downloader.downloadWithScraper7(video.video_url, rapidApiKey)
+          : { success: false, error: 'RAPIDAPI_KEY not set' }
+
+        // 2. yt-dlp (secondary - may work for non-TikTok or if Scraper7 fails)
         if (!downloadResult.success) {
-          // Fallback to Supadata if available
+          console.log('[deep-analyze] Scraper7 failed, trying yt-dlp:', downloadResult.error)
+          downloadResult = await downloader.downloadWithYtDlp(video.video_url)
+        }
+
+        // 3. Supadata (tertiary)
+        if (!downloadResult.success && process.env.SUPADATA_API_KEY) {
+          console.log('[deep-analyze] yt-dlp failed, trying Supadata:', downloadResult.error)
           const supadataResult = await downloader.downloadWithSupadata(
             video.video_url,
-            process.env.SUPADATA_API_KEY!
+            process.env.SUPADATA_API_KEY
           )
-          
-          if (!supadataResult.success) {
-            throw new Error(`Download failed: ${downloadResult.error}`)
+          if (supadataResult.success) {
+            downloadResult = supadataResult
           }
-          
-          localFilePath = supadataResult.filePath
-        } else {
-          localFilePath = downloadResult.filePath
         }
+
+        if (!downloadResult.success) {
+          throw new Error(`Download failed: ${downloadResult.error}`)
+        }
+
+        localFilePath = downloadResult.filePath
 
         console.log(`✅ Downloaded: ${localFilePath}`)
       }

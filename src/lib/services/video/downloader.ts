@@ -164,6 +164,48 @@ export class VideoDownloader {
     }
   }
 
+  async downloadWithScraper7(tiktokUrl: string, apiKey: string): Promise<DownloadResult> {
+    try {
+      const infoUrl = new URL('https://tiktok-scraper7.p.rapidapi.com/video/info')
+      infoUrl.searchParams.set('url', tiktokUrl)
+
+      console.log('[video-downloader] Fetching Scraper7 video info:', tiktokUrl)
+
+      const infoRes = await fetch(infoUrl.toString(), {
+        headers: {
+          'x-rapidapi-key': apiKey,
+          'x-rapidapi-host': 'tiktok-scraper7.p.rapidapi.com',
+        },
+        signal: AbortSignal.timeout(15000),
+      })
+
+      if (!infoRes.ok) {
+        throw new Error(`Scraper7 /video/info returned ${infoRes.status}`)
+      }
+
+      const info = await infoRes.json() as Record<string, any>
+      const playUrl: string | undefined =
+        info?.data?.play ||
+        info?.data?.wmplay ||
+        info?.play ||
+        info?.wmplay
+
+      if (!playUrl || typeof playUrl !== 'string') {
+        throw new Error('Scraper7 returned no play URL')
+      }
+
+      console.log('[video-downloader] Got Scraper7 play URL, downloading...')
+
+      return this.downloadFromUrl(playUrl)
+    } catch (error) {
+      console.error('[video-downloader] Scraper7 download failed:', error)
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      }
+    }
+  }
+
   async downloadWithSupadata(url: string, apiKey: string): Promise<DownloadResult> {
     try {
       const supadataUrl = `https://api.supadata.ai/v1/download?url=${encodeURIComponent(url)}`
