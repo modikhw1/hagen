@@ -152,7 +152,7 @@ export class BrandAnalyzer {
     console.log('🔶 BrandAnalyzer calling Gemini API with fileUri:', fileUri.substring(0, 80))
     
     const genAI = new GoogleGenerativeAI(this.apiKey)
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' })
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-001' })
 
     try {
       const result = await model.generateContent([

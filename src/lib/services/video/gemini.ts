@@ -14,7 +14,7 @@ export class GeminiVideoAnalyzer implements VideoAnalysisProvider {
   private client: GoogleGenerativeAI
   private model: string
 
-  constructor(apiKey: string = GEMINI_API_KEY, model: string = 'gemini-2.0-flash-exp') {
+  constructor(apiKey: string = GEMINI_API_KEY, model: string = 'gemini-2.0-flash-001') {
     this.client = new GoogleGenerativeAI(apiKey)
     this.model = model
   }
