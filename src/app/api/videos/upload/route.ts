@@ -66,9 +66,17 @@ export async function POST(request: NextRequest) {
     const downloadResult = await downloader.downloadWithYtDlp(sourceUrl);
 
     if (!downloadResult.success || !downloadResult.filePath) {
+      console.error('[videos/upload] Download failed', {
+        sourceUrl,
+        platform,
+        details: downloadResult.error,
+      });
+
       return NextResponse.json({
         error: 'Failed to download video',
-        details: downloadResult.error
+        details: downloadResult.error,
+        sourceUrl,
+        platform,
       }, { status: 500 });
     }
 

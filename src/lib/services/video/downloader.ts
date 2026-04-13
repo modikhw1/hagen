@@ -1,92 +1,101 @@
 /**
  * Video Download Service
- * 
- * Downloads videos from TikTok, YouTube, etc. for deep analysis
- * Requires external tools since direct TikTok downloading is complex
+ *
+ * Downloads videos from TikTok, YouTube, etc. for deep analysis.
+ * Requires external tools since direct TikTok downloading is complex.
  */
 
-import { exec, spawn } from 'child_process'
-import { promisify } from 'util'
+import { spawn } from 'child_process'
 import fs from 'fs/promises'
 import path from 'path'
 
-const execAsync = promisify(exec)
-
-// Helper to run command with spawn (better for Windows)
 function spawnAsync(command: string, args: string[]): Promise<{ stdout: string; stderr: string }> {
   return new Promise((resolve, reject) => {
     const proc = spawn(command, args, { shell: true })
     let stdout = ''
     let stderr = ''
-    proc.stdout.on('data', (data) => { stdout += data.toString() })
-    proc.stderr.on('data', (data) => { stderr += data.toString() })
-    proc.on('close', (code) => {
-      if (code === 0) resolve({ stdout, stderr })
-      else reject(new Error(`Exit code ${code}: ${stderr || stdout}`))
+
+    proc.stdout.on('data', (data) => {
+      stdout += data.toString()
     })
+
+    proc.stderr.on('data', (data) => {
+      stderr += data.toString()
+    })
+
+    proc.on('close', (code) => {
+      if (code === 0) {
+        resolve({ stdout, stderr })
+        return
+      }
+
+      reject(new Error(`Exit code ${code}: ${stderr || stdout}`))
+    })
+
     proc.on('error', reject)
   })
 }
 
+function truncateOutput(value: string, maxLength: number = 1200): string {
+  const trimmed = value.trim()
+  if (!trimmed) {
+    return ''
+  }
+
+  return trimmed.length > maxLength ? `${trimmed.slice(0, maxLength)}...` : trimmed
+}
+
 export interface DownloadOptions {
   outputDir?: string
-  maxFileSize?: number // MB
+  maxFileSize?: number
   quality?: 'high' | 'medium' | 'low'
 }
 
 export interface DownloadResult {
   success: boolean
   filePath?: string
-  fileSize?: number // bytes
-  duration?: number // seconds
+  fileSize?: number
+  duration?: number
   error?: string
 }
 
 export class VideoDownloader {
   private outputDir: string
   private maxFileSize: number
-  
+
   constructor(options: DownloadOptions = {}) {
     this.outputDir = options.outputDir || process.env.VIDEO_STORAGE_PATH || '/tmp/hagen-videos'
-    this.maxFileSize = (options.maxFileSize || 100) * 1024 * 1024 // Convert MB to bytes
+    this.maxFileSize = (options.maxFileSize || 100) * 1024 * 1024
   }
 
-  /**
-   * Main download method - tries best available strategy
-   */
   async download(url: string, options?: { outputDir?: string }): Promise<DownloadResult> {
-    // Update output dir if provided
     if (options?.outputDir) {
       this.outputDir = options.outputDir
     }
 
-    // Default to yt-dlp as it's the most robust for TikTok
     return this.downloadWithYtDlp(url)
   }
 
   /**
    * Download video using yt-dlp (most reliable for TikTok)
-   * 
+   *
    * Installation required:
    *   Ubuntu/Debian: sudo apt install yt-dlp
    *   Mac: brew install yt-dlp
    *   Or: pip install yt-dlp (recommended - handles SSL better)
    */
   async downloadWithYtDlp(url: string): Promise<DownloadResult> {
+    const pythonPath = process.platform === 'win32'
+      ? `${process.env.LOCALAPPDATA}\\Programs\\Python\\Python314\\python.exe`
+      : 'python3'
+
     try {
-      // Ensure output directory exists
       await fs.mkdir(this.outputDir, { recursive: true })
 
       const filename = `video_${Date.now()}.mp4`
       const outputPath = path.join(this.outputDir, filename)
 
-      console.log(`📥 Downloading video: ${url}`)
-
-      // Use Python's yt-dlp (handles SSL/certificates better than system yt-dlp)
-      // Use spawn with args array (more reliable on Windows)
-      const pythonPath = process.platform === 'win32'
-        ? `${process.env.LOCALAPPDATA}\\Programs\\Python\\Python314\\python.exe`
-        : 'python3'
+      console.log(`Downloading video: ${url}`)
 
       const args = [
         '-m', 'yt_dlp',
@@ -96,97 +105,107 @@ export class VideoDownloader {
         '--max-filesize', `${this.maxFileSize}`,
         '--output', outputPath,
         '--no-warnings',
-        url
+        url,
       ]
+
+      console.log('[video-downloader] Running yt-dlp', {
+        platform: process.platform,
+        pythonPath,
+        outputPath,
+        outputDir: this.outputDir,
+      })
 
       const { stdout, stderr } = await spawnAsync(pythonPath, args)
 
-      // Check if file exists
-      try {
-        const stats = await fs.stat(outputPath)
-        
-        console.log(`✅ Downloaded: ${outputPath} (${(stats.size / 1024 / 1024).toFixed(2)} MB)`)
+      if (stdout.trim()) {
+        console.log('[video-downloader] yt-dlp stdout:', truncateOutput(stdout))
+      }
 
-        return {
-          success: true,
-          filePath: outputPath,
-          fileSize: stats.size
-        }
-      } catch (err) {
+      if (stderr.trim()) {
+        console.warn('[video-downloader] yt-dlp stderr:', truncateOutput(stderr))
+      }
+
+      const stats = await fs.stat(outputPath).catch(() => null)
+      if (!stats) {
         throw new Error('Download completed but file not found')
       }
 
+      console.log(`Downloaded: ${outputPath} (${(stats.size / 1024 / 1024).toFixed(2)} MB)`)
+
+      return {
+        success: true,
+        filePath: outputPath,
+        fileSize: stats.size,
+      }
     } catch (error) {
-      console.error('❌ Download failed:', error)
+      const diagnostic = [
+        `platform=${process.platform}`,
+        `python=${pythonPath}`,
+        `outputDir=${this.outputDir}`,
+        'hint=ensure python3,pip,yt-dlp,ffmpeg are installed in runtime',
+        error instanceof Error ? `cause=${truncateOutput(error.message)}` : 'cause=Unknown error',
+      ].join(' | ')
+
+      console.error('Download failed:', diagnostic)
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: diagnostic,
       }
     }
   }
 
-  /**
-   * Alternative: Use Supadata's download API (if available)
-   * Check Supadata docs for download endpoint
-   */
   async downloadWithSupadata(url: string, apiKey: string): Promise<DownloadResult> {
     try {
       const supadataUrl = `https://api.supadata.ai/v1/download?url=${encodeURIComponent(url)}`
-      
+
       const response = await fetch(supadataUrl, {
         headers: {
           'x-api-key': apiKey,
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       })
 
       if (!response.ok) {
         throw new Error(`Supadata download failed: ${response.status}`)
       }
 
-      // Check if response has download URL or direct binary
       const contentType = response.headers.get('content-type')
-      
+
       if (contentType?.includes('application/json')) {
-        // Response is JSON with download URL
         const data = await response.json()
         if (data.downloadUrl) {
           return this.downloadFromUrl(data.downloadUrl)
         }
+
         throw new Error('No download URL in response')
-      } else {
-        // Direct binary download
-        const arrayBuffer = await response.arrayBuffer()
-        const buffer = Buffer.from(arrayBuffer)
-        
-        await fs.mkdir(this.outputDir, { recursive: true })
-        const filename = `video_${Date.now()}.mp4`
-        const outputPath = path.join(this.outputDir, filename)
-        
-        await fs.writeFile(outputPath, buffer)
-        
-        return {
-          success: true,
-          filePath: outputPath,
-          fileSize: buffer.length
-        }
       }
 
+      const arrayBuffer = await response.arrayBuffer()
+      const buffer = Buffer.from(arrayBuffer)
+
+      await fs.mkdir(this.outputDir, { recursive: true })
+      const filename = `video_${Date.now()}.mp4`
+      const outputPath = path.join(this.outputDir, filename)
+
+      await fs.writeFile(outputPath, buffer)
+
+      return {
+        success: true,
+        filePath: outputPath,
+        fileSize: buffer.length,
+      }
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
   }
 
-  /**
-   * Download from direct URL
-   */
   private async downloadFromUrl(url: string): Promise<DownloadResult> {
     try {
       const response = await fetch(url)
-      
+
       if (!response.ok) {
         throw new Error(`Download failed: ${response.status}`)
       }
@@ -200,49 +219,42 @@ export class VideoDownloader {
 
       await fs.writeFile(outputPath, buffer)
 
-      console.log(`✅ Downloaded from URL: ${outputPath}`)
+      console.log(`Downloaded from URL: ${outputPath}`)
 
       return {
         success: true,
         filePath: outputPath,
-        fileSize: buffer.length
+        fileSize: buffer.length,
       }
-
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
   }
 
-  /**
-   * Clean up downloaded files
-   */
   async cleanup(filePath: string): Promise<void> {
     try {
       await fs.unlink(filePath)
-      console.log(`🗑️ Cleaned up: ${filePath}`)
+      console.log(`Cleaned up: ${filePath}`)
     } catch (error) {
       console.error('Cleanup failed:', error)
     }
   }
 
-  /**
-   * Clean up old files (older than specified hours)
-   */
   async cleanupOldFiles(olderThanHours: number = 24): Promise<void> {
     try {
       const files = await fs.readdir(this.outputDir)
-      const cutoffTime = Date.now() - (olderThanHours * 60 * 60 * 1000)
+      const cutoffTime = Date.now() - olderThanHours * 60 * 60 * 1000
 
       for (const file of files) {
         const filePath = path.join(this.outputDir, file)
         const stats = await fs.stat(filePath)
-        
+
         if (stats.mtimeMs < cutoffTime) {
           await fs.unlink(filePath)
-          console.log(`🗑️ Cleaned up old file: ${file}`)
+          console.log(`Cleaned up old file: ${file}`)
         }
       }
     } catch (error) {
