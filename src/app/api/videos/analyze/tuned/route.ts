@@ -143,8 +143,8 @@ async function saveAnalysis(videoId: string, analysis: any) {
         humor_mechanism: analysis.why_it_works,
         summary: analysis.summary,
         is_humorous: true,
-        analysis_model: analysis.usedTunedModel ? 'gemini-tuned' : 'gemini-2.0-flash-001',
-        analysis_version: 'v6.0-tuned',
+        analysis_model: analysis.usedTunedModel ? 'gemini-tuned-v7b' : 'gemini-2.0-flash-001',
+        analysis_version: 'v7.B-tuned',
         deep_reasoning_used: false,
         rag_examples_count: 0, // Tuned model doesn't need RAG
         confidence_score: 0.8,
