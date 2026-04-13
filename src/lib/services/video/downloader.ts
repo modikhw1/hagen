@@ -80,14 +80,14 @@ export class VideoDownloader {
    * Download video using yt-dlp (most reliable for TikTok)
    *
    * Installation required:
-   *   Ubuntu/Debian: sudo apt install yt-dlp
+   *   Ubuntu/Debian: sudo apt install python3 yt-dlp ffmpeg
    *   Mac: brew install yt-dlp
-   *   Or: pip install yt-dlp (recommended - handles SSL better)
+   *   Railway/Nixpacks: install python3, yt-dlp, ffmpeg via Nix packages
    */
   async downloadWithYtDlp(url: string): Promise<DownloadResult> {
-    const pythonPath = process.platform === 'win32'
+    const ytDlpCommand = process.platform === 'win32'
       ? `${process.env.LOCALAPPDATA}\\Programs\\Python\\Python314\\python.exe`
-      : 'python3'
+      : 'yt-dlp'
 
     try {
       await fs.mkdir(this.outputDir, { recursive: true })
@@ -97,25 +97,35 @@ export class VideoDownloader {
 
       console.log(`Downloading video: ${url}`)
 
-      const args = [
-        '-m', 'yt_dlp',
-        '--no-cache-dir',
-        '--no-playlist',
-        '--format', 'best[ext=mp4]/best',
-        '--max-filesize', `${this.maxFileSize}`,
-        '--output', outputPath,
-        '--no-warnings',
-        url,
-      ]
+      const args = process.platform === 'win32'
+        ? [
+            '-m', 'yt_dlp',
+            '--no-cache-dir',
+            '--no-playlist',
+            '--format', 'best[ext=mp4]/best',
+            '--max-filesize', `${this.maxFileSize}`,
+            '--output', outputPath,
+            '--no-warnings',
+            url,
+          ]
+        : [
+            '--no-cache-dir',
+            '--no-playlist',
+            '--format', 'best[ext=mp4]/best',
+            '--max-filesize', `${this.maxFileSize}`,
+            '--output', outputPath,
+            '--no-warnings',
+            url,
+          ]
 
       console.log('[video-downloader] Running yt-dlp', {
         platform: process.platform,
-        pythonPath,
+        command: ytDlpCommand,
         outputPath,
         outputDir: this.outputDir,
       })
 
-      const { stdout, stderr } = await spawnAsync(pythonPath, args)
+      const { stdout, stderr } = await spawnAsync(ytDlpCommand, args)
 
       if (stdout.trim()) {
         console.log('[video-downloader] yt-dlp stdout:', truncateOutput(stdout))
@@ -140,9 +150,9 @@ export class VideoDownloader {
     } catch (error) {
       const diagnostic = [
         `platform=${process.platform}`,
-        `python=${pythonPath}`,
+        `command=${ytDlpCommand}`,
         `outputDir=${this.outputDir}`,
-        'hint=ensure python3,pip,yt-dlp,ffmpeg are installed in runtime',
+        'hint=ensure python3,yt-dlp,ffmpeg are installed in runtime',
         error instanceof Error ? `cause=${truncateOutput(error.message)}` : 'cause=Unknown error',
       ].join(' | ')
 
