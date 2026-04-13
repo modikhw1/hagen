@@ -1,11 +1,10 @@
+providers = ["node"]
+
 [phases.setup]
-nixPkgs = ["nodejs_20", "python3", "python3Packages.pip", "ffmpeg"]
+nixPkgs = ["nodejs_20", "python3", "yt-dlp", "ffmpeg"]
 
 [phases.install]
-cmds = [
-  "npm ci",
-  "python3 -m pip install --no-cache-dir yt-dlp"
-]
+cmds = ["npm ci"]
 
 [phases.build]
 cmds = ["npm run build"]
