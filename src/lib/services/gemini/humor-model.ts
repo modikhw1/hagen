@@ -76,7 +76,7 @@ export async function runTunedHumorModel(gcsUri: string): Promise<TunedHumorResu
   }
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { GoogleAuth } = require('google-auth-library') as {
       GoogleAuth: new (opts: { scopes: string[] }) => {
         getClient(): Promise<{
