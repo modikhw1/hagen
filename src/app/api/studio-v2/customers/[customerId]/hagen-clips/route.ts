@@ -71,6 +71,19 @@ export async function GET(
         sourceUsername = author.username;
       } else if (metadata?.username) {
         sourceUsername = metadata.username;
+      } else {
+        // Fallback: parse username from TikTok URL
+        try {
+          const url = new URL(video.video_url);
+          if (url.hostname === 'www.tiktok.com' || url.hostname === 'tiktok.com') {
+            const match = url.pathname.match(/^\/@([^/]+)/);
+            if (match) {
+              sourceUsername = match[1];
+            }
+          }
+        } catch {
+          // Invalid URL, leave sourceUsername as null
+        }
       }
       // Normalize: ensure no @ prefix
       if (sourceUsername && sourceUsername.startsWith('@')) {
