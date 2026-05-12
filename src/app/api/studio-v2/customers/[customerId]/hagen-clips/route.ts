@@ -71,6 +71,34 @@ export async function GET(
   { params }: { params: { customerId: string } }
 ) {
   try {
+    // ── 1. Auth: Validate shared secret ───────────────────────────────────────
+    const hagenSyncSecret = process.env.HAGEN_SYNC_SECRET;
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    if (isProduction && !hagenSyncSecret) {
+      return NextResponse.json(
+        {
+          error: 'hagen-sync-secret-not-configured',
+          message: 'HAGEN_SYNC_SECRET is required in production',
+        },
+        { status: 500 }
+      );
+    }
+
+    if (hagenSyncSecret) {
+      const providedSecret = request.headers.get('x-hagen-sync-secret');
+      if (providedSecret !== hagenSyncSecret) {
+        return NextResponse.json(
+          {
+            error: 'unauthorized',
+            message: 'Missing or invalid Hagen sync secret',
+          },
+          { status: 401 }
+        );
+      }
+    }
+
+    // ── 2. Parse query params ─────────────────────────────────────────────────
     const { searchParams } = new URL(request.url);
     const handleFilter = normalizeHandle(searchParams.get('handle'));
 
@@ -147,6 +175,17 @@ export async function GET(
       };
     });
 
+    // Resolve all usernames from full library before filtering
+    const allResolvedUsernames = allClips
+      .map((clip) => clip._resolvedUsername)
+      .filter((u): u is string => u !== null);
+    const uniqueUsernames = [...new Set(allResolvedUsernames)].sort();
+
+    // Limit to first 50 to avoid huge responses
+    const MAX_USERNAMES = 50;
+    const availableUsernames = uniqueUsernames.slice(0, MAX_USERNAMES);
+    const availableUsernameCount = uniqueUsernames.length;
+
     // Apply handle filter if present
     const filteredClips = handleFilter
       ? allClips.filter((clip) => clip._resolvedUsername === handleFilter)
@@ -162,6 +201,8 @@ export async function GET(
         returnedClips: clips.length,
         unresolvedUsernameCount,
         handleFilter: handleFilter || null,
+        availableUsernames,
+        availableUsernameCount,
       },
     });
   } catch (error) {
