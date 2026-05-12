@@ -5,9 +5,44 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 /**
- * GET /api/studio-v2/customers/:customerId/hagen-clips
+ * Normalizes a TikTok handle by stripping @ prefix and lowercasing.
+ */
+function normalizeHandle(value: string | null | undefined): string {
+  if (!value || typeof value !== 'string') return '';
+  return value.trim().replace(/^@/, '').toLowerCase();
+}
+
+/**
+ * Resolves the TikTok username from a clip's metadata or URL.
+ * Returns normalized username or null if unresolvable.
+ */
+function resolveUsername(sourceUsername: string | null, videoUrl: string): string | null {
+  // Try source_username first
+  const normalized = normalizeHandle(sourceUsername);
+  if (normalized) return normalized;
+
+  // Fallback: parse from TikTok URL
+  try {
+    const url = new URL(videoUrl);
+    if (url.hostname === 'www.tiktok.com' || url.hostname === 'tiktok.com') {
+      const match = url.pathname.match(/^\/@([^/]+)/);
+      if (match) {
+        return match[1].toLowerCase();
+      }
+    }
+  } catch {
+    // Invalid URL
+  }
+  return null;
+}
+
+/**
+ * GET /api/studio-v2/customers/:customerId/hagen-clips?handle=username
  *
  * Returns TikTok clips from the Hagen library in a shape suitable for hagen-ui history sync.
+ *
+ * Query params:
+ * - handle (optional): Filter clips to only those matching this TikTok username
  *
  * Response shape:
  * {
@@ -20,17 +55,25 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PU
  *     tiktok_likes?: number | null;
  *     tiktok_comments?: number | null;
  *     published_at?: string | null;
- *   }>
+ *   }>,
+ *   diagnostics?: {
+ *     totalTikTokClips: number;
+ *     returnedClips: number;
+ *     unresolvedUsernameCount: number;
+ *     handleFilter: string | null;
+ *   }
  * }
  *
  * The customerId is currently unused — Hagen does not track LeTrend customer IDs.
- * All TikTok clips in the library are returned. The caller (hagen-ui) filters by handle.
  */
 export async function GET(
   request: NextRequest,
   { params }: { params: { customerId: string } }
 ) {
   try {
+    const { searchParams } = new URL(request.url);
+    const handleFilter = normalizeHandle(searchParams.get('handle'));
+
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Fetch all TikTok videos from analyzed_videos
@@ -49,8 +92,11 @@ export async function GET(
       );
     }
 
-    // Transform to HagenClip shape expected by hagen-ui
-    const clips = (videos || []).map((video) => {
+    // Transform and optionally filter clips
+    const totalTikTokClips = (videos || []).length;
+    let unresolvedUsernameCount = 0;
+
+    const allClips = (videos || []).map((video) => {
       const metadata = video.metadata as any;
 
       // Extract TikTok stats from metadata
@@ -63,7 +109,7 @@ export async function GET(
       // Extract thumbnail
       const thumbnail = metadata?.video?.cover || metadata?.video?.dynamicCover || metadata?.cover || null;
 
-      // Extract username - normalize by removing @ prefix if present
+      // Extract username from metadata
       let sourceUsername: string | null = null;
       if (author?.uniqueId) {
         sourceUsername = author.uniqueId;
@@ -71,23 +117,16 @@ export async function GET(
         sourceUsername = author.username;
       } else if (metadata?.username) {
         sourceUsername = metadata.username;
-      } else {
-        // Fallback: parse username from TikTok URL
-        try {
-          const url = new URL(video.video_url);
-          if (url.hostname === 'www.tiktok.com' || url.hostname === 'tiktok.com') {
-            const match = url.pathname.match(/^\/@([^/]+)/);
-            if (match) {
-              sourceUsername = match[1];
-            }
-          }
-        } catch {
-          // Invalid URL, leave sourceUsername as null
-        }
       }
       // Normalize: ensure no @ prefix
       if (sourceUsername && sourceUsername.startsWith('@')) {
         sourceUsername = sourceUsername.slice(1);
+      }
+
+      // Check if username can be resolved (metadata or URL)
+      const resolvedUsername = resolveUsername(sourceUsername, video.video_url);
+      if (!resolvedUsername) {
+        unresolvedUsernameCount++;
       }
 
       // Extract published date
@@ -104,10 +143,27 @@ export async function GET(
         tiktok_likes: typeof stats.diggCount === 'number' ? stats.diggCount : null,
         tiktok_comments: typeof stats.commentCount === 'number' ? stats.commentCount : null,
         published_at: publishedAt,
+        _resolvedUsername: resolvedUsername, // internal for filtering
       };
     });
 
-    return NextResponse.json({ clips });
+    // Apply handle filter if present
+    const filteredClips = handleFilter
+      ? allClips.filter((clip) => clip._resolvedUsername === handleFilter)
+      : allClips;
+
+    // Remove internal _resolvedUsername field from response
+    const clips = filteredClips.map(({ _resolvedUsername, ...clip }) => clip);
+
+    return NextResponse.json({
+      clips,
+      diagnostics: {
+        totalTikTokClips,
+        returnedClips: clips.length,
+        unresolvedUsernameCount,
+        handleFilter: handleFilter || null,
+      },
+    });
   } catch (error) {
     console.error('Hagen clips API error:', error);
     return NextResponse.json(
